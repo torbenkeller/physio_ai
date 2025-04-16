@@ -33,3 +33,4 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - Internationalization using flutter_intl with German as main locale
 - Repository pattern for data access with retrofit for API calls
 - Use dart's and kotlin's strong typing features throughout the codebase
+- Use always IList from fast_immutable_collections.dart instead of List

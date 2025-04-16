@@ -6,8 +6,8 @@ part of '../patient_form_dto.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-_$PatientFormDtoImpl _$$PatientFormDtoImplFromJson(Map<String, dynamic> json) =>
-    _$PatientFormDtoImpl(
+_PatientFormDto _$PatientFormDtoFromJson(Map<String, dynamic> json) =>
+    _PatientFormDto(
       vorname: json['vorname'] as String,
       nachname: json['nachname'] as String,
       geburtstag: DateTime.parse(json['geburtstag'] as String),
@@ -21,8 +21,7 @@ _$PatientFormDtoImpl _$$PatientFormDtoImplFromJson(Map<String, dynamic> json) =>
       email: json['email'] as String?,
     );
 
-Map<String, dynamic> _$$PatientFormDtoImplToJson(
-        _$PatientFormDtoImpl instance) =>
+Map<String, dynamic> _$PatientFormDtoToJson(_PatientFormDto instance) =>
     <String, dynamic>{
       'vorname': instance.vorname,
       'nachname': instance.nachname,

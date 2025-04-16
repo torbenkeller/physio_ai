@@ -6,9 +6,10 @@ part 'generated/rezept.freezed.dart';
 part 'generated/rezept.g.dart';
 
 @freezed
-class Rezept with _$Rezept {
+abstract class Rezept with _$Rezept {
   const factory Rezept({
     required String id,
+    @JsonKey(includeIfNull: false) String? patientId,
     required DateTime ausgestelltAm,
     required double preisGesamt,
     @Default(IListConst([])) IList<RezeptPos> positionen,
@@ -20,7 +21,7 @@ class Rezept with _$Rezept {
 }
 
 @freezed
-class RezeptPos with _$RezeptPos {
+abstract class RezeptPos with _$RezeptPos {
   const factory RezeptPos({
     required int anzahl,
     required Behandlungsart behandlungsart,
@@ -32,7 +33,7 @@ class RezeptPos with _$RezeptPos {
 }
 
 @freezed
-class Behandlungsart with _$Behandlungsart {
+abstract class Behandlungsart with _$Behandlungsart {
   const factory Behandlungsart({
     required String id,
     required String name,

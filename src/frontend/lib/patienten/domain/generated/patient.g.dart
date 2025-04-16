@@ -6,8 +6,7 @@ part of '../patient.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-_$PatientImpl _$$PatientImplFromJson(Map<String, dynamic> json) =>
-    _$PatientImpl(
+_Patient _$PatientFromJson(Map<String, dynamic> json) => _Patient(
       id: json['id'] as String,
       vorname: json['vorname'] as String,
       nachname: json['nachname'] as String,
@@ -22,8 +21,7 @@ _$PatientImpl _$$PatientImplFromJson(Map<String, dynamic> json) =>
       email: json['email'] as String?,
     );
 
-Map<String, dynamic> _$$PatientImplToJson(_$PatientImpl instance) =>
-    <String, dynamic>{
+Map<String, dynamic> _$PatientToJson(_Patient instance) => <String, dynamic>{
       'id': instance.id,
       'vorname': instance.vorname,
       'nachname': instance.nachname,

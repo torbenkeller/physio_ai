@@ -4,7 +4,7 @@ part 'generated/patient_form_dto.freezed.dart';
 part 'generated/patient_form_dto.g.dart';
 
 @freezed
-class PatientFormDto with _$PatientFormDto {
+abstract class PatientFormDto with _$PatientFormDto {
   const factory PatientFormDto({
     required String vorname,
     required String nachname,

@@ -6,8 +6,11 @@ import 'package:physio_ai/patienten/presentation/create_patient_page.dart';
 import 'package:physio_ai/patienten/presentation/patient_detail_page.dart';
 import 'package:physio_ai/patienten/presentation/patienten_page.dart';
 import 'package:physio_ai/rezepte/home_page.dart';
-import 'package:physio_ai/rezepte/rezepte_page.dart';
 import 'package:physio_ai/rezepte/presentation/create_rezept_page.dart';
+import 'package:physio_ai/rezepte/presentation/rezept_detail_page.dart';
+import 'package:physio_ai/rezepte/presentation/upload_rezept_page.dart';
+import 'package:physio_ai/rezepte/rezept.dart';
+import 'package:physio_ai/rezepte/rezepte_page.dart';
 
 final _rootNavigatorKey = GlobalKey<NavigatorState>();
 final _shellKey = GlobalKey<StatefulNavigationShellState>();
@@ -64,9 +67,33 @@ final _mobileRouterConfig = RoutingConfig(
               routes: [
                 GoRoute(
                   path: 'create',
+                  pageBuilder: (context, state) {
+                    // Get rezept if passed as extra
+                    Rezept? rezept;
+                    if (state.extra != null && state.extra is Rezept) {
+                      rezept = state.extra as Rezept;
+                    }
+
+                    return MaterialPage(
+                      fullscreenDialog: true,
+                      child: CreateRezeptPage(
+                        prefillRezept: rezept,
+                      ),
+                    );
+                  },
+                ),
+                GoRoute(
+                  path: 'upload',
                   pageBuilder: (context, state) => const MaterialPage(
                     fullscreenDialog: true,
-                    child: CreateRezeptPage(),
+                    child: UploadRezeptPage(),
+                  ),
+                ),
+                GoRoute(
+                  path: ':id',
+                  pageBuilder: (context, state) => MaterialPage(
+                    fullscreenDialog: true,
+                    child: RezeptDetailPage(id: state.pathParameters['id']!),
                   ),
                 ),
               ],
@@ -127,9 +154,33 @@ final _tabletRouterConfig = RoutingConfig(
               routes: [
                 GoRoute(
                   path: 'create',
+                  pageBuilder: (context, state) {
+                    // Get rezept if passed as extra
+                    Rezept? rezept;
+                    if (state.extra != null && state.extra is Rezept) {
+                      rezept = state.extra as Rezept;
+                    }
+
+                    return MaterialPage(
+                      fullscreenDialog: true,
+                      child: CreateRezeptPage(
+                        prefillRezept: rezept,
+                      ),
+                    );
+                  },
+                ),
+                GoRoute(
+                  path: 'upload',
                   pageBuilder: (context, state) => const MaterialPage(
                     fullscreenDialog: true,
-                    child: CreateRezeptPage(),
+                    child: UploadRezeptPage(),
+                  ),
+                ),
+                GoRoute(
+                  path: ':id',
+                  pageBuilder: (context, state) => MaterialPage(
+                    fullscreenDialog: true,
+                    child: RezeptDetailPage(id: state.pathParameters['id']!),
                   ),
                 ),
               ],
@@ -193,8 +244,9 @@ final _desktopRouterConfig = RoutingConfig(
           routes: [
             GoRoute(
               path: '/rezepte',
-              pageBuilder: (context, state) => const NoTransitionPage(
-                child: SplittedRezeptePage(
+              pageBuilder: (context, state) => NoTransitionPage(
+                key: const ValueKey('rezeptePage'),
+                child: const SplittedRezeptePage(
                   rightPane: SizedBox(),
                   isContextCreate: false,
                 ),
@@ -202,9 +254,40 @@ final _desktopRouterConfig = RoutingConfig(
             ),
             GoRoute(
               path: '/rezepte/create',
-              pageBuilder: (context, state) => const NoTransitionPage(
+              pageBuilder: (context, state) {
+                // Get rezept if passed as extra
+                Rezept? rezept;
+                if (state.extra != null && state.extra is Rezept) {
+                  rezept = state.extra as Rezept;
+                }
+
+                return NoTransitionPage(
+                  key: const ValueKey('rezepteCreatePage'),
+                  child: SplittedRezeptePage(
+                    rightPane: CreateRezeptContent(
+                      prefillRezept: rezept,
+                    ),
+                    isContextCreate: true,
+                  ),
+                );
+              },
+            ),
+            GoRoute(
+              path: '/rezepte/upload',
+              pageBuilder: (context, state) => NoTransitionPage(
+                key: const ValueKey('rezepteUploadPage'),
+                child: const SplittedRezeptePage(
+                  rightPane: UploadRezeptContent(),
+                  isContextCreate: true,
+                ),
+              ),
+            ),
+            GoRoute(
+              path: '/rezepte/:id',
+              pageBuilder: (context, state) => NoTransitionPage(
+                key: ValueKey('rezepteDetailPage-${state.pathParameters['id']}'),
                 child: SplittedRezeptePage(
-                  rightPane: CreateRezeptContent(),
+                  rightPane: RezeptDetailPage(id: state.pathParameters['id']!),
                   isContextCreate: true,
                 ),
               ),

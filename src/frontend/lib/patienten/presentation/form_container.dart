@@ -19,7 +19,7 @@ abstract class FormContainer {
       if (value is String) {
         return value.isNotEmpty;
       }
-      
+
       return value != null;
     });
   }

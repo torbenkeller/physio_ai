@@ -27,7 +27,8 @@ create table rezepte
     ausgestellt_am          date             not null,
     ausgestellt_von_arzt_id uuid references aerzte (id),
     preis_gesamt            double precision not null default 0,
-    rechnungsnummer         varchar
+    rechnungsnummer         varchar,
+    version                 int              not null default 0
 );
 
 create table behandlungsarten

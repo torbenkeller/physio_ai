@@ -1,0 +1,263 @@
+import 'dart:io';
+
+import 'package:fast_immutable_collections/fast_immutable_collections.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:physio_ai/rezepte/model/rezept_einlesen_response.dart';
+import 'package:physio_ai/rezepte/rezept.dart';
+import 'package:physio_ai/rezepte/rezept_repository.dart';
+import 'package:physio_ai/rezepte/rezepte_page.dart';
+import 'dart:io' show Platform;
+
+class UploadRezeptPage extends StatelessWidget {
+  const UploadRezeptPage({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Rezept von Bild'),
+      ),
+      body: const UploadRezeptContent(),
+    );
+  }
+}
+
+class UploadRezeptContent extends ConsumerStatefulWidget {
+  const UploadRezeptContent({super.key});
+
+  @override
+  ConsumerState<UploadRezeptContent> createState() => _UploadRezeptContentState();
+}
+
+class _UploadRezeptContentState extends ConsumerState<UploadRezeptContent> {
+  bool _loading = false;
+  File? _selectedFile;
+  RezeptEinlesenResponse? _response;
+
+  @override
+  Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    
+    if (_loading) {
+      return const Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            CircularProgressIndicator(),
+            SizedBox(height: 16),
+            Text('Rezept wird analysiert... (Das kann bis zu 30 Sekunden dauern)'),
+          ],
+        ),
+      );
+    }
+    
+    return Center(
+      child: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.all(24.0),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              if (_selectedFile != null) ...[
+                Image.file(
+                  _selectedFile!,
+                  height: 300,
+                  fit: BoxFit.contain,
+                ),
+                const SizedBox(height: 16),
+                ElevatedButton.icon(
+                  onPressed: _uploadImage,
+                  icon: const Icon(Icons.upload),
+                  label: const Text('Bild hochladen und analysieren'),
+                ),
+                TextButton(
+                  onPressed: () => setState(() => _selectedFile = null),
+                  child: const Text('Anderes Bild auswählen'),
+                ),
+              ] else ...[
+                const Text(
+                  'Laden Sie ein Foto eines Rezepts hoch, um es automatisch zu analysieren',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(fontSize: 16),
+                ),
+                const SizedBox(height: 24),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    ElevatedButton.icon(
+                      onPressed: _pickImage,
+                      icon: const Icon(Icons.photo_library),
+                      label: const Text('Aus Galerie'),
+                    ),
+                    const SizedBox(width: 16),
+                    ElevatedButton.icon(
+                      onPressed: _takePhoto,
+                      icon: const Icon(Icons.camera_alt),
+                      label: const Text('Kamera'),
+                    ),
+                  ],
+                ),
+              ],
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Future<void> _pickImage() async {
+    try {
+      // Use ImagePicker from gallery
+      final picker = ImagePicker();
+      final pickedFile = await picker.pickImage(
+        source: ImageSource.gallery,
+        maxWidth: 1800,
+        maxHeight: 1800,
+      );
+      
+      if (pickedFile != null) {
+        setState(() {
+          _selectedFile = File(pickedFile.path);
+        });
+      }
+    } catch (e) {
+      // Show error in UI
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Fehler beim Auswählen der Datei: $e'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+      print('Error picking image: $e');
+    }
+  }
+
+  Future<void> _takePhoto() async {
+    try {
+      final picker = ImagePicker();
+      final pickedFile = await picker.pickImage(
+        source: ImageSource.camera,
+        maxWidth: 1800,
+        maxHeight: 1800,
+      );
+      
+      if (pickedFile != null) {
+        setState(() {
+          _selectedFile = File(pickedFile.path);
+        });
+      }
+    } catch (e) {
+      // Show error in UI
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Fehler beim Aufnehmen des Fotos: $e'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+      print('Error taking photo: $e');
+    }
+  }
+
+  Future<void> _uploadImage() async {
+    if (_selectedFile == null) return;
+    
+    setState(() {
+      _loading = true;
+    });
+    
+    try {
+      final repo = ref.read(rezeptRepositoryProvider);
+      final response = await repo.uploadRezeptImage(_selectedFile!);
+      
+      if (mounted) {
+        // Convert the EingelesenesRezept to a Rezept
+        final rezept = Rezept(
+          id: '', // Will be assigned by the server
+          ausgestelltAm: response.rezept.ausgestelltAm,
+          preisGesamt: response.rezept.rezeptpositionen
+              .fold(0.0, (sum, pos) => sum + (pos.behandlungsart.preis * pos.anzahl)),
+          positionen: response.rezept.rezeptpositionen
+              .map((pos) => RezeptPos(
+                    anzahl: pos.anzahl,
+                    behandlungsart: pos.behandlungsart,
+                  ))
+              .toList()
+              .toIList(),
+        );
+        
+        // Navigate directly to the create form
+        context.go('/rezepte/create', extra: rezept);
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          _loading = false;
+        });
+        
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Fehler beim Upload: $e'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
+  }
+  
+  // This method is no longer used as we're using the Rezept object directly
+  // Keeping it commented for reference
+  /*
+  Future<void> _createRezeptFromResponse() async {
+    if (_response == null) return;
+    
+    try {
+      final response = _response!;
+      
+      // Convert the response to a Rezept object
+      final patientId = response.existingPatient?.id ?? "a1b2c3d4-e5f6-7a8b-9c0d-1e2f3a4b5c6d";
+      
+      final rezept = Rezept(
+        id: '', // Will be assigned by the server
+        patientId: patientId,
+        ausgestelltAm: response.rezept.ausgestelltAm,
+        preisGesamt: response.rezept.rezeptpositionen
+            .fold(0.0, (sum, pos) => sum + (pos.behandlungsart.preis * pos.anzahl)),
+        positionen: response.rezept.rezeptpositionen
+            .map((pos) => RezeptPos(
+                  anzahl: pos.anzahl,
+                  behandlungsart: pos.behandlungsart,
+                ))
+            .toList()
+            .toIList(),
+      );
+      
+      if (mounted) {
+        // Navigate to the create page with the rezept object
+        context.go('/rezepte/create', extra: rezept);
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Fehler beim Erstellen des Rezepts: $e'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+      print('Error preparing rezept: $e');
+    }
+  }
+  */
+  
+  String _formatDate(DateTime date) {
+    return '${date.day.toString().padLeft(2, '0')}.${date.month.toString().padLeft(2, '0')}.${date.year}';
+  }
+}

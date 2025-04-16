@@ -24,7 +24,7 @@ interface RezeptRepository : org.springframework.data.repository.Repository<Reze
 
     @Transactional(readOnly = false)
     @Modifying
-    fun save(rezept: Rezept)
+    fun save(rezept: Rezept): Rezept
 }
 
 @Component

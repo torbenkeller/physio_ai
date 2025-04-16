@@ -1,5 +1,6 @@
 package de.keller.physio_ai.rezepte.web
 
+import de.keller.physio_ai.patienten.PatientId
 import de.keller.physio_ai.patienten.PatientenRepository
 import de.keller.physio_ai.rezepte.*
 import org.springframework.beans.factory.annotation.Autowired
@@ -7,6 +8,7 @@ import org.springframework.core.io.Resource
 import org.springframework.core.io.UrlResource
 import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
+import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.multipart.MultipartFile
 import java.nio.file.Path
@@ -52,6 +54,60 @@ class RezepteController @Autowired constructor(
     @DeleteMapping("/{id}")
     fun deleteRezept(@PathVariable id: UUID) {
         rezeptRepository.deleteById(RezeptId.fromUUID(id))
+    }
+    
+    @PostMapping
+    @Transactional
+    fun createRezept(@RequestBody rezeptCreateDto: RezeptCreateDto): RezeptDto {
+        try {
+            // Log the received data
+            println("Received rezeptCreateDto: $rezeptCreateDto")
+            
+            // Validate patient exists first
+            val patientId = PatientId(rezeptCreateDto.patientId)
+            val patient = patientenRepository.findById(patientId) 
+                ?: throw IllegalArgumentException("Patient with ID ${rezeptCreateDto.patientId} not found")
+            println("Found patient: $patient")
+            
+            // Validate all behandlungsarten exist
+            val behandlungsartIds = rezeptCreateDto.positionen.map { BehandlungsartId(it.behandlungsartId) }
+            val behandlungsarten = behandlungsartenRepository.findAllById(behandlungsartIds).toList()
+            if (behandlungsarten.size != behandlungsartIds.size) {
+                throw IllegalArgumentException("One or more BehandlungsartId not found")
+            }
+            println("Found all behandlungsarten: $behandlungsarten")
+            
+            // Use the toRezept method from the DTO to create the entity
+            // This ensures proper ID generation and structure
+            val rezept = rezeptCreateDto.toRezept()
+            println("Generated new Rezept with ID: ${rezept.id.id} and ${rezept.positionen.size} positionen")
+            
+            // Save the complete rezept with positions
+            val savedRezept = rezeptRepository.save(rezept)
+            println("Saved rezept with ID: ${savedRezept.id.id}, positions count: ${savedRezept.positionen.size}")
+            
+            // Return DTO with the saved rezept
+            return RezeptDto.fromRezept(
+                rezept = savedRezept,
+                patient = patient,
+                arzt = null, // No doctor information in the frontend
+                behandlungsarten = behandlungsarten
+            )
+        } catch (e: Exception) {
+            val errorMessage = "Failed to create Rezept: ${e.message ?: "Unknown error"}"
+            val rootCause = getRootCause(e)
+            println("Error creating rezept: $errorMessage. Root cause: ${rootCause.message}")
+            e.printStackTrace()
+            throw e
+        }
+    }
+    
+    private fun getRootCause(throwable: Throwable): Throwable {
+        var rootCause = throwable
+        while (rootCause.cause != null && rootCause.cause !== rootCause) {
+            rootCause = rootCause.cause!!
+        }
+        return rootCause
     }
 
     @PostMapping("/createFromImage", consumes = [MediaType.MULTIPART_FORM_DATA_VALUE])

@@ -2,6 +2,7 @@ package de.keller.physio_ai.rezepte
 
 import de.keller.physio_ai.patienten.PatientId
 import org.springframework.data.annotation.Id
+import org.springframework.data.annotation.Version
 import org.springframework.data.relational.core.mapping.MappedCollection
 import org.springframework.data.relational.core.mapping.Table
 import java.time.LocalDate
@@ -26,7 +27,10 @@ data class Rezept(
     val preisGesamt: Double,
     val rechnungsnummer: String?,
 
-    @MappedCollection(idColumn = "rezept_id", keyColumn = "rezept_index")
-    val positionen: List<RezeptPos>
+    @MappedCollection(idColumn = "rezept_id", keyColumn = "index")
+    val positionen: List<RezeptPos>,
+
+    @Version
+    val version: Long = 0
 ) {
 }

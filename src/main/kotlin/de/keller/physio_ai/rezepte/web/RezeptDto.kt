@@ -1,10 +1,8 @@
 package de.keller.physio_ai.rezepte.web
 
 import de.keller.physio_ai.patienten.Patient
-import de.keller.physio_ai.rezepte.Arzt
-import de.keller.physio_ai.rezepte.Behandlungsart
-import de.keller.physio_ai.rezepte.Rezept
-import de.keller.physio_ai.rezepte.RezeptPos
+import de.keller.physio_ai.patienten.PatientId
+import de.keller.physio_ai.rezepte.*
 import java.time.LocalDate
 import java.util.*
 
@@ -85,7 +83,7 @@ enum class RezeptRechnungStatus {
 }
 
 data class RezeptPosDto(
-    val beahandlungsart: BehandlungsartDto,
+    val behandlungsart: BehandlungsartDto,
     val anzahl: Long
 ) {
     companion object {
@@ -95,7 +93,7 @@ data class RezeptPosDto(
         ): RezeptPosDto {
             return RezeptPosDto(
                 anzahl = rezeptPos.anzahl,
-                beahandlungsart = BehandlungsartDto.fromBehandlungsart(behandlungsart)
+                behandlungsart = BehandlungsartDto.fromBehandlungsart(behandlungsart)
             )
         }
     }
@@ -116,3 +114,43 @@ data class BehandlungsartDto(
         }
     }
 }
+
+/**
+ * DTO for creating a new Rezept
+ */
+data class RezeptCreateDto(
+    val patientId: UUID,
+    val ausgestelltAm: LocalDate,
+    val preisGesamt: Double,
+    val positionen: List<RezeptPosCreateDto>,
+) {
+    fun toRezept(): Rezept {
+        val rezeptId = RezeptId.generate()
+        
+        return Rezept(
+            id = rezeptId,
+            patientId = PatientId(patientId),
+            ausgestelltAm = ausgestelltAm,
+            ausgestelltVonArztId = null, // Not provided in frontend
+            preisGesamt = preisGesamt,
+            rechnungsnummer = null, // No invoice number initially
+            positionen = positionen.mapIndexed { index, pos ->
+                RezeptPos(
+                    id = UUID.randomUUID(),
+                    index = index.toLong(),
+                    rezeptId = rezeptId,
+                    behandlungsartId = BehandlungsartId(pos.behandlungsartId),
+                    anzahl = pos.anzahl
+                )
+            }
+        )
+    }
+}
+
+/**
+ * DTO for creating a new RezeptPos
+ */
+data class RezeptPosCreateDto(
+    val behandlungsartId: UUID,
+    val anzahl: Long,
+)

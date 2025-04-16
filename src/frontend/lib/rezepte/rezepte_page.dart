@@ -23,14 +23,24 @@ class SplittedRezeptePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Using AnimatedSwitcher with zero duration prevents unwanted animations
     return Row(
       children: [
         Expanded(
-          child: RezeptePage(
-            showAddButton: !isContextCreate,
+          child: AnimatedSwitcher(
+            duration: Duration.zero,
+            child: RezeptePage(
+              key: const ValueKey('rezeptePage'),
+              showAddButton: !isContextCreate,
+            ),
           ),
         ),
-        Expanded(child: rightPane),
+        Expanded(
+          child: AnimatedSwitcher(
+            duration: Duration.zero,
+            child: rightPane,
+          ),
+        ),
       ],
     );
   }
@@ -67,16 +77,33 @@ class RezeptePage extends ConsumerWidget {
     );
 
     final page = Scaffold(
+      floatingActionButtonAnimator: FloatingActionButtonAnimator.scaling,
+      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
       floatingActionButton: showAddButton
-          ? FloatingActionButton.extended(
-              heroTag: 'createPatient',
-              key: const Key('createRezept'),
-              icon: const Icon(Icons.add),
-              label: const Text('Anlegen'),
-              tooltip: 'Anlegen',
-              onPressed: () {
-                context.go('/rezepte/create');
-              },
+          ? Column(
+              mainAxisAlignment: MainAxisAlignment.end,
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                FloatingActionButton.extended(
+                  key: const Key('uploadRezept'),
+                  icon: const Icon(Icons.camera_alt),
+                  label: const Text('Von Bild'),
+                  tooltip: 'Rezept von Bild erstellen',
+                  onPressed: () {
+                    context.go('/rezepte/upload');
+                  },
+                ),
+                const SizedBox(height: 16),
+                FloatingActionButton.extended(
+                  key: const Key('createRezept'),
+                  icon: const Icon(Icons.add),
+                  label: const Text('Manuell anlegen'),
+                  tooltip: 'Manuell anlegen',
+                  onPressed: () {
+                    context.go('/rezepte/create');
+                  },
+                ),
+              ],
             )
           : null,
       body: content,
@@ -85,7 +112,7 @@ class RezeptePage extends ConsumerWidget {
   }
 }
 
-class RezeptListTile extends StatelessWidget {
+class RezeptListTile extends ConsumerWidget {
   const RezeptListTile({
     required this.rezept,
     super.key,
@@ -94,9 +121,26 @@ class RezeptListTile extends StatelessWidget {
   final Rezept rezept;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final dateFormat =
+        DateTime.now().difference(rezept.ausgestelltAm).inDays < 365 ? 'dd.MM.' : 'dd.MM.yyyy';
+    final formattedDate =
+        '${rezept.ausgestelltAm.day}.${rezept.ausgestelltAm.month}.${rezept.ausgestelltAm.year}';
+
     return ListTile(
-      title: Text(rezept.id),
+      onTap: () {
+        context.go('/rezepte/${rezept.id}');
+      },
+      title: Text('Rezept vom $formattedDate'),
+      subtitle: Text(
+          '${rezept.positionen.length} Positionen, ${rezept.preisGesamt.toStringAsFixed(2)} €'),
+      trailing: IconButton(
+        icon: const Icon(Icons.delete),
+        onPressed: () async {
+          await ref.read(rezeptRepositoryProvider).deleteRezept(rezept.id);
+          ref.refresh(rezepteProvider);
+        },
+      ),
     );
   }
 }

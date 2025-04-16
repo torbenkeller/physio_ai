@@ -49,11 +49,12 @@ class _RezeptRepository implements RezeptRepository {
   }
 
   @override
-  Future<Rezept> createRezept(Rezept rezept) async {
+  Future<Rezept> createRezept(Map<String, dynamic> rezeptCreate) async {
     final _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{};
     final _headers = <String, dynamic>{};
-    final _data = rezept;
+    final _data = <String, dynamic>{};
+    _data.addAll(rezeptCreate);
     final _options = _setStreamType<Rezept>(
       Options(method: 'POST', headers: _headers, extra: _extra)
           .compose(
@@ -92,6 +93,47 @@ class _RezeptRepository implements RezeptRepository {
           .copyWith(baseUrl: _combineBaseUrls(_dio.options.baseUrl, baseUrl)),
     );
     await _dio.fetch<void>(_options);
+  }
+
+  @override
+  Future<RezeptEinlesenResponse> uploadRezeptImage(File file) async {
+    final _extra = <String, dynamic>{};
+    final queryParameters = <String, dynamic>{};
+    final _headers = <String, dynamic>{};
+    final _data = FormData();
+    _data.files.add(
+      MapEntry(
+        'file',
+        MultipartFile.fromFileSync(
+          file.path,
+          filename: file.path.split(Platform.pathSeparator).last,
+        ),
+      ),
+    );
+    final _options = _setStreamType<RezeptEinlesenResponse>(
+      Options(
+        method: 'POST',
+        headers: _headers,
+        extra: _extra,
+        contentType: 'multipart/form-data',
+      )
+          .compose(
+            _dio.options,
+            '/createFromImage',
+            queryParameters: queryParameters,
+            data: _data,
+          )
+          .copyWith(baseUrl: _combineBaseUrls(_dio.options.baseUrl, baseUrl)),
+    );
+    final _result = await _dio.fetch<Map<String, dynamic>>(_options);
+    late RezeptEinlesenResponse _value;
+    try {
+      _value = RezeptEinlesenResponse.fromJson(_result.data!);
+    } on Object catch (e, s) {
+      errorLogger?.logError(e, s, _options);
+      rethrow;
+    }
+    return _value;
   }
 
   RequestOptions _setStreamType<T>(RequestOptions requestOptions) {

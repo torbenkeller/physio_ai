@@ -33,10 +33,7 @@ class CreateRezeptContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Assign a unique key to ensure the form is recreated each time
-    // This ensures the form is properly reset when navigating back to this page
     return RezeptForm(
-      key: UniqueKey(),
       rezept: prefillRezept,
     );
   }

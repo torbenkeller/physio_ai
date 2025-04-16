@@ -23,12 +23,10 @@ class SplittedRezeptePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Using AnimatedSwitcher with zero duration prevents unwanted animations
     return Row(
       children: [
         Expanded(
-          child: AnimatedSwitcher(
-            duration: Duration.zero,
+          child: FocusTraversalGroup(
             child: RezeptePage(
               key: const ValueKey('rezeptePage'),
               showAddButton: !isContextCreate,
@@ -36,8 +34,7 @@ class SplittedRezeptePage extends StatelessWidget {
           ),
         ),
         Expanded(
-          child: AnimatedSwitcher(
-            duration: Duration.zero,
+          child: FocusTraversalGroup(
             child: rightPane,
           ),
         ),

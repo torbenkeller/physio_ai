@@ -111,7 +111,6 @@ class _UploadRezeptContentState extends ConsumerState<UploadRezeptContent> {
 
   Future<void> _pickImage() async {
     try {
-      // Use ImagePicker from gallery
       final picker = ImagePicker();
       final pickedFile = await picker.pickImage(
         source: ImageSource.gallery,
@@ -125,7 +124,6 @@ class _UploadRezeptContentState extends ConsumerState<UploadRezeptContent> {
         });
       }
     } catch (e) {
-      // Show error in UI
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -153,7 +151,6 @@ class _UploadRezeptContentState extends ConsumerState<UploadRezeptContent> {
         });
       }
     } catch (e) {
-      // Show error in UI
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -178,9 +175,8 @@ class _UploadRezeptContentState extends ConsumerState<UploadRezeptContent> {
       final response = await repo.uploadRezeptImage(_selectedFile!);
       
       if (mounted) {
-        // Convert the EingelesenesRezept to a Rezept
         final rezept = Rezept(
-          id: '', // Will be assigned by the server
+          id: '',
           ausgestelltAm: response.rezept.ausgestelltAm,
           preisGesamt: response.rezept.rezeptpositionen
               .fold(0.0, (sum, pos) => sum + (pos.behandlungsart.preis * pos.anzahl)),
@@ -193,7 +189,6 @@ class _UploadRezeptContentState extends ConsumerState<UploadRezeptContent> {
               .toIList(),
         );
         
-        // Navigate directly to the create form
         context.go('/rezepte/create', extra: rezept);
       }
     } catch (e) {
@@ -212,50 +207,6 @@ class _UploadRezeptContentState extends ConsumerState<UploadRezeptContent> {
     }
   }
   
-  // This method is no longer used as we're using the Rezept object directly
-  // Keeping it commented for reference
-  /*
-  Future<void> _createRezeptFromResponse() async {
-    if (_response == null) return;
-    
-    try {
-      final response = _response!;
-      
-      // Convert the response to a Rezept object
-      final patientId = response.existingPatient?.id ?? "a1b2c3d4-e5f6-7a8b-9c0d-1e2f3a4b5c6d";
-      
-      final rezept = Rezept(
-        id: '', // Will be assigned by the server
-        patientId: patientId,
-        ausgestelltAm: response.rezept.ausgestelltAm,
-        preisGesamt: response.rezept.rezeptpositionen
-            .fold(0.0, (sum, pos) => sum + (pos.behandlungsart.preis * pos.anzahl)),
-        positionen: response.rezept.rezeptpositionen
-            .map((pos) => RezeptPos(
-                  anzahl: pos.anzahl,
-                  behandlungsart: pos.behandlungsart,
-                ))
-            .toList()
-            .toIList(),
-      );
-      
-      if (mounted) {
-        // Navigate to the create page with the rezept object
-        context.go('/rezepte/create', extra: rezept);
-      }
-    } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Fehler beim Erstellen des Rezepts: $e'),
-            backgroundColor: Colors.red,
-          ),
-        );
-      }
-      print('Error preparing rezept: $e');
-    }
-  }
-  */
   
   String _formatDate(DateTime date) {
     return '${date.day.toString().padLeft(2, '0')}.${date.month.toString().padLeft(2, '0')}.${date.year}';

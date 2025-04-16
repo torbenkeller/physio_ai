@@ -1,4 +1,5 @@
 import 'package:date_field/date_field.dart';
+import 'package:fast_immutable_collections/fast_immutable_collections.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -34,57 +35,39 @@ class RezeptForm extends ConsumerStatefulWidget {
 class _RezeptFormState extends ConsumerState<RezeptForm> {
   var _loading = false;
 
-  // Hardcoded Behandlungsarten based on the database
-  final List<Behandlungsart> _behandlungsarten = [
-    const Behandlungsart(
-        id: 'cfdc701b-c5f9-4000-8d4b-85ed7aa7a141',
-        name: 'Klassische Massagetherapie',
-        preis: 22.84),
-    const Behandlungsart(
-        id: '2a4f9ebd-9963-4c60-a7ec-5591cbf7f3b3',
-        name: 'Manuelle Lymphdrainage (30 Min.)',
-        preis: 38),
-    const Behandlungsart(
-        id: 'e9107b42-91da-47a8-9fcc-7e1fdf69b058',
-        name: 'Manuelle Lymphdrainage (45 Min.)',
-        preis: 56.98),
-    const Behandlungsart(
-        id: '398df86a-51ef-4f12-8fbc-40377230dcbc',
-        name: 'Manuelle Lymphdrainage (60 Min.)',
-        preis: 75.99),
-    const Behandlungsart(
-        id: '1b102da5-b8b4-4e78-8a01-1f9c8552cdc5', name: 'Krankengymnastik', preis: 31.3),
-    const Behandlungsart(
-        id: 'adf3630e-7706-4aca-b030-5326f164c959',
-        name: 'Krankengymnastik Doppelbehandlung',
-        preis: 62.6),
-    const Behandlungsart(
-        id: 'c378461c-f410-4655-a62d-b2d4124ec38b',
-        name: 'Krankengymnastik am Gerät',
-        preis: 58.94),
-    const Behandlungsart(
-        id: 'a5422b49-88b0-4e52-915e-f159261c711f', name: 'Krankengymnastik ZNS', preis: 49.71),
-    const Behandlungsart(
-        id: '65cbab03-f884-4a2a-a510-0fba056224e9',
-        name: 'Krankengymnastik ZNS Doppelbehandlung',
-        preis: 99.42),
-    const Behandlungsart(
-        id: 'f5571a9f-c679-4422-8750-5faa760e8ea7', name: 'Manuelle Therapie', preis: 37.6),
-    const Behandlungsart(
-        id: 'e48f0626-6ecd-4d26-8909-bd1e41508e2e',
-        name: 'Manuelle Therapie Doppelbehandlung',
-        preis: 75.2),
-    const Behandlungsart(
-        id: '43c27a35-612b-4297-98da-2bb93c24f723', name: 'Wärmepackung', preis: 17.07),
-    const Behandlungsart(
-        id: 'e70d961c-80fa-461d-9ecd-17852cc052d0', name: 'Atlastherapie', preis: 290),
-  ];
-
   @override
   Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
 
-    // Get form container from provider in build method
+    final behandlungsartenAsync = ref.watch(behandlungsartenProvider);
+
+    if (behandlungsartenAsync.isLoading) {
+      return Center(
+        child: CircularProgressIndicator.adaptive(),
+      );
+    }
+
+    if (behandlungsartenAsync.hasError) {
+      return Expanded(
+        child: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Text('Fehler beim Laden der Behandlungsarten'),
+              const SizedBox(height: 16),
+              ElevatedButton(
+                onPressed: () {
+                  ref.invalidate(behandlungsartenProvider);
+                },
+                child: const Text('Erneut versuchen'),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
+
     final formContainer = ref.watch(rezeptFormContainerProvider(widget.rezept));
 
     final form = Form(
@@ -94,9 +77,6 @@ class _RezeptFormState extends ConsumerState<RezeptForm> {
       },
       child: Column(
         children: [
-          // Removed hidden preisGesamt field
-
-          // Only show the date field
           DateTimeFormField(
             key: formContainer.ausgestelltAm,
             decoration: const InputDecoration(labelText: 'Ausgestellt am*'),
@@ -107,7 +87,7 @@ class _RezeptFormState extends ConsumerState<RezeptForm> {
             validator: (value) => validateRequired(value, context),
           ),
           const SizedBox(height: 24),
-          _buildPositionenSection(formContainer),
+          _buildPositionenSection(theme, formContainer),
         ],
       ),
     );
@@ -170,7 +150,7 @@ class _RezeptFormState extends ConsumerState<RezeptForm> {
     return content;
   }
 
-  Widget _buildPositionenSection(RezeptFormContainer formContainer) {
+  Widget _buildPositionenSection(ThemeData theme, RezeptFormContainer formContainer) {
     final formState = ref.watch(rezeptFormStateProvider(widget.rezept));
 
     return Column(
@@ -185,10 +165,8 @@ class _RezeptFormState extends ConsumerState<RezeptForm> {
             ),
             ElevatedButton.icon(
               onPressed: () {
-                // First add the position
                 ref.read(rezeptFormContainerProvider(widget.rezept)).addPosition();
 
-                // Then force a rebuild to show the new position
                 ref.invalidate(rezeptFormStateProvider(widget.rezept));
                 setState(() {});
               },
@@ -198,8 +176,6 @@ class _RezeptFormState extends ConsumerState<RezeptForm> {
           ],
         ),
         const SizedBox(height: 16),
-
-        // Use native Table widget for proper alignment of columns
         Container(
           decoration: BoxDecoration(
             color: Theme.of(context).colorScheme.surfaceVariant.withOpacity(0.2),
@@ -208,22 +184,14 @@ class _RezeptFormState extends ConsumerState<RezeptForm> {
           padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
           child: Table(
             columnWidths: const {
-              0: FixedColumnWidth(60), // Anzahl
-              1: FlexColumnWidth(4), // Behandlungsart
-              2: FlexColumnWidth(2), // Gesamtpreis
-              3: FixedColumnWidth(40), // Delete button
+              0: FixedColumnWidth(60),
+              1: FlexColumnWidth(4),
+              2: FixedColumnWidth(100),
+              3: FixedColumnWidth(40),
             },
             defaultVerticalAlignment: TableCellVerticalAlignment.middle,
             children: [
-              // Header row
               TableRow(
-                decoration: BoxDecoration(
-                  border: Border(
-                      bottom: BorderSide(
-                    color: Theme.of(context).colorScheme.primary.withOpacity(0.2),
-                    width: 1,
-                  )),
-                ),
                 children: [
                   Padding(
                     padding: const EdgeInsets.symmetric(vertical: 8),
@@ -260,12 +228,8 @@ class _RezeptFormState extends ConsumerState<RezeptForm> {
                   const SizedBox(width: 40),
                 ],
               ),
-
-              // Data rows - one for each position
               for (var i = 0; i < formContainer.positionen.length; i++)
-                _buildPositionRow(i, formContainer),
-
-              // Footer row with total - integrated directly into the table
+                _buildPositionRow(i, theme, formContainer),
               _buildTableFooterRow(formState),
             ],
           ),
@@ -274,15 +238,15 @@ class _RezeptFormState extends ConsumerState<RezeptForm> {
     );
   }
 
-  TableRow _buildPositionRow(int index, RezeptFormContainer formContainer) {
+  TableRow _buildPositionRow(int index, ThemeData theme, RezeptFormContainer formContainer) {
     final position = formContainer.positionen[index];
     final formState = ref.watch(rezeptFormStateProvider(widget.rezept));
+    final behandlungsarten = ref.watch(behandlungsartenProvider).value ?? IList<Behandlungsart>([]);
 
     final initialAnzahl = widget.rezept?.positionen.getOrNull(index)?.anzahl.toString() ?? '1';
-    final initialBehandlungsart =
-        widget.rezept?.positionen.getOrNull(index)?.behandlungsart ?? _behandlungsarten.first;
+    final initialBehandlungsart = widget.rezept?.positionen.getOrNull(index)?.behandlungsart ??
+        (behandlungsarten.isNotEmpty ? behandlungsarten.first : null);
 
-    // Calculate the position price
     final positionPrice = formState.calculatePositionPrice(index);
 
     return TableRow(
@@ -295,28 +259,19 @@ class _RezeptFormState extends ConsumerState<RezeptForm> {
         ),
       ),
       children: [
-        // Quantity input
         Padding(
           padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 4),
           child: TextFormField(
             key: position.anzahl,
-            decoration: const InputDecoration(
-              isDense: true,
-              contentPadding: EdgeInsets.symmetric(horizontal: 8, vertical: 12),
-              border: OutlineInputBorder(),
-            ),
             initialValue: initialAnzahl,
             keyboardType: TextInputType.number,
             textAlign: TextAlign.center,
             validator: (value) => validateRequired(value, context),
             onChanged: (_) {
-              // Force update price calculations
               ref.invalidate(rezeptFormStateProvider(widget.rezept));
             },
           ),
         ),
-
-        // Treatment type dropdown with MenuAnchor
         Padding(
           padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 4),
           child: FormField<Behandlungsart>(
@@ -326,16 +281,16 @@ class _RezeptFormState extends ConsumerState<RezeptForm> {
             builder: (state) {
               return MenuAnchor(
                 builder: (context, controller, child) {
-                  return OutlinedButton(
-                    onPressed: () {
+                  return InkWell(
+                    onTap: () {
                       if (controller.isOpen) {
                         controller.close();
                       } else {
                         controller.open();
                       }
                     },
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
+                    child: InputDecorator(
+                      decoration: const InputDecoration().applyDefaults(theme.inputDecorationTheme),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
@@ -351,13 +306,13 @@ class _RezeptFormState extends ConsumerState<RezeptForm> {
                     ),
                   );
                 },
-                menuChildren: _behandlungsarten.map((behandlungsart) {
+                menuChildren:
+                    (ref.watch(behandlungsartenProvider).value ?? IList<Behandlungsart>([]))
+                        .map((behandlungsart) {
                   return MenuItemButton(
                     onPressed: () {
                       state.didChange(behandlungsart);
-                      // Force update price calculations
                       ref.invalidate(rezeptFormStateProvider(widget.rezept));
-                      setState(() {});
                     },
                     child: Text(behandlungsart.name),
                   );
@@ -366,8 +321,6 @@ class _RezeptFormState extends ConsumerState<RezeptForm> {
             },
           ),
         ),
-
-        // Position total price
         Padding(
           padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 4),
           child: Text(
@@ -376,17 +329,13 @@ class _RezeptFormState extends ConsumerState<RezeptForm> {
             style: const TextStyle(fontWeight: FontWeight.bold),
           ),
         ),
-
-        // Delete button
         Padding(
           padding: const EdgeInsets.symmetric(vertical: 8),
           child: IconButton(
             icon: const Icon(Icons.delete, size: 20),
             onPressed: () {
-              // Remove the position
               ref.read(rezeptFormContainerProvider(widget.rezept)).removePosition(index);
 
-              // Force a rebuild
               ref.invalidate(rezeptFormStateProvider(widget.rezept));
               setState(() {});
             },
@@ -402,20 +351,8 @@ class _RezeptFormState extends ConsumerState<RezeptForm> {
     final totalPrice = formState.calculateTotalPrice();
 
     return TableRow(
-      decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.primaryContainer.withOpacity(0.3),
-        border: Border(
-          top: BorderSide(
-            color: Theme.of(context).colorScheme.primary.withOpacity(0.2),
-            width: 1,
-          ),
-        ),
-      ),
       children: [
-        // Empty cell for Anzahl column
         const SizedBox(),
-
-        // Gesamtsumme label
         Padding(
           padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 4),
           child: Text(
@@ -427,8 +364,6 @@ class _RezeptFormState extends ConsumerState<RezeptForm> {
             textAlign: TextAlign.right,
           ),
         ),
-
-        // Total price amount
         Padding(
           padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 4),
           child: Text(
@@ -441,8 +376,6 @@ class _RezeptFormState extends ConsumerState<RezeptForm> {
             textAlign: TextAlign.right,
           ),
         ),
-
-        // Empty cell for Delete button column
         const SizedBox(),
       ],
     );
@@ -450,9 +383,6 @@ class _RezeptFormState extends ConsumerState<RezeptForm> {
 
   Future<void> _onSubmit() async {
     final formContainer = ref.read(rezeptFormContainerProvider(widget.rezept));
-    final formState = ref.read(rezeptFormStateProvider(widget.rezept));
-
-    // Get the total price from calculated values
 
     if (!formContainer.formKey.currentState!.validate()) {
       return;
@@ -465,21 +395,16 @@ class _RezeptFormState extends ConsumerState<RezeptForm> {
     });
 
     try {
-      // Use the form container to create the properly formatted request DTO
       final rezeptCreateDto = formContainer.toRezeptCreateDto();
 
       if (widget.rezept == null) {
-        // Creating a new rezept
         await repo.createRezept(rezeptCreateDto);
       } else {
-        // When editing, still use the same format but might need adjustments
-        // for a real update endpoint
         await repo.createRezept(rezeptCreateDto);
       }
 
       if (mounted) {
         context.go('/rezepte');
-        // Invalidate the rezepte provider to refresh the list
         ref.invalidate(rezepteProvider);
       }
     } catch (e) {

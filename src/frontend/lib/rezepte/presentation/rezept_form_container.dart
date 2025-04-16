@@ -17,12 +17,10 @@ class RezeptFormContainer extends FormContainer {
     final container = RezeptFormContainer();
 
     if (rezept != null) {
-      // Add position form fields based on the rezept positions
       for (final _ in rezept.positionen) {
         container.addPosition();
       }
     } else {
-      // Add one initial position for a new rezept
       container.addPosition();
     }
 
@@ -33,7 +31,8 @@ class RezeptFormContainer extends FormContainer {
   IList<RezeptPositionFormField> positionen;
 
   void addPosition() {
-    positionen = positionen.add(RezeptPositionFormField());
+    final newPosition = RezeptPositionFormField();
+    positionen = positionen.add(newPosition);
   }
 
   void removePosition(int index) {
@@ -53,16 +52,14 @@ class RezeptFormContainer extends FormContainer {
 
     return RezeptFormState(
       ausgestelltAm: ausgestelltAm.currentState?.value ?? DateTime.now(),
-      preisGesamt: 0.0, // This will be calculated dynamically
+      preisGesamt: 0.0,
       positionen: positionStates,
     );
   }
 
   Map<String, dynamic> toRezeptCreateDto({String? patientId}) {
-    // Use an existing test patient ID from the database if none provided
     final defaultPatientId = patientId ?? "a1b2c3d4-e5f6-7a8b-9c0d-1e2f3a4b5c6d";
 
-    // Format the positionen in the format expected by the server
     final positionenDto = positionen.map((pos) {
       final behandlungsart = pos.behandlungsart.currentState!.value!;
       return {
@@ -71,16 +68,12 @@ class RezeptFormContainer extends FormContainer {
       };
     }).toList();
 
-    // Calculate total price from the form state
     final formState = toFormState();
     final totalPrice = formState.calculateTotalPrice();
 
-    // Create the request payload
     return {
       'patientId': defaultPatientId,
-      'ausgestelltAm': ausgestelltAm.currentState!.value!
-          .toIso8601String()
-          .split('T')[0], // Format as YYYY-MM-DD
+      'ausgestelltAm': ausgestelltAm.currentState!.value!.toIso8601String().split('T')[0],
       'preisGesamt': totalPrice,
       'positionen': positionenDto,
     };
@@ -99,13 +92,12 @@ class RezeptFormContainer extends FormContainer {
             ))
         .toList();
 
-    // Calculate total price from positionen
     final formState = toFormState();
     final totalPrice = formState.calculateTotalPrice();
 
     return Rezept(
-      id: existingId ?? '', // Use existing ID if editing, otherwise empty for new
-      patientId: patientId, // Include patient ID if provided
+      id: existingId ?? '',
+      patientId: patientId,
       ausgestelltAm: ausgestelltAm.currentState!.value!,
       preisGesamt: totalPrice,
       positionen: positionenList.toIList(),

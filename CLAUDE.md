@@ -24,7 +24,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Code Style Guidelines
 - Flutter: Follow the [very_good_analysis](https://pub.dev/packages/very_good_analysis) style guide
-- Max line length is unlimited (default 80-char limit is disabled)
+- Max line length is 120 (default 80-char limit is disabled)
 - Imports organized in groups: dart/kotlin stdlib, flutter/spring, packages, project imports
 - Use freezed for immutable models and json_serializable for DTOs
 - Use Riverpod for state management in Flutter
@@ -34,3 +34,5 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - Repository pattern for data access with retrofit for API calls
 - Use dart's and kotlin's strong typing features throughout the codebase
 - Use always IList from fast_immutable_collections.dart instead of List
+- only doc comments are necessary
+- clean up build methods by extracting widget trees into separate new widgets

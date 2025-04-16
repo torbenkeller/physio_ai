@@ -130,5 +130,12 @@ class RezepteController @Autowired constructor(
 
         return ResponseEntity.notFound().build()
     }
+    
+    @GetMapping("/behandlungsarten")
+    fun getBehandlungsarten(): List<BehandlungsartDto> {
+        return behandlungsartenRepository.findAll()
+            .map { BehandlungsartDto.fromBehandlungsart(it) }
+            .toList()
+    }
 
 }

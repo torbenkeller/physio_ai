@@ -100,14 +100,14 @@ data class RezeptPosDto(
 }
 
 data class BehandlungsartDto(
-    val id: UUID,
+    val id: String,
     val name: String,
     val preis: Double,
 ) {
     companion object {
         fun fromBehandlungsart(behandlungsart: Behandlungsart): BehandlungsartDto {
             return BehandlungsartDto(
-                id = behandlungsart.id.id,
+                id = behandlungsart.id.id.toString(),
                 name = behandlungsart.name,
                 preis = behandlungsart.preis
             )

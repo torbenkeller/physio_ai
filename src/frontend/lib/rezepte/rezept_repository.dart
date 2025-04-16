@@ -3,12 +3,10 @@ import 'dart:io';
 import 'package:dio/dio.dart';
 import 'package:fast_immutable_collections/fast_immutable_collections.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:http_parser/http_parser.dart';
 import 'package:logger/logger.dart';
 import 'package:physio_ai/main.dart';
 import 'package:physio_ai/rezepte/model/rezept_einlesen_response.dart';
 import 'package:physio_ai/rezepte/rezept.dart';
-import 'package:physio_ai/rezepte/rezept_repository_impl.dart';
 import 'package:retrofit/error_logger.dart';
 import 'package:retrofit/http.dart';
 
@@ -32,10 +30,15 @@ class ErrorLogger implements ParseErrorLogger {
 final rezeptRepositoryProvider = Provider<RezeptRepository>(
   (ref) {
     final dio = ref.watch(dioProvider);
-    // Use the custom implementation for better file upload handling
-    return RezeptRepositoryImplementation(dio);
+    return RezeptRepository(dio);
   },
 );
+
+final behandlungsartenProvider = FutureProvider<IList<Behandlungsart>>((ref) async {
+  final repository = ref.watch(rezeptRepositoryProvider);
+  final behandlungsarten = await repository.getBehandlungsarten();
+  return behandlungsarten.lock;
+});
 
 @RestApi(baseUrl: '/rezepte')
 abstract class RezeptRepository {
@@ -53,8 +56,11 @@ abstract class RezeptRepository {
 
   @DELETE('{id}')
   Future<void> deleteRezept(@Path('id') String id);
-  
+
   @POST('/createFromImage')
   @MultiPart()
   Future<RezeptEinlesenResponse> uploadRezeptImage(@Part() File file);
+
+  @GET('/behandlungsarten')
+  Future<List<Behandlungsart>> getBehandlungsarten();
 }

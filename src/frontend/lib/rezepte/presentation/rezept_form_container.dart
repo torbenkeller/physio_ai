@@ -9,6 +9,7 @@ part 'generated/rezept_form_container.freezed.dart';
 class RezeptFormContainer extends FormContainer {
   RezeptFormContainer()
       : ausgestelltAm = GlobalKey<FormFieldState<DateTime>>(),
+        patientId = GlobalKey<FormFieldState<String>>(),
         positionen = const IListConst<RezeptPositionFormField>(<RezeptPositionFormField>[]),
         super(formKey: GlobalKey<FormState>());
 
@@ -28,6 +29,7 @@ class RezeptFormContainer extends FormContainer {
   }
 
   final GlobalKey<FormFieldState<DateTime>> ausgestelltAm;
+  final GlobalKey<FormFieldState<String>> patientId;
   IList<RezeptPositionFormField> positionen;
 
   void addPosition() {
@@ -57,8 +59,11 @@ class RezeptFormContainer extends FormContainer {
     );
   }
 
-  Map<String, dynamic> toRezeptCreateDto({String? patientId}) {
-    final defaultPatientId = patientId ?? "a1b2c3d4-e5f6-7a8b-9c0d-1e2f3a4b5c6d";
+  Map<String, dynamic> toRezeptCreateDto() {
+    final selectedPatientId = patientId.currentState?.value;
+    if (selectedPatientId == null || selectedPatientId.isEmpty) {
+      throw Exception('Bitte wählen Sie einen Patienten aus');
+    }
 
     final positionenDto = positionen.map((pos) {
       final behandlungsart = pos.behandlungsart.currentState!.value!;
@@ -72,14 +77,16 @@ class RezeptFormContainer extends FormContainer {
     final totalPrice = formState.calculateTotalPrice();
 
     return {
-      'patientId': defaultPatientId,
+      'patientId': selectedPatientId,
       'ausgestelltAm': ausgestelltAm.currentState!.value!.toIso8601String().split('T')[0],
       'preisGesamt': totalPrice,
       'positionen': positionenDto,
     };
   }
 
-  Rezept toRezept({String? existingId, String? patientId}) {
+  Rezept toRezept({String? existingId}) {
+    final selectedPatientId = patientId.currentState?.value;
+    
     final positionenList = positionen
         .map((p) => RezeptPos(
               anzahl: int.parse(p.anzahl.currentState!.value ?? '0'),
@@ -97,7 +104,7 @@ class RezeptFormContainer extends FormContainer {
 
     return Rezept(
       id: existingId ?? '',
-      patientId: patientId,
+      patientId: selectedPatientId,
       ausgestelltAm: ausgestelltAm.currentState!.value!,
       preisGesamt: totalPrice,
       positionen: positionenList.toIList(),
@@ -107,6 +114,7 @@ class RezeptFormContainer extends FormContainer {
   @override
   List<GlobalKey<FormFieldState<dynamic>>> get requiredFields => [
         ausgestelltAm,
+        patientId,
         ...positionen.expand((p) => [p.anzahl, p.behandlungsart]),
       ];
 }

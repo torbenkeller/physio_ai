@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:dio/dio.dart';
 import 'package:fast_immutable_collections/fast_immutable_collections.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -59,7 +57,7 @@ abstract class RezeptRepository {
 
   @POST('/createFromImage')
   @MultiPart()
-  Future<RezeptEinlesenResponse> uploadRezeptImage(@Part() File file);
+  Future<RezeptEinlesenResponse> uploadRezeptImage(@Part() List<MultipartFile> file);
 
   @GET('/behandlungsarten')
   Future<List<Behandlungsart>> getBehandlungsarten();

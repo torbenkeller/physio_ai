@@ -3,6 +3,8 @@ import 'package:fast_immutable_collections/fast_immutable_collections.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:physio_ai/patienten/domain/patient.dart';
+import 'package:physio_ai/patienten/presentation/patienten_page.dart';
 import 'package:physio_ai/patienten/presentation/validation/validators.dart';
 import 'package:physio_ai/rezepte/presentation/rezept_form_container.dart';
 import 'package:physio_ai/rezepte/rezept.dart';
@@ -41,8 +43,9 @@ class _RezeptFormState extends ConsumerState<RezeptForm> {
     final colorScheme = theme.colorScheme;
 
     final behandlungsartenAsync = ref.watch(behandlungsartenProvider);
+    final patientenAsync = ref.watch(patientenProvider);
 
-    if (behandlungsartenAsync.isLoading) {
+    if (behandlungsartenAsync.isLoading || patientenAsync.isLoading) {
       return Center(
         child: CircularProgressIndicator.adaptive(),
       );
@@ -68,6 +71,24 @@ class _RezeptFormState extends ConsumerState<RezeptForm> {
       );
     }
 
+    if (patientenAsync.hasError) {
+      return Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const Text('Fehler beim Laden der Patientendaten'),
+            const SizedBox(height: 16),
+            ElevatedButton(
+              onPressed: () {
+                ref.invalidate(patientenProvider);
+              },
+              child: const Text('Erneut versuchen'),
+            ),
+          ],
+        ),
+      );
+    }
+
     final formContainer = ref.watch(rezeptFormContainerProvider(widget.rezept));
 
     final form = Form(
@@ -77,6 +98,8 @@ class _RezeptFormState extends ConsumerState<RezeptForm> {
       },
       child: Column(
         children: [
+          _buildPatientSelector(formContainer, patientenAsync.value ?? IList<Patient>([])),
+          const SizedBox(height: 24),
           DateTimeFormField(
             key: formContainer.ausgestelltAm,
             decoration: const InputDecoration(labelText: 'Ausgestellt am*'),
@@ -378,6 +401,42 @@ class _RezeptFormState extends ConsumerState<RezeptForm> {
         ),
         const SizedBox(),
       ],
+    );
+  }
+
+  Widget _buildPatientSelector(RezeptFormContainer formContainer, IList<Patient> patienten) {
+    final selectedPatientId = widget.rezept?.patientId;
+
+    return FormField<String>(
+      key: formContainer.patientId,
+      initialValue: selectedPatientId,
+      validator: (value) =>
+          (value == null || value.isEmpty) ? 'Bitte wählen Sie einen Patienten aus' : null,
+      builder: (state) {
+        return InputDecorator(
+          decoration: InputDecoration(
+            labelText: 'Patient*',
+            errorText: state.errorText,
+          ),
+          child: DropdownButtonHideUnderline(
+            child: DropdownButton<String>(
+              isExpanded: true,
+              value: state.value,
+              hint: const Text('Bitte wählen Sie einen Patienten aus'),
+              onChanged: (newValue) {
+                state.didChange(newValue);
+                ref.invalidate(rezeptFormStateProvider(widget.rezept));
+              },
+              items: patienten.map((patient) {
+                return DropdownMenuItem<String>(
+                  value: patient.id,
+                  child: Text(patient.fullName),
+                );
+              }).toList(),
+            ),
+          ),
+        );
+      },
     );
   }
 

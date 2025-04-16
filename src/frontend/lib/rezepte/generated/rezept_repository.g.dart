@@ -96,20 +96,14 @@ class _RezeptRepository implements RezeptRepository {
   }
 
   @override
-  Future<RezeptEinlesenResponse> uploadRezeptImage(File file) async {
+  Future<RezeptEinlesenResponse> uploadRezeptImage(
+    List<MultipartFile> file,
+  ) async {
     final _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{};
     final _headers = <String, dynamic>{};
     final _data = FormData();
-    _data.files.add(
-      MapEntry(
-        'file',
-        MultipartFile.fromFileSync(
-          file.path,
-          filename: file.path.split(Platform.pathSeparator).last,
-        ),
-      ),
-    );
+    _data.files.addAll(file.map((i) => MapEntry('file', i)));
     final _options = _setStreamType<RezeptEinlesenResponse>(
       Options(
         method: 'POST',

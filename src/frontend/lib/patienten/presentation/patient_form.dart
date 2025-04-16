@@ -163,6 +163,15 @@ class _PatientFormState extends ConsumerState<PatientForm> {
       mainAxisAlignment: MainAxisAlignment.end,
       spacing: 16,
       children: [
+        if (widget.patient != null) 
+          ElevatedButton.icon(
+            onPressed: () {
+              context.go('/rezepte/create?patientId=${widget.patient!.id}');
+            },
+            icon: const Icon(Icons.add),
+            label: const Text('Rezept erstellen'),
+          ),
+        const Spacer(),
         TextButton(
           onPressed: () {
             context.go('/patienten');

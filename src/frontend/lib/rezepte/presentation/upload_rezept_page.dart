@@ -1,7 +1,7 @@
-import 'dart:io';
+import 'dart:io' if (dart.library.html) 'package:web/web.dart' show File;
 
+import 'package:dio/dio.dart' show DioMediaType, MultipartFile;
 import 'package:fast_immutable_collections/fast_immutable_collections.dart';
-import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -9,8 +9,6 @@ import 'package:image_picker/image_picker.dart';
 import 'package:physio_ai/rezepte/model/rezept_einlesen_response.dart';
 import 'package:physio_ai/rezepte/rezept.dart';
 import 'package:physio_ai/rezepte/rezept_repository.dart';
-import 'package:physio_ai/rezepte/rezepte_page.dart';
-import 'dart:io' show Platform;
 
 class UploadRezeptPage extends StatelessWidget {
   const UploadRezeptPage({super.key});
@@ -41,7 +39,7 @@ class _UploadRezeptContentState extends ConsumerState<UploadRezeptContent> {
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
-    
+
     if (_loading) {
       return const Center(
         child: Column(
@@ -54,7 +52,7 @@ class _UploadRezeptContentState extends ConsumerState<UploadRezeptContent> {
         ),
       );
     }
-    
+
     return Center(
       child: SingleChildScrollView(
         child: Padding(
@@ -117,7 +115,7 @@ class _UploadRezeptContentState extends ConsumerState<UploadRezeptContent> {
         maxWidth: 1800,
         maxHeight: 1800,
       );
-      
+
       if (pickedFile != null) {
         setState(() {
           _selectedFile = File(pickedFile.path);
@@ -144,7 +142,7 @@ class _UploadRezeptContentState extends ConsumerState<UploadRezeptContent> {
         maxWidth: 1800,
         maxHeight: 1800,
       );
-      
+
       if (pickedFile != null) {
         setState(() {
           _selectedFile = File(pickedFile.path);
@@ -165,15 +163,48 @@ class _UploadRezeptContentState extends ConsumerState<UploadRezeptContent> {
 
   Future<void> _uploadImage() async {
     if (_selectedFile == null) return;
-    
+
     setState(() {
       _loading = true;
     });
-    
+
     try {
+      String fileName = _selectedFile!.path.split('/').last;
+      String extension = fileName.split('.').last.toLowerCase();
+
+      // Map file extension to mime type
+      String mimeType;
+      switch (extension) {
+        case 'jpg':
+        case 'jpeg':
+          mimeType = 'image/jpeg';
+          break;
+        case 'png':
+          mimeType = 'image/png';
+          break;
+        case 'gif':
+          mimeType = 'image/gif';
+          break;
+        case 'webp':
+          mimeType = 'image/webp';
+          break;
+        case 'heic':
+          mimeType = 'image/heic';
+          break;
+        default:
+          mimeType = 'application/octet-stream';
+      }
+
+      // Create form data
+      final file = await MultipartFile.fromFile(
+        _selectedFile!.path,
+        filename: fileName,
+        contentType: DioMediaType.parse(mimeType),
+      );
+
       final repo = ref.read(rezeptRepositoryProvider);
-      final response = await repo.uploadRezeptImage(_selectedFile!);
-      
+      final response = await repo.uploadRezeptImage([file]);
+
       if (mounted) {
         final rezept = Rezept(
           id: '',
@@ -188,7 +219,7 @@ class _UploadRezeptContentState extends ConsumerState<UploadRezeptContent> {
               .toList()
               .toIList(),
         );
-        
+
         context.go('/rezepte/create', extra: rezept);
       }
     } catch (e) {
@@ -196,7 +227,7 @@ class _UploadRezeptContentState extends ConsumerState<UploadRezeptContent> {
         setState(() {
           _loading = false;
         });
-        
+
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Fehler beim Upload: $e'),
@@ -206,8 +237,7 @@ class _UploadRezeptContentState extends ConsumerState<UploadRezeptContent> {
       }
     }
   }
-  
-  
+
   String _formatDate(DateTime date) {
     return '${date.day.toString().padLeft(2, '0')}.${date.month.toString().padLeft(2, '0')}.${date.year}';
   }

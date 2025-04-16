@@ -74,6 +74,18 @@ final _mobileRouterConfig = RoutingConfig(
                       rezept = state.extra as Rezept;
                     }
 
+                    // Get patient ID from query parameters if present
+                    final patientId = state.uri.queryParameters['patientId'];
+                    if (patientId != null && patientId.isNotEmpty) {
+                      // Create a prefill rezept with the patient ID
+                      rezept = Rezept(
+                        id: '',
+                        ausgestelltAm: DateTime.now(),
+                        preisGesamt: 0,
+                        patientId: patientId,
+                      );
+                    }
+
                     return MaterialPage(
                       fullscreenDialog: true,
                       child: CreateRezeptPage(
@@ -159,6 +171,18 @@ final _tabletRouterConfig = RoutingConfig(
                     Rezept? rezept;
                     if (state.extra != null && state.extra is Rezept) {
                       rezept = state.extra as Rezept;
+                    }
+
+                    // Get patient ID from query parameters if present
+                    final patientId = state.uri.queryParameters['patientId'];
+                    if (patientId != null && patientId.isNotEmpty) {
+                      // Create a prefill rezept with the patient ID
+                      rezept = Rezept(
+                        id: '',
+                        ausgestelltAm: DateTime.now(),
+                        preisGesamt: 0,
+                        patientId: patientId,
+                      );
                     }
 
                     return MaterialPage(

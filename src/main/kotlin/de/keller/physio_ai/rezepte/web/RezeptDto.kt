@@ -148,6 +148,37 @@ data class RezeptCreateDto(
 }
 
 /**
+ * DTO for updating an existing Rezept
+ */
+data class RezeptUpdateDto(
+    val patientId: UUID,
+    val ausgestelltAm: LocalDate,
+    val preisGesamt: Double,
+    val positionen: List<RezeptPosCreateDto>,
+) {
+    fun toRezept(existingRezeptId: RezeptId, existingVersion: Long): Rezept {
+        return Rezept(
+            id = existingRezeptId,
+            patientId = PatientId(patientId),
+            ausgestelltAm = ausgestelltAm,
+            ausgestelltVonArztId = null, // Not updated from frontend
+            preisGesamt = preisGesamt,
+            rechnungsnummer = null, // Not updated from frontend
+            positionen = positionen.mapIndexed { index, pos ->
+                RezeptPos(
+                    id = UUID.randomUUID(), // Generate new IDs for positions
+                    index = index.toLong(),
+                    rezeptId = existingRezeptId,
+                    behandlungsartId = BehandlungsartId(pos.behandlungsartId),
+                    anzahl = pos.anzahl
+                )
+            },
+            version = existingVersion // Keep existing version for optimistic locking
+        )
+    }
+}
+
+/**
  * DTO for creating a new RezeptPos
  */
 data class RezeptPosCreateDto(

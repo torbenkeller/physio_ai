@@ -102,6 +102,57 @@ class RezepteController @Autowired constructor(
         }
     }
     
+    @PatchMapping("/{id}")
+    @Transactional
+    fun updateRezept(@PathVariable id: UUID, @RequestBody rezeptUpdateDto: RezeptUpdateDto): RezeptDto {
+        try {
+            // Log the received data
+            println("Updating rezept with ID: $id, data: $rezeptUpdateDto")
+            
+            // Check if rezept exists
+            val rezeptId = RezeptId.fromUUID(id)
+            val existingRezept = rezeptRepository.findById(rezeptId)
+                ?: throw IllegalArgumentException("Rezept with ID $id not found")
+            println("Found existing rezept: $existingRezept")
+            
+            // Validate patient exists
+            val patientId = PatientId(rezeptUpdateDto.patientId)
+            val patient = patientenRepository.findById(patientId)
+                ?: throw IllegalArgumentException("Patient with ID ${rezeptUpdateDto.patientId} not found")
+            println("Found patient: $patient")
+            
+            // Validate all behandlungsarten exist
+            val behandlungsartIds = rezeptUpdateDto.positionen.map { BehandlungsartId(it.behandlungsartId) }
+            val behandlungsarten = behandlungsartenRepository.findAllById(behandlungsartIds).toList()
+            if (behandlungsarten.size != behandlungsartIds.size) {
+                throw IllegalArgumentException("One or more BehandlungsartId not found")
+            }
+            println("Found all behandlungsarten: $behandlungsarten")
+            
+            // Convert DTO to entity, preserving ID and version
+            val rezeptToUpdate = rezeptUpdateDto.toRezept(existingRezept.id, existingRezept.version)
+            println("Updating rezept with ${rezeptToUpdate.positionen.size} positionen")
+            
+            // Save the updated rezept with positions
+            val savedRezept = rezeptRepository.save(rezeptToUpdate)
+            println("Updated rezept with ID: ${savedRezept.id.id}, positions count: ${savedRezept.positionen.size}")
+            
+            // Return DTO with the updated rezept
+            return RezeptDto.fromRezept(
+                rezept = savedRezept,
+                patient = patient,
+                arzt = null, // No doctor information from frontend
+                behandlungsarten = behandlungsarten
+            )
+        } catch (e: Exception) {
+            val errorMessage = "Failed to update Rezept: ${e.message ?: "Unknown error"}"
+            val rootCause = getRootCause(e)
+            println("Error updating rezept: $errorMessage. Root cause: ${rootCause.message}")
+            e.printStackTrace()
+            throw e
+        }
+    }
+    
     private fun getRootCause(throwable: Throwable): Throwable {
         var rootCause = throwable
         while (rootCause.cause != null && rootCause.cause !== rootCause) {

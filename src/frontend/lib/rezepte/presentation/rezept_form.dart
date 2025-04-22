@@ -3,9 +3,9 @@ import 'package:fast_immutable_collections/fast_immutable_collections.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:intl/intl.dart';
 import 'package:physio_ai/patienten/domain/patient.dart';
 import 'package:physio_ai/patienten/presentation/patienten_page.dart';
-import 'package:physio_ai/patienten/presentation/validation/validators.dart';
 import 'package:physio_ai/rezepte/presentation/rezept_form_container.dart';
 import 'package:physio_ai/rezepte/rezept.dart';
 import 'package:physio_ai/rezepte/rezept_repository.dart';
@@ -13,13 +13,14 @@ import 'package:physio_ai/rezepte/rezepte_page.dart';
 
 final rezeptFormContainerProvider =
     Provider.family.autoDispose<RezeptFormContainer, Rezept?>((ref, rezept) {
-  return RezeptFormContainer.fromRezept(rezept);
-});
+  final behandlungsarten = ref.watch(behandlungsartenProvider).value!;
 
-final rezeptFormStateProvider =
-    Provider.family.autoDispose<RezeptFormState, Rezept?>((ref, rezept) {
-  final formContainer = ref.watch(rezeptFormContainerProvider(rezept));
-  return formContainer.toFormState();
+  final initialBehandlungsart = behandlungsarten.sort((a, b) => a.name.compareTo(b.name)).first;
+
+  return RezeptFormContainer.fromRezept(
+    rezept: rezept,
+    initialBehandlungsart: initialBehandlungsart,
+  );
 });
 
 class RezeptForm extends ConsumerStatefulWidget {
@@ -46,7 +47,7 @@ class _RezeptFormState extends ConsumerState<RezeptForm> {
     final patientenAsync = ref.watch(patientenProvider);
 
     if (behandlungsartenAsync.isLoading || patientenAsync.isLoading) {
-      return Center(
+      return const Center(
         child: CircularProgressIndicator.adaptive(),
       );
     }
@@ -94,20 +95,20 @@ class _RezeptFormState extends ConsumerState<RezeptForm> {
     final form = Form(
       key: formContainer.formKey,
       onChanged: () {
-        ref.invalidate(rezeptFormStateProvider(widget.rezept));
+        setState(() {});
       },
       child: Column(
         children: [
           _buildPatientSelector(formContainer, patientenAsync.value ?? IList<Patient>([])),
           const SizedBox(height: 24),
           DateTimeFormField(
-            key: formContainer.ausgestelltAm,
+            key: formContainer.ausgestelltAm.key,
             decoration: const InputDecoration(labelText: 'Ausgestellt am*'),
-            initialValue: widget.rezept?.ausgestelltAm ?? DateTime.now(),
+            initialValue: formContainer.ausgestelltAm.initialValue,
             pickerPlatform: DateTimeFieldPickerPlatform.material,
             initialPickerDateTime: DateTime.now(),
             mode: DateTimeFieldPickerMode.date,
-            validator: (value) => validateRequired(value, context),
+            validator: (value) => formContainer.ausgestelltAm.validate(value, context),
           ),
           const SizedBox(height: 24),
           _buildPositionenSection(theme, formContainer),
@@ -174,8 +175,6 @@ class _RezeptFormState extends ConsumerState<RezeptForm> {
   }
 
   Widget _buildPositionenSection(ThemeData theme, RezeptFormContainer formContainer) {
-    final formState = ref.watch(rezeptFormStateProvider(widget.rezept));
-
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -189,8 +188,6 @@ class _RezeptFormState extends ConsumerState<RezeptForm> {
             ElevatedButton.icon(
               onPressed: () {
                 ref.read(rezeptFormContainerProvider(widget.rezept)).addPosition();
-
-                ref.invalidate(rezeptFormStateProvider(widget.rezept));
                 setState(() {});
               },
               icon: const Icon(Icons.add),
@@ -201,7 +198,7 @@ class _RezeptFormState extends ConsumerState<RezeptForm> {
         const SizedBox(height: 16),
         Container(
           decoration: BoxDecoration(
-            color: Theme.of(context).colorScheme.surfaceVariant.withOpacity(0.2),
+            color: Theme.of(context).colorScheme.secondaryContainer.withAlpha(51),
             borderRadius: BorderRadius.circular(8),
           ),
           padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
@@ -253,7 +250,7 @@ class _RezeptFormState extends ConsumerState<RezeptForm> {
               ),
               for (var i = 0; i < formContainer.positionen.length; i++)
                 _buildPositionRow(i, theme, formContainer),
-              _buildTableFooterRow(formState),
+              _buildTableFooterRow(formContainer),
             ],
           ),
         ),
@@ -263,14 +260,7 @@ class _RezeptFormState extends ConsumerState<RezeptForm> {
 
   TableRow _buildPositionRow(int index, ThemeData theme, RezeptFormContainer formContainer) {
     final position = formContainer.positionen[index];
-    final formState = ref.watch(rezeptFormStateProvider(widget.rezept));
-    final behandlungsarten = ref.watch(behandlungsartenProvider).value ?? IList<Behandlungsart>([]);
-
-    final initialAnzahl = widget.rezept?.positionen.getOrNull(index)?.anzahl.toString() ?? '1';
-    final initialBehandlungsart = widget.rezept?.positionen.getOrNull(index)?.behandlungsart ??
-        (behandlungsarten.isNotEmpty ? behandlungsarten.first : null);
-
-    final positionPrice = formState.calculatePositionPrice(index);
+    final behandlungsarten = ref.watch(behandlungsartenProvider).value!;
 
     return TableRow(
       decoration: BoxDecoration(
@@ -285,22 +275,19 @@ class _RezeptFormState extends ConsumerState<RezeptForm> {
         Padding(
           padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 4),
           child: TextFormField(
-            key: position.anzahl,
-            initialValue: initialAnzahl,
+            key: position.anzahl.key,
+            initialValue: position.anzahl.initialValue,
             keyboardType: TextInputType.number,
             textAlign: TextAlign.center,
-            validator: (value) => validateRequired(value, context),
-            onChanged: (_) {
-              ref.invalidate(rezeptFormStateProvider(widget.rezept));
-            },
+            validator: (value) => position.anzahl.validate(value, context),
           ),
         ),
         Padding(
           padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 4),
           child: FormField<Behandlungsart>(
-            key: position.behandlungsart,
-            validator: (value) => value == null ? 'Bitte wählen Sie eine Behandlungsart' : null,
-            initialValue: initialBehandlungsart,
+            key: position.behandlungsart.key,
+            validator: (value) => position.behandlungsart.validate(value, context),
+            initialValue: position.behandlungsart.initialValue,
             builder: (state) {
               return MenuAnchor(
                 builder: (context, controller, child) {
@@ -335,7 +322,6 @@ class _RezeptFormState extends ConsumerState<RezeptForm> {
                   return MenuItemButton(
                     onPressed: () {
                       state.didChange(behandlungsart);
-                      ref.invalidate(rezeptFormStateProvider(widget.rezept));
                     },
                     child: Text(behandlungsart.name),
                   );
@@ -347,7 +333,10 @@ class _RezeptFormState extends ConsumerState<RezeptForm> {
         Padding(
           padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 4),
           child: Text(
-            '${positionPrice.toStringAsFixed(2)} €',
+            NumberFormat.currency(
+              decimalDigits: 2,
+              symbol: '€',
+            ).format(position.price),
             textAlign: TextAlign.right,
             style: const TextStyle(fontWeight: FontWeight.bold),
           ),
@@ -358,8 +347,6 @@ class _RezeptFormState extends ConsumerState<RezeptForm> {
             icon: const Icon(Icons.delete, size: 20),
             onPressed: () {
               ref.read(rezeptFormContainerProvider(widget.rezept)).removePosition(index);
-
-              ref.invalidate(rezeptFormStateProvider(widget.rezept));
               setState(() {});
             },
             padding: EdgeInsets.zero,
@@ -370,9 +357,7 @@ class _RezeptFormState extends ConsumerState<RezeptForm> {
     );
   }
 
-  TableRow _buildTableFooterRow(RezeptFormState formState) {
-    final totalPrice = formState.calculateTotalPrice();
-
+  TableRow _buildTableFooterRow(RezeptFormContainer formContainer) {
     return TableRow(
       children: [
         const SizedBox(),
@@ -390,7 +375,7 @@ class _RezeptFormState extends ConsumerState<RezeptForm> {
         Padding(
           padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 4),
           child: Text(
-            '${totalPrice.toStringAsFixed(2)} €',
+            '${formContainer.price.toStringAsFixed(2)} €',
             style: TextStyle(
               fontWeight: FontWeight.bold,
               fontSize: 16,
@@ -408,7 +393,7 @@ class _RezeptFormState extends ConsumerState<RezeptForm> {
     final selectedPatientId = widget.rezept?.patientId;
 
     return FormField<String>(
-      key: formContainer.patientId,
+      key: formContainer.patientId.key,
       initialValue: selectedPatientId,
       validator: (value) =>
           (value == null || value.isEmpty) ? 'Bitte wählen Sie einen Patienten aus' : null,
@@ -425,12 +410,13 @@ class _RezeptFormState extends ConsumerState<RezeptForm> {
               hint: const Text('Bitte wählen Sie einen Patienten aus'),
               onChanged: (newValue) {
                 state.didChange(newValue);
-                ref.invalidate(rezeptFormStateProvider(widget.rezept));
               },
               items: patienten.map((patient) {
                 return DropdownMenuItem<String>(
                   value: patient.id,
-                  child: Text(patient.fullName),
+                  child: Text(
+                    '${patient.fullName} (geb. ${DateFormat('dd.MM.yyyy').format(patient.geburtstag)}',
+                  ),
                 );
               }).toList(),
             ),
@@ -454,12 +440,12 @@ class _RezeptFormState extends ConsumerState<RezeptForm> {
     });
 
     try {
-      final rezeptCreateDto = formContainer.toRezeptCreateDto();
+      final rezeptPayload = formContainer.toRezeptCreateDto();
 
       if (widget.rezept == null) {
-        await repo.createRezept(rezeptCreateDto);
+        await repo.createRezept(rezeptPayload);
       } else {
-        await repo.createRezept(rezeptCreateDto);
+        await repo.updateRezept(widget.rezept!.id, rezeptPayload);
       }
 
       if (mounted) {

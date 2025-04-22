@@ -77,6 +77,37 @@ class _RezeptRepository implements RezeptRepository {
   }
 
   @override
+  Future<Rezept> updateRezept(
+    String id,
+    Map<String, dynamic> rezeptUpdate,
+  ) async {
+    final _extra = <String, dynamic>{};
+    final queryParameters = <String, dynamic>{};
+    final _headers = <String, dynamic>{};
+    final _data = <String, dynamic>{};
+    _data.addAll(rezeptUpdate);
+    final _options = _setStreamType<Rezept>(
+      Options(method: 'PATCH', headers: _headers, extra: _extra)
+          .compose(
+            _dio.options,
+            '/${id}',
+            queryParameters: queryParameters,
+            data: _data,
+          )
+          .copyWith(baseUrl: _combineBaseUrls(_dio.options.baseUrl, baseUrl)),
+    );
+    final _result = await _dio.fetch<Map<String, dynamic>>(_options);
+    late Rezept _value;
+    try {
+      _value = Rezept.fromJson(_result.data!);
+    } on Object catch (e, s) {
+      errorLogger?.logError(e, s, _options);
+      rethrow;
+    }
+    return _value;
+  }
+
+  @override
   Future<void> deleteRezept(String id) async {
     final _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{};
@@ -86,7 +117,7 @@ class _RezeptRepository implements RezeptRepository {
       Options(method: 'DELETE', headers: _headers, extra: _extra)
           .compose(
             _dio.options,
-            '${id}',
+            '/${id}',
             queryParameters: queryParameters,
             data: _data,
           )

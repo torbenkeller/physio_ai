@@ -52,7 +52,10 @@ abstract class RezeptRepository {
   @POST('')
   Future<Rezept> createRezept(@Body() Map<String, dynamic> rezeptCreate);
 
-  @DELETE('{id}')
+  @PATCH('/{id}')
+  Future<Rezept> updateRezept(@Path('id') String id, @Body() Map<String, dynamic> rezeptUpdate);
+
+  @DELETE('/{id}')
   Future<void> deleteRezept(@Path('id') String id);
 
   @POST('/createFromImage')

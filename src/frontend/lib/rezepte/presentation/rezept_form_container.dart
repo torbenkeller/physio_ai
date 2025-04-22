@@ -1,39 +1,56 @@
 import 'package:fast_immutable_collections/fast_immutable_collections.dart';
 import 'package:flutter/material.dart';
-import 'package:freezed_annotation/freezed_annotation.dart';
-import 'package:physio_ai/patienten/presentation/form_container.dart';
 import 'package:physio_ai/rezepte/rezept.dart';
-
-part 'generated/rezept_form_container.freezed.dart';
+import 'package:physio_ai/shared_kernel/presentation/form_container.dart';
+import 'package:physio_ai/shared_kernel/presentation/form_field_container.dart';
+import 'package:physio_ai/shared_kernel/presentation/validation/validators.dart';
 
 class RezeptFormContainer extends FormContainer {
-  RezeptFormContainer()
-      : ausgestelltAm = GlobalKey<FormFieldState<DateTime>>(),
-        patientId = GlobalKey<FormFieldState<String>>(),
-        positionen = const IListConst<RezeptPositionFormField>(<RezeptPositionFormField>[]),
+  RezeptFormContainer._({
+    required this.ausgestelltAm,
+    required this.patientId,
+    required Behandlungsart initialBehandlungsart,
+    required this.positionen,
+  })  : _initialBehandlungsart = initialBehandlungsart,
         super(formKey: GlobalKey<FormState>());
 
   /// Factory constructor to create a form container from a Rezept
-  factory RezeptFormContainer.fromRezept(Rezept? rezept) {
-    final container = RezeptFormContainer();
+  factory RezeptFormContainer.fromRezept({
+    required Rezept? rezept,
+    required Behandlungsart initialBehandlungsart,
+  }) {
+    final ausgestelltAm = FormFieldContainer<DateTime>(
+      initialValue: rezept?.ausgestelltAm ?? DateTime.now(),
+      validators: [validateRequired],
+    );
 
-    if (rezept != null) {
-      for (final _ in rezept.positionen) {
-        container.addPosition();
-      }
-    } else {
-      container.addPosition();
-    }
+    final patientId = FormFieldContainer<String?>(
+      initialValue: rezept?.patientId,
+      validators: [validateRequired],
+    );
 
-    return container;
+    final positionen = rezept?.positionen
+            .map((pos) => RezeptPositionFormField.fromPosition(rezeptPos: pos))
+            .toIList() ??
+        IListConst([RezeptPositionFormField.empty(initialBehandlungsart: initialBehandlungsart)]);
+
+    return RezeptFormContainer._(
+      ausgestelltAm: ausgestelltAm,
+      patientId: patientId,
+      initialBehandlungsart: initialBehandlungsart,
+      positionen: positionen,
+    );
   }
 
-  final GlobalKey<FormFieldState<DateTime>> ausgestelltAm;
-  final GlobalKey<FormFieldState<String>> patientId;
+  final FormFieldContainer<DateTime> ausgestelltAm;
+  final FormFieldContainer<String?> patientId;
   IList<RezeptPositionFormField> positionen;
 
+  final Behandlungsart _initialBehandlungsart;
+
   void addPosition() {
-    final newPosition = RezeptPositionFormField();
+    final newPosition =
+        RezeptPositionFormField.empty(initialBehandlungsart: _initialBehandlungsart);
     positionen = positionen.add(newPosition);
   }
 
@@ -43,76 +60,42 @@ class RezeptFormContainer extends FormContainer {
     }
   }
 
-  RezeptFormState toFormState() {
-    final positionStates = positionen.map((pos) {
-      return RezeptPositionState(
-        anzahl: int.tryParse(pos.anzahl.currentState?.value ?? '1') ?? 1,
-        behandlungsart: pos.behandlungsart.currentState?.value ??
-            const Behandlungsart(id: '', name: '', preis: 0.0),
-      );
-    }).toIList();
-
-    return RezeptFormState(
-      ausgestelltAm: ausgestelltAm.currentState?.value ?? DateTime.now(),
-      preisGesamt: 0.0,
-      positionen: positionStates,
-    );
-  }
-
   Map<String, dynamic> toRezeptCreateDto() {
-    final selectedPatientId = patientId.currentState?.value;
+    final selectedPatientId = patientId.value;
     if (selectedPatientId == null || selectedPatientId.isEmpty) {
       throw Exception('Bitte wählen Sie einen Patienten aus');
     }
 
     final positionenDto = positionen.map((pos) {
-      final behandlungsart = pos.behandlungsart.currentState!.value!;
+      final behandlungsart = pos.behandlungsart.value;
       return {
         'behandlungsartId': behandlungsart.id,
-        'anzahl': int.parse(pos.anzahl.currentState!.value ?? '0'),
+        'anzahl': int.parse(pos.anzahl.value),
       };
     }).toList();
 
-    final formState = toFormState();
-    final totalPrice = formState.calculateTotalPrice();
-
     return {
       'patientId': selectedPatientId,
-      'ausgestelltAm': ausgestelltAm.currentState!.value!.toIso8601String().split('T')[0],
-      'preisGesamt': totalPrice,
+      'ausgestelltAm': ausgestelltAm.value.toIso8601String().split('T')[0],
+      'preisGesamt': price,
       'positionen': positionenDto,
     };
   }
 
   Rezept toRezept({String? existingId}) {
-    final selectedPatientId = patientId.currentState?.value;
-    
-    final positionenList = positionen
-        .map((p) => RezeptPos(
-              anzahl: int.parse(p.anzahl.currentState!.value ?? '0'),
-              behandlungsart: p.behandlungsart.currentState!.value ??
-                  const Behandlungsart(
-                    id: '',
-                    name: '',
-                    preis: 0.0,
-                  ),
-            ))
-        .toList();
-
-    final formState = toFormState();
-    final totalPrice = formState.calculateTotalPrice();
-
     return Rezept(
       id: existingId ?? '',
-      patientId: selectedPatientId,
-      ausgestelltAm: ausgestelltAm.currentState!.value!,
-      preisGesamt: totalPrice,
-      positionen: positionenList.toIList(),
+      patientId: patientId.value,
+      ausgestelltAm: ausgestelltAm.value,
+      preisGesamt: price,
+      positionen: positionen.map((p) => p.toRezeptPos()).toIList(),
     );
   }
 
+  double get price => positionen.sumBy((p) => p.price);
+
   @override
-  List<GlobalKey<FormFieldState<dynamic>>> get requiredFields => [
+  List<FormFieldContainer<dynamic>> get requiredFields => [
         ausgestelltAm,
         patientId,
         ...positionen.expand((p) => [p.anzahl, p.behandlungsart]),
@@ -120,39 +103,43 @@ class RezeptFormContainer extends FormContainer {
 }
 
 class RezeptPositionFormField {
-  final anzahl = GlobalKey<FormFieldState<String>>();
-  final behandlungsart = GlobalKey<FormFieldState<Behandlungsart>>();
+  RezeptPositionFormField._({
+    required int initialAnzahl,
+    required Behandlungsart initialBehandlungsart,
+  })  : anzahl = FormFieldContainer<String>(
+          initialValue: initialAnzahl.toString(),
+          validators: [validateRequired],
+        ),
+        behandlungsart = FormFieldContainer<Behandlungsart>(
+          initialValue: initialBehandlungsart,
+          validators: [validateRequired],
+        );
 
-  RezeptPositionFormField();
-}
-
-@freezed
-abstract class RezeptFormState with _$RezeptFormState {
-  const factory RezeptFormState({
-    required DateTime ausgestelltAm,
-    required double preisGesamt,
-    required IList<RezeptPositionState> positionen,
-  }) = _RezeptFormState;
-
-  const RezeptFormState._();
-
-  /// Calculate price for a specific position
-  double calculatePositionPrice(int index) {
-    if (index >= positionen.length) return 0;
-    final position = positionen[index];
-    return position.anzahl * position.behandlungsart.preis;
+  factory RezeptPositionFormField.empty({required Behandlungsart initialBehandlungsart}) {
+    return RezeptPositionFormField._(
+      initialAnzahl: 1,
+      initialBehandlungsart: initialBehandlungsart,
+    );
   }
 
-  /// Calculate total price across all positions
-  double calculateTotalPrice() {
-    return positionen.fold(0, (sum, pos) => sum + (pos.anzahl * pos.behandlungsart.preis));
+  factory RezeptPositionFormField.fromPosition({required RezeptPos rezeptPos}) {
+    return RezeptPositionFormField._(
+      initialAnzahl: rezeptPos.anzahl,
+      initialBehandlungsart: rezeptPos.behandlungsart,
+    );
   }
-}
 
-@freezed
-abstract class RezeptPositionState with _$RezeptPositionState {
-  const factory RezeptPositionState({
-    required int anzahl,
-    required Behandlungsart behandlungsart,
-  }) = _RezeptPositionState;
+  final FormFieldContainer<String> anzahl;
+  final FormFieldContainer<Behandlungsart> behandlungsart;
+
+  RezeptPos toRezeptPos() {
+    return RezeptPos(
+      anzahl: int.parse(anzahl.value),
+      behandlungsart: behandlungsart.value,
+    );
+  }
+
+  double get price {
+    return int.parse(anzahl.value) * behandlungsart.value.preis;
+  }
 }

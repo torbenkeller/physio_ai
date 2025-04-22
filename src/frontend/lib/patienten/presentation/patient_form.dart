@@ -6,7 +6,6 @@ import 'package:physio_ai/patienten/domain/patient.dart';
 import 'package:physio_ai/patienten/infrastructure/patient_repository.dart';
 import 'package:physio_ai/patienten/presentation/patient_form_container.dart';
 import 'package:physio_ai/patienten/presentation/patienten_page.dart';
-import 'package:physio_ai/patienten/presentation/validation/validators.dart';
 
 class PatientForm extends ConsumerStatefulWidget {
   const PatientForm({
@@ -28,13 +27,13 @@ class _PatientFormState extends ConsumerState<PatientForm> {
   @override
   void initState() {
     super.initState();
-    formContainer = PatientFormContainer();
+    formContainer = PatientFormContainer(patient: widget.patient);
   }
 
   @override
   void didUpdateWidget(covariant PatientForm oldWidget) {
     if (oldWidget.patient != widget.patient) {
-      formContainer = PatientFormContainer();
+      formContainer = PatientFormContainer(patient: widget.patient);
     }
     super.didUpdateWidget(oldWidget);
   }
@@ -56,27 +55,27 @@ class _PatientFormState extends ConsumerState<PatientForm> {
                 fit: FlexFit.tight,
                 flex: 1,
                 child: TextFormField(
-                  key: formContainer.titel,
+                  key: formContainer.titel.key,
                   decoration: const InputDecoration(labelText: 'Titel'),
-                  initialValue: widget.patient?.titel,
+                  initialValue: formContainer.titel.initialValue,
                 ),
               ),
               Flexible(
                 flex: 3,
                 child: TextFormField(
-                  key: formContainer.vorname,
+                  key: formContainer.vorname.key,
                   decoration: const InputDecoration(labelText: 'Vorname*'),
                   initialValue: widget.patient?.vorname,
-                  validator: (value) => validateRequired(value, context),
+                  validator: (value) => formContainer.vorname.validate(value, context),
                 ),
               ),
               Flexible(
                 flex: 3,
                 child: TextFormField(
-                  key: formContainer.nachname,
+                  key: formContainer.nachname.key,
                   decoration: const InputDecoration(labelText: 'Nachname*'),
-                  initialValue: widget.patient?.nachname,
-                  validator: (value) => validateRequired(value, context),
+                  initialValue: formContainer.nachname.initialValue,
+                  validator: (value) => formContainer.nachname.validate(value, context),
                 ),
               ),
             ],
@@ -86,13 +85,13 @@ class _PatientFormState extends ConsumerState<PatientForm> {
             children: [
               Expanded(
                 child: DateTimeFormField(
-                  key: formContainer.geburtstag,
+                  key: formContainer.geburtstag.key,
                   decoration: const InputDecoration(labelText: 'Geburtstag*'),
                   initialValue: widget.patient?.geburtstag,
                   pickerPlatform: DateTimeFieldPickerPlatform.material,
                   initialPickerDateTime: DateTime(1970),
                   mode: DateTimeFieldPickerMode.date,
-                  validator: (value) => validateRequired(value, context),
+                  validator: (value) => formContainer.geburtstag.validate(value, context),
                 ),
               ),
               const Spacer(),
@@ -105,16 +104,16 @@ class _PatientFormState extends ConsumerState<PatientForm> {
               Flexible(
                 flex: 2,
                 child: TextFormField(
-                  key: formContainer.strasse,
+                  key: formContainer.strasse.key,
                   decoration: const InputDecoration(labelText: 'Straße'),
-                  initialValue: widget.patient?.strasse,
+                  initialValue: formContainer.strasse.initialValue,
                 ),
               ),
               Flexible(
                 child: TextFormField(
-                  key: formContainer.hausnummer,
+                  key: formContainer.hausnummer.key,
                   decoration: const InputDecoration(labelText: 'Hausnummer'),
-                  initialValue: widget.patient?.hausnummer,
+                  initialValue: formContainer.hausnummer.initialValue,
                 ),
               ),
             ],
@@ -125,33 +124,33 @@ class _PatientFormState extends ConsumerState<PatientForm> {
             children: [
               Flexible(
                 child: TextFormField(
-                  key: formContainer.plz,
+                  key: formContainer.plz.key,
                   decoration: const InputDecoration(labelText: 'PLZ'),
-                  initialValue: widget.patient?.plz,
+                  initialValue: formContainer.plz.initialValue,
                 ),
               ),
               Flexible(
                 flex: 2,
                 child: TextFormField(
-                  key: formContainer.stadt,
+                  key: formContainer.stadt.key,
                   decoration: const InputDecoration(labelText: 'Stadt'),
-                  initialValue: widget.patient?.stadt,
+                  initialValue: formContainer.stadt.initialValue,
                 ),
               ),
             ],
           ),
           TextFormField(
-            key: formContainer.email,
+            key: formContainer.email.key,
             decoration: const InputDecoration(labelText: 'E-Mail'),
-            initialValue: widget.patient?.email,
+            initialValue: formContainer.email.initialValue,
           ),
           TextFormField(
-            key: formContainer.telFestnetz,
+            key: formContainer.telFestnetz.key,
             decoration: const InputDecoration(labelText: 'Tel. Festnetz'),
             initialValue: widget.patient?.telFestnetz,
           ),
           TextFormField(
-            key: formContainer.telMobil,
+            key: formContainer.telMobil.key,
             decoration: const InputDecoration(labelText: 'Tel. Mobil'),
             initialValue: widget.patient?.telMobil,
           ),
@@ -163,7 +162,7 @@ class _PatientFormState extends ConsumerState<PatientForm> {
       mainAxisAlignment: MainAxisAlignment.end,
       spacing: 16,
       children: [
-        if (widget.patient != null) 
+        if (widget.patient != null)
           ElevatedButton.icon(
             onPressed: () {
               context.go('/rezepte/create?patientId=${widget.patient!.id}');

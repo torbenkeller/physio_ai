@@ -10,6 +10,14 @@
         "LOG_LEVEL": "critical"
       },
       "disabled": false
+    },
+    "PubDev-MCP": {
+      "command": "dart",
+      "args": [
+        "/Users/torben/Desktop/Projects/pubdev_mcp/bin/pubdev_mcp.dart"
+      ],
+      "workingDirectory": "/Users/torben/Desktop/Projects/pubdev_mcp",
+      "disabled": false
     }
   }
 }

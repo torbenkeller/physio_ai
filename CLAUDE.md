@@ -36,3 +36,6 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - Use always IList from fast_immutable_collections.dart instead of List
 - only doc comments are necessary
 - clean up build methods by extracting widget trees into separate new widgets
+
+## General Workflow
+After each Prompt, run the tests. If the tests pass, create a new git commit with the changes. The message must match the Promt.

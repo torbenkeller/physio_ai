@@ -1,13 +1,11 @@
 import 'dart:io' if (dart.library.html) 'package:web/web.dart' show File;
 
 import 'package:dio/dio.dart' show DioMediaType, MultipartFile;
-import 'package:fast_immutable_collections/fast_immutable_collections.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:physio_ai/rezepte/model/rezept_einlesen_response.dart';
-import 'package:physio_ai/rezepte/rezept.dart';
 import 'package:physio_ai/rezepte/rezept_repository.dart';
 
 class UploadRezeptPage extends StatelessWidget {
@@ -206,19 +204,7 @@ class _UploadRezeptContentState extends ConsumerState<UploadRezeptContent> {
       final response = await repo.uploadRezeptImage([file]);
 
       if (mounted) {
-        final rezept = Rezept(
-          id: '',
-          ausgestelltAm: response.rezept.ausgestelltAm,
-          preisGesamt: response.rezept.rezeptpositionen
-              .fold(0.0, (sum, pos) => sum + (pos.behandlungsart.preis * pos.anzahl)),
-          positionen: response.rezept.rezeptpositionen
-              .map((pos) => RezeptPos(
-                    anzahl: pos.anzahl,
-                    behandlungsart: pos.behandlungsart,
-                  ))
-              .toList()
-              .toIList(),
-        );
+        final rezept = response.toRezept();
 
         context.go('/rezepte/create', extra: rezept);
       }

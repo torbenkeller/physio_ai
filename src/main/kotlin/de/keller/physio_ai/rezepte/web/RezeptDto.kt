@@ -1,8 +1,10 @@
 package de.keller.physio_ai.rezepte.web
 
 import de.keller.physio_ai.patienten.Patient
-import de.keller.physio_ai.patienten.PatientId
-import de.keller.physio_ai.rezepte.*
+import de.keller.physio_ai.rezepte.domain.Arzt
+import de.keller.physio_ai.rezepte.domain.Behandlungsart
+import de.keller.physio_ai.rezepte.domain.Rezept
+import de.keller.physio_ai.rezepte.domain.RezeptPosSource
 import java.time.LocalDate
 import java.util.*
 
@@ -21,7 +23,6 @@ data class RezeptDto(
             rezept: Rezept,
             patient: Patient,
             arzt: Arzt?,
-            behandlungsarten: List<Behandlungsart>,
         ): RezeptDto {
             return RezeptDto(
                 id = rezept.id.id,
@@ -29,9 +30,13 @@ data class RezeptDto(
                 ausgestelltAm = rezept.ausgestelltAm,
                 ausgestelltVon = if (arzt != null) RezeptArztDto.fromArzt(arzt) else null,
                 positionen = rezept.positionen.map { pos ->
-                    RezeptPosDto.fromRezeptPos(
-                        rezeptPos = pos,
-                        behandlungsart = behandlungsarten.first { it.id == pos.behandlungsartId }
+                    RezeptPosDto(
+                        anzahl = pos.anzahl,
+                        behandlungsart = BehandlungsartDto(
+                            preis = pos.einzelpreis,
+                            id = pos.behandlungsartId.id,
+                            name = pos.behandlungsartName,
+                        )
                     )
                 }.toList(),
                 rechnung = null,
@@ -86,28 +91,17 @@ data class RezeptPosDto(
     val behandlungsart: BehandlungsartDto,
     val anzahl: Long
 ) {
-    companion object {
-        fun fromRezeptPos(
-            rezeptPos: RezeptPos,
-            behandlungsart: Behandlungsart
-        ): RezeptPosDto {
-            return RezeptPosDto(
-                anzahl = rezeptPos.anzahl,
-                behandlungsart = BehandlungsartDto.fromBehandlungsart(behandlungsart)
-            )
-        }
-    }
 }
 
 data class BehandlungsartDto(
-    val id: String,
+    val id: UUID,
     val name: String,
     val preis: Double,
 ) {
     companion object {
         fun fromBehandlungsart(behandlungsart: Behandlungsart): BehandlungsartDto {
             return BehandlungsartDto(
-                id = behandlungsart.id.id.toString(),
+                id = behandlungsart.id.id,
                 name = behandlungsart.name,
                 preis = behandlungsart.preis
             )
@@ -121,30 +115,8 @@ data class BehandlungsartDto(
 data class RezeptCreateDto(
     val patientId: UUID,
     val ausgestelltAm: LocalDate,
-    val preisGesamt: Double,
     val positionen: List<RezeptPosCreateDto>,
 ) {
-    fun toRezept(): Rezept {
-        val rezeptId = RezeptId.generate()
-        
-        return Rezept(
-            id = rezeptId,
-            patientId = PatientId(patientId),
-            ausgestelltAm = ausgestelltAm,
-            ausgestelltVonArztId = null, // Not provided in frontend
-            preisGesamt = preisGesamt,
-            rechnungsnummer = null, // No invoice number initially
-            positionen = positionen.mapIndexed { index, pos ->
-                RezeptPos(
-                    id = UUID.randomUUID(),
-                    index = index.toLong(),
-                    rezeptId = rezeptId,
-                    behandlungsartId = BehandlungsartId(pos.behandlungsartId),
-                    anzahl = pos.anzahl
-                )
-            }
-        )
-    }
 }
 
 /**
@@ -153,29 +125,8 @@ data class RezeptCreateDto(
 data class RezeptUpdateDto(
     val patientId: UUID,
     val ausgestelltAm: LocalDate,
-    val preisGesamt: Double,
     val positionen: List<RezeptPosCreateDto>,
 ) {
-    fun toRezept(existingRezeptId: RezeptId, existingVersion: Long): Rezept {
-        return Rezept(
-            id = existingRezeptId,
-            patientId = PatientId(patientId),
-            ausgestelltAm = ausgestelltAm,
-            ausgestelltVonArztId = null, // Not updated from frontend
-            preisGesamt = preisGesamt,
-            rechnungsnummer = null, // Not updated from frontend
-            positionen = positionen.mapIndexed { index, pos ->
-                RezeptPos(
-                    id = UUID.randomUUID(), // Generate new IDs for positions
-                    index = index.toLong(),
-                    rezeptId = existingRezeptId,
-                    behandlungsartId = BehandlungsartId(pos.behandlungsartId),
-                    anzahl = pos.anzahl
-                )
-            },
-            version = existingVersion // Keep existing version for optimistic locking
-        )
-    }
 }
 
 /**

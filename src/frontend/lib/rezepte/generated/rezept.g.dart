@@ -8,7 +8,7 @@ part of '../rezept.dart';
 
 _Rezept _$RezeptFromJson(Map<String, dynamic> json) => _Rezept(
       id: json['id'] as String,
-      patientId: json['patientId'] as String?,
+      patient: RezeptPatient.fromJson(json['patient'] as Map<String, dynamic>),
       ausgestelltAm: DateTime.parse(json['ausgestelltAm'] as String),
       preisGesamt: (json['preisGesamt'] as num).toDouble(),
       positionen: json['positionen'] == null
@@ -19,7 +19,7 @@ _Rezept _$RezeptFromJson(Map<String, dynamic> json) => _Rezept(
 
 Map<String, dynamic> _$RezeptToJson(_Rezept instance) => <String, dynamic>{
       'id': instance.id,
-      if (instance.patientId case final value?) 'patientId': value,
+      'patient': instance.patient,
       'ausgestelltAm': instance.ausgestelltAm.toIso8601String(),
       'preisGesamt': instance.preisGesamt,
       'positionen': instance.positionen.toJson(
@@ -51,4 +51,18 @@ Map<String, dynamic> _$BehandlungsartToJson(_Behandlungsart instance) =>
       'id': instance.id,
       'name': instance.name,
       'preis': instance.preis,
+    };
+
+_RezeptPatient _$RezeptPatientFromJson(Map<String, dynamic> json) =>
+    _RezeptPatient(
+      id: json['id'] as String,
+      vorname: json['vorname'] as String,
+      nachname: json['nachname'] as String,
+    );
+
+Map<String, dynamic> _$RezeptPatientToJson(_RezeptPatient instance) =>
+    <String, dynamic>{
+      'id': instance.id,
+      'vorname': instance.vorname,
+      'nachname': instance.nachname,
     };

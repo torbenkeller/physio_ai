@@ -390,13 +390,10 @@ class _RezeptFormState extends ConsumerState<RezeptForm> {
   }
 
   Widget _buildPatientSelector(RezeptFormContainer formContainer, IList<Patient> patienten) {
-    final selectedPatientId = widget.rezept?.patientId;
-
-    return FormField<String>(
+    return FormField<String?>(
       key: formContainer.patientId.key,
-      initialValue: selectedPatientId,
-      validator: (value) =>
-          (value == null || value.isEmpty) ? 'Bitte wählen Sie einen Patienten aus' : null,
+      initialValue: formContainer.patientId.initialValue,
+      validator: (value) => formContainer.patientId.validate(value, context),
       builder: (state) {
         return InputDecorator(
           decoration: InputDecoration(
@@ -404,7 +401,7 @@ class _RezeptFormState extends ConsumerState<RezeptForm> {
             errorText: state.errorText,
           ),
           child: DropdownButtonHideUnderline(
-            child: DropdownButton<String>(
+            child: DropdownButton<String?>(
               isExpanded: true,
               value: state.value,
               hint: const Text('Bitte wählen Sie einen Patienten aus'),
@@ -415,7 +412,7 @@ class _RezeptFormState extends ConsumerState<RezeptForm> {
                 return DropdownMenuItem<String>(
                   value: patient.id,
                   child: Text(
-                    '${patient.fullName} (geb. ${DateFormat('dd.MM.yyyy').format(patient.geburtstag)}',
+                    '${patient.fullName} (geb. ${DateFormat('dd.MM.yyyy').format(patient.geburtstag)})',
                   ),
                 );
               }).toList(),

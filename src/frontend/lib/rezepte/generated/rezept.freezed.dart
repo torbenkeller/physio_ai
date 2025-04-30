@@ -16,8 +16,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$Rezept {
   String get id;
-  @JsonKey(includeIfNull: false)
-  String? get patientId;
+  RezeptPatient get patient;
   DateTime get ausgestelltAm;
   double get preisGesamt;
   IList<RezeptPos> get positionen;
@@ -38,8 +37,7 @@ mixin _$Rezept {
         (other.runtimeType == runtimeType &&
             other is Rezept &&
             (identical(other.id, id) || other.id == id) &&
-            (identical(other.patientId, patientId) ||
-                other.patientId == patientId) &&
+            (identical(other.patient, patient) || other.patient == patient) &&
             (identical(other.ausgestelltAm, ausgestelltAm) ||
                 other.ausgestelltAm == ausgestelltAm) &&
             (identical(other.preisGesamt, preisGesamt) ||
@@ -50,12 +48,12 @@ mixin _$Rezept {
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  int get hashCode => Object.hash(runtimeType, id, patientId, ausgestelltAm,
+  int get hashCode => Object.hash(runtimeType, id, patient, ausgestelltAm,
       preisGesamt, const DeepCollectionEquality().hash(positionen));
 
   @override
   String toString() {
-    return 'Rezept(id: $id, patientId: $patientId, ausgestelltAm: $ausgestelltAm, preisGesamt: $preisGesamt, positionen: $positionen)';
+    return 'Rezept(id: $id, patient: $patient, ausgestelltAm: $ausgestelltAm, preisGesamt: $preisGesamt, positionen: $positionen)';
   }
 }
 
@@ -66,10 +64,12 @@ abstract mixin class $RezeptCopyWith<$Res> {
   @useResult
   $Res call(
       {String id,
-      @JsonKey(includeIfNull: false) String? patientId,
+      RezeptPatient patient,
       DateTime ausgestelltAm,
       double preisGesamt,
       IList<RezeptPos> positionen});
+
+  $RezeptPatientCopyWith<$Res> get patient;
 }
 
 /// @nodoc
@@ -85,7 +85,7 @@ class _$RezeptCopyWithImpl<$Res> implements $RezeptCopyWith<$Res> {
   @override
   $Res call({
     Object? id = null,
-    Object? patientId = freezed,
+    Object? patient = null,
     Object? ausgestelltAm = null,
     Object? preisGesamt = null,
     Object? positionen = null,
@@ -95,10 +95,10 @@ class _$RezeptCopyWithImpl<$Res> implements $RezeptCopyWith<$Res> {
           ? _self.id
           : id // ignore: cast_nullable_to_non_nullable
               as String,
-      patientId: freezed == patientId
-          ? _self.patientId
-          : patientId // ignore: cast_nullable_to_non_nullable
-              as String?,
+      patient: null == patient
+          ? _self.patient
+          : patient // ignore: cast_nullable_to_non_nullable
+              as RezeptPatient,
       ausgestelltAm: null == ausgestelltAm
           ? _self.ausgestelltAm
           : ausgestelltAm // ignore: cast_nullable_to_non_nullable
@@ -113,6 +113,16 @@ class _$RezeptCopyWithImpl<$Res> implements $RezeptCopyWith<$Res> {
               as IList<RezeptPos>,
     ));
   }
+
+  /// Create a copy of Rezept
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $RezeptPatientCopyWith<$Res> get patient {
+    return $RezeptPatientCopyWith<$Res>(_self.patient, (value) {
+      return _then(_self.copyWith(patient: value));
+    });
+  }
 }
 
 /// @nodoc
@@ -120,7 +130,7 @@ class _$RezeptCopyWithImpl<$Res> implements $RezeptCopyWith<$Res> {
 class _Rezept extends Rezept {
   const _Rezept(
       {required this.id,
-      @JsonKey(includeIfNull: false) this.patientId,
+      required this.patient,
       required this.ausgestelltAm,
       required this.preisGesamt,
       this.positionen = const IListConst([])})
@@ -130,8 +140,7 @@ class _Rezept extends Rezept {
   @override
   final String id;
   @override
-  @JsonKey(includeIfNull: false)
-  final String? patientId;
+  final RezeptPatient patient;
   @override
   final DateTime ausgestelltAm;
   @override
@@ -161,8 +170,7 @@ class _Rezept extends Rezept {
         (other.runtimeType == runtimeType &&
             other is _Rezept &&
             (identical(other.id, id) || other.id == id) &&
-            (identical(other.patientId, patientId) ||
-                other.patientId == patientId) &&
+            (identical(other.patient, patient) || other.patient == patient) &&
             (identical(other.ausgestelltAm, ausgestelltAm) ||
                 other.ausgestelltAm == ausgestelltAm) &&
             (identical(other.preisGesamt, preisGesamt) ||
@@ -173,12 +181,12 @@ class _Rezept extends Rezept {
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  int get hashCode => Object.hash(runtimeType, id, patientId, ausgestelltAm,
+  int get hashCode => Object.hash(runtimeType, id, patient, ausgestelltAm,
       preisGesamt, const DeepCollectionEquality().hash(positionen));
 
   @override
   String toString() {
-    return 'Rezept(id: $id, patientId: $patientId, ausgestelltAm: $ausgestelltAm, preisGesamt: $preisGesamt, positionen: $positionen)';
+    return 'Rezept(id: $id, patient: $patient, ausgestelltAm: $ausgestelltAm, preisGesamt: $preisGesamt, positionen: $positionen)';
   }
 }
 
@@ -190,10 +198,13 @@ abstract mixin class _$RezeptCopyWith<$Res> implements $RezeptCopyWith<$Res> {
   @useResult
   $Res call(
       {String id,
-      @JsonKey(includeIfNull: false) String? patientId,
+      RezeptPatient patient,
       DateTime ausgestelltAm,
       double preisGesamt,
       IList<RezeptPos> positionen});
+
+  @override
+  $RezeptPatientCopyWith<$Res> get patient;
 }
 
 /// @nodoc
@@ -209,7 +220,7 @@ class __$RezeptCopyWithImpl<$Res> implements _$RezeptCopyWith<$Res> {
   @pragma('vm:prefer-inline')
   $Res call({
     Object? id = null,
-    Object? patientId = freezed,
+    Object? patient = null,
     Object? ausgestelltAm = null,
     Object? preisGesamt = null,
     Object? positionen = null,
@@ -219,10 +230,10 @@ class __$RezeptCopyWithImpl<$Res> implements _$RezeptCopyWith<$Res> {
           ? _self.id
           : id // ignore: cast_nullable_to_non_nullable
               as String,
-      patientId: freezed == patientId
-          ? _self.patientId
-          : patientId // ignore: cast_nullable_to_non_nullable
-              as String?,
+      patient: null == patient
+          ? _self.patient
+          : patient // ignore: cast_nullable_to_non_nullable
+              as RezeptPatient,
       ausgestelltAm: null == ausgestelltAm
           ? _self.ausgestelltAm
           : ausgestelltAm // ignore: cast_nullable_to_non_nullable
@@ -236,6 +247,16 @@ class __$RezeptCopyWithImpl<$Res> implements _$RezeptCopyWith<$Res> {
           : positionen // ignore: cast_nullable_to_non_nullable
               as IList<RezeptPos>,
     ));
+  }
+
+  /// Create a copy of Rezept
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $RezeptPatientCopyWith<$Res> get patient {
+    return $RezeptPatientCopyWith<$Res>(_self.patient, (value) {
+      return _then(_self.copyWith(patient: value));
+    });
   }
 }
 
@@ -594,6 +615,184 @@ class __$BehandlungsartCopyWithImpl<$Res>
           ? _self.preis
           : preis // ignore: cast_nullable_to_non_nullable
               as double,
+    ));
+  }
+}
+
+/// @nodoc
+mixin _$RezeptPatient {
+  String get id;
+  String get vorname;
+  String get nachname;
+
+  /// Create a copy of RezeptPatient
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @pragma('vm:prefer-inline')
+  $RezeptPatientCopyWith<RezeptPatient> get copyWith =>
+      _$RezeptPatientCopyWithImpl<RezeptPatient>(
+          this as RezeptPatient, _$identity);
+
+  /// Serializes this RezeptPatient to a JSON map.
+  Map<String, dynamic> toJson();
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is RezeptPatient &&
+            (identical(other.id, id) || other.id == id) &&
+            (identical(other.vorname, vorname) || other.vorname == vorname) &&
+            (identical(other.nachname, nachname) ||
+                other.nachname == nachname));
+  }
+
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  int get hashCode => Object.hash(runtimeType, id, vorname, nachname);
+
+  @override
+  String toString() {
+    return 'RezeptPatient(id: $id, vorname: $vorname, nachname: $nachname)';
+  }
+}
+
+/// @nodoc
+abstract mixin class $RezeptPatientCopyWith<$Res> {
+  factory $RezeptPatientCopyWith(
+          RezeptPatient value, $Res Function(RezeptPatient) _then) =
+      _$RezeptPatientCopyWithImpl;
+  @useResult
+  $Res call({String id, String vorname, String nachname});
+}
+
+/// @nodoc
+class _$RezeptPatientCopyWithImpl<$Res>
+    implements $RezeptPatientCopyWith<$Res> {
+  _$RezeptPatientCopyWithImpl(this._self, this._then);
+
+  final RezeptPatient _self;
+  final $Res Function(RezeptPatient) _then;
+
+  /// Create a copy of RezeptPatient
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? id = null,
+    Object? vorname = null,
+    Object? nachname = null,
+  }) {
+    return _then(_self.copyWith(
+      id: null == id
+          ? _self.id
+          : id // ignore: cast_nullable_to_non_nullable
+              as String,
+      vorname: null == vorname
+          ? _self.vorname
+          : vorname // ignore: cast_nullable_to_non_nullable
+              as String,
+      nachname: null == nachname
+          ? _self.nachname
+          : nachname // ignore: cast_nullable_to_non_nullable
+              as String,
+    ));
+  }
+}
+
+/// @nodoc
+@JsonSerializable()
+class _RezeptPatient extends RezeptPatient {
+  const _RezeptPatient(
+      {required this.id, required this.vorname, required this.nachname})
+      : super._();
+  factory _RezeptPatient.fromJson(Map<String, dynamic> json) =>
+      _$RezeptPatientFromJson(json);
+
+  @override
+  final String id;
+  @override
+  final String vorname;
+  @override
+  final String nachname;
+
+  /// Create a copy of RezeptPatient
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @pragma('vm:prefer-inline')
+  _$RezeptPatientCopyWith<_RezeptPatient> get copyWith =>
+      __$RezeptPatientCopyWithImpl<_RezeptPatient>(this, _$identity);
+
+  @override
+  Map<String, dynamic> toJson() {
+    return _$RezeptPatientToJson(
+      this,
+    );
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _RezeptPatient &&
+            (identical(other.id, id) || other.id == id) &&
+            (identical(other.vorname, vorname) || other.vorname == vorname) &&
+            (identical(other.nachname, nachname) ||
+                other.nachname == nachname));
+  }
+
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  int get hashCode => Object.hash(runtimeType, id, vorname, nachname);
+
+  @override
+  String toString() {
+    return 'RezeptPatient(id: $id, vorname: $vorname, nachname: $nachname)';
+  }
+}
+
+/// @nodoc
+abstract mixin class _$RezeptPatientCopyWith<$Res>
+    implements $RezeptPatientCopyWith<$Res> {
+  factory _$RezeptPatientCopyWith(
+          _RezeptPatient value, $Res Function(_RezeptPatient) _then) =
+      __$RezeptPatientCopyWithImpl;
+  @override
+  @useResult
+  $Res call({String id, String vorname, String nachname});
+}
+
+/// @nodoc
+class __$RezeptPatientCopyWithImpl<$Res>
+    implements _$RezeptPatientCopyWith<$Res> {
+  __$RezeptPatientCopyWithImpl(this._self, this._then);
+
+  final _RezeptPatient _self;
+  final $Res Function(_RezeptPatient) _then;
+
+  /// Create a copy of RezeptPatient
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $Res call({
+    Object? id = null,
+    Object? vorname = null,
+    Object? nachname = null,
+  }) {
+    return _then(_RezeptPatient(
+      id: null == id
+          ? _self.id
+          : id // ignore: cast_nullable_to_non_nullable
+              as String,
+      vorname: null == vorname
+          ? _self.vorname
+          : vorname // ignore: cast_nullable_to_non_nullable
+              as String,
+      nachname: null == nachname
+          ? _self.nachname
+          : nachname // ignore: cast_nullable_to_non_nullable
+              as String,
     ));
   }
 }

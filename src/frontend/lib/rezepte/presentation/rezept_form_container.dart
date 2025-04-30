@@ -25,7 +25,7 @@ class RezeptFormContainer extends FormContainer {
     );
 
     final patientId = FormFieldContainer<String?>(
-      initialValue: rezept?.patientId,
+      initialValue: rezept?.patient.id,
       validators: [validateRequired],
     );
 
@@ -85,7 +85,7 @@ class RezeptFormContainer extends FormContainer {
   Rezept toRezept({String? existingId}) {
     return Rezept(
       id: existingId ?? '',
-      patientId: patientId.value,
+      patient: RezeptPatient(id: patientId.value!, nachname: '', vorname: ''),
       ausgestelltAm: ausgestelltAm.value,
       preisGesamt: price,
       positionen: positionen.map((p) => p.toRezeptPos()).toIList(),

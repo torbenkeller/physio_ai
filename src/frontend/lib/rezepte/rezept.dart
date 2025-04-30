@@ -1,15 +1,14 @@
-import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:fast_immutable_collections/fast_immutable_collections.dart';
+import 'package:freezed_annotation/freezed_annotation.dart';
 
 part 'generated/rezept.freezed.dart';
-
 part 'generated/rezept.g.dart';
 
 @freezed
 abstract class Rezept with _$Rezept {
   const factory Rezept({
     required String id,
-    @JsonKey(includeIfNull: false) String? patientId,
+    required RezeptPatient patient,
     required DateTime ausgestelltAm,
     required double preisGesamt,
     @Default(IListConst([])) IList<RezeptPos> positionen,
@@ -43,4 +42,17 @@ abstract class Behandlungsart with _$Behandlungsart {
   const Behandlungsart._();
 
   factory Behandlungsart.fromJson(Map<String, dynamic> json) => _$BehandlungsartFromJson(json);
+}
+
+@freezed
+abstract class RezeptPatient with _$RezeptPatient {
+  const factory RezeptPatient({
+    required String id,
+    required String vorname,
+    required String nachname,
+  }) = _RezeptPatient;
+
+  const RezeptPatient._();
+
+  factory RezeptPatient.fromJson(Map<String, dynamic> json) => _$RezeptPatientFromJson(json);
 }

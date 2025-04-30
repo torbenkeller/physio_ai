@@ -1,8 +1,9 @@
-package de.keller.physio_ai.rezepte
+package de.keller.physio_ai.rezepte.domain
 
 import de.keller.physio_ai.patienten.Patient
 import de.keller.physio_ai.patienten.PatientId
 import de.keller.physio_ai.patienten.PatientenRepository
+import de.keller.physio_ai.rezepte.domain.*
 import de.keller.physio_ai.rezepte.web.BehandlungsartDto
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -27,7 +28,7 @@ class RezeptAiServiceTest {
     @Mock
     private lateinit var patientenRepository: PatientenRepository
 
-    private lateinit var rezeptService: RezeptService
+    private lateinit var rezeptService: RezeptAiService
     
     @TempDir
     lateinit var tempDir: Path
@@ -38,7 +39,7 @@ class RezeptAiServiceTest {
         // so we can use a mock that doesn't do anything
         val mockChatClientBuilder = mock(org.springframework.ai.chat.client.ChatClient.Builder::class.java)
         
-        rezeptService = RezeptService(
+        rezeptService = RezeptAiService(
             behandlungsartenRepository,
             mockChatClientBuilder,
             patientenRepository,

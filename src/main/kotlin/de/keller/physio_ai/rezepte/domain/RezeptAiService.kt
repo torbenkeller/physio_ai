@@ -1,4 +1,4 @@
-package de.keller.physio_ai.rezepte
+package de.keller.physio_ai.rezepte.domain
 
 import com.fasterxml.jackson.databind.PropertyNamingStrategies
 import com.fasterxml.jackson.databind.annotation.JsonNaming
@@ -51,7 +51,7 @@ data class RezeptEinlesenResponse(
 )
 
 @Service
-class RezeptService(
+class RezeptAiService(
     private val behandlungsartenRepository: BehandlungsartenRepository,
     private val chatClientBuilder: ChatClient.Builder,
     private val patientenRepository: PatientenRepository,

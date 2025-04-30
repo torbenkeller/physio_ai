@@ -1,4 +1,4 @@
-package de.keller.physio_ai.rezepte
+package de.keller.physio_ai.rezepte.domain
 
 import org.springframework.data.annotation.Id
 import org.springframework.data.relational.core.mapping.Table

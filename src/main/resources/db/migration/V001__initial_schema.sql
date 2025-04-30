@@ -40,9 +40,12 @@ create table behandlungsarten
 
 create table rezept_pos
 (
-    id                uuid not null primary key,
-    rezept_id         uuid not null references rezepte (id),
-    index             int  not null,
-    anzahl            int  not null,
-    behandlungsart_id uuid not null references behandlungsarten (id)
+    id                  uuid             not null primary key,
+    rezept_id           uuid             not null references rezepte (id),
+    index               int              not null,
+    anzahl              int              not null,
+    einzel_preis        double precision not null,
+    preis_gesamt        double precision not null,
+    behandlungsart_name varchar          not null,
+    behandlungsart_id   uuid             not null references behandlungsarten (id)
 );

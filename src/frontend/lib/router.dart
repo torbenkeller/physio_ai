@@ -71,19 +71,7 @@ final _mobileRouterConfig = RoutingConfig(
                     // Get rezept if passed as extra
                     Rezept? rezept;
                     if (state.extra != null && state.extra is Rezept) {
-                      rezept = state.extra as Rezept;
-                    }
-
-                    // Get patient ID from query parameters if present
-                    final patientId = state.uri.queryParameters['patientId'];
-                    if (patientId != null && patientId.isNotEmpty) {
-                      // Create a prefill rezept with the patient ID
-                      rezept = Rezept(
-                        id: '',
-                        ausgestelltAm: DateTime.now(),
-                        preisGesamt: 0,
-                        patientId: patientId,
-                      );
+                      rezept = state.extra! as Rezept;
                     }
 
                     return MaterialPage(
@@ -173,18 +161,6 @@ final _tabletRouterConfig = RoutingConfig(
                       rezept = state.extra as Rezept;
                     }
 
-                    // Get patient ID from query parameters if present
-                    final patientId = state.uri.queryParameters['patientId'];
-                    if (patientId != null && patientId.isNotEmpty) {
-                      // Create a prefill rezept with the patient ID
-                      rezept = Rezept(
-                        id: '',
-                        ausgestelltAm: DateTime.now(),
-                        preisGesamt: 0,
-                        patientId: patientId,
-                      );
-                    }
-
                     return MaterialPage(
                       fullscreenDialog: true,
                       child: CreateRezeptPage(
@@ -268,9 +244,9 @@ final _desktopRouterConfig = RoutingConfig(
           routes: [
             GoRoute(
               path: '/rezepte',
-              pageBuilder: (context, state) => NoTransitionPage(
-                key: const ValueKey('rezeptePage'),
-                child: const SplittedRezeptePage(
+              pageBuilder: (context, state) => const NoTransitionPage(
+                key: ValueKey('rezeptePage'),
+                child: SplittedRezeptePage(
                   rightPane: SizedBox(),
                   isContextCreate: false,
                 ),
@@ -298,9 +274,9 @@ final _desktopRouterConfig = RoutingConfig(
             ),
             GoRoute(
               path: '/rezepte/upload',
-              pageBuilder: (context, state) => NoTransitionPage(
-                key: const ValueKey('rezepteUploadPage'),
-                child: const SplittedRezeptePage(
+              pageBuilder: (context, state) => const NoTransitionPage(
+                key: ValueKey('rezepteUploadPage'),
+                child: SplittedRezeptePage(
                   rightPane: UploadRezeptContent(),
                   isContextCreate: true,
                 ),

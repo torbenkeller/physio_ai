@@ -1,4 +1,4 @@
-package de.keller.physio_ai.rezepte
+package de.keller.physio_ai.rezepte.domain
 
 import de.keller.physio_ai.config.SpringDataJdbcConverter
 import org.springframework.core.convert.converter.Converter

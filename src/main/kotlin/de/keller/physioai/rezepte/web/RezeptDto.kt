@@ -1,12 +1,11 @@
-package de.keller.physio_ai.rezepte.web
+package de.keller.physioai.rezepte.web
 
-import de.keller.physio_ai.patienten.Patient
-import de.keller.physio_ai.rezepte.domain.Arzt
-import de.keller.physio_ai.rezepte.domain.Behandlungsart
-import de.keller.physio_ai.rezepte.domain.Rezept
-import de.keller.physio_ai.rezepte.domain.RezeptPosSource
+import de.keller.physioai.patienten.Patient
+import de.keller.physioai.rezepte.domain.Arzt
+import de.keller.physioai.rezepte.domain.Behandlungsart
+import de.keller.physioai.rezepte.domain.Rezept
 import java.time.LocalDate
-import java.util.*
+import java.util.UUID
 
 data class RezeptDto(
     val id: UUID,
@@ -17,32 +16,33 @@ data class RezeptDto(
     val rechnung: RezeptRechnungDto?,
     val positionen: List<RezeptPosDto>,
 ) {
-
     companion object {
         fun fromRezept(
             rezept: Rezept,
             patient: Patient,
             arzt: Arzt?,
-        ): RezeptDto {
-            return RezeptDto(
+        ): RezeptDto =
+            RezeptDto(
                 id = rezept.id.id,
                 patient = RezeptPatientDto.fromPatient(patient),
                 ausgestelltAm = rezept.ausgestelltAm,
                 ausgestelltVon = if (arzt != null) RezeptArztDto.fromArzt(arzt) else null,
-                positionen = rezept.positionen.map { pos ->
-                    RezeptPosDto(
-                        anzahl = pos.anzahl,
-                        behandlungsart = BehandlungsartDto(
-                            preis = pos.einzelpreis,
-                            id = pos.behandlungsartId.id,
-                            name = pos.behandlungsartName,
-                        )
-                    )
-                }.toList(),
+                positionen =
+                    rezept.positionen
+                        .map { pos ->
+                            RezeptPosDto(
+                                anzahl = pos.anzahl,
+                                behandlungsart =
+                                    BehandlungsartDto(
+                                        preis = pos.einzelpreis,
+                                        id = pos.behandlungsartId.id,
+                                        name = pos.behandlungsartName,
+                                    ),
+                            )
+                        }.toList(),
                 rechnung = null,
-                preisGesamt = rezept.preisGesamt
+                preisGesamt = rezept.preisGesamt,
             )
-        }
     }
 }
 
@@ -52,27 +52,25 @@ data class RezeptPatientDto(
     val nachname: String,
 ) {
     companion object {
-        fun fromPatient(patient: Patient): RezeptPatientDto {
-            return RezeptPatientDto(
+        fun fromPatient(patient: Patient): RezeptPatientDto =
+            RezeptPatientDto(
                 id = patient.id.id,
                 vorname = patient.vorname,
                 nachname = patient.nachname,
             )
-        }
     }
 }
 
 data class RezeptArztDto(
     val id: UUID,
-    val name: String
+    val name: String,
 ) {
     companion object {
-        fun fromArzt(arzt: Arzt): RezeptArztDto {
-            return RezeptArztDto(
+        fun fromArzt(arzt: Arzt): RezeptArztDto =
+            RezeptArztDto(
                 id = arzt.id.id,
-                name = arzt.name
+                name = arzt.name,
             )
-        }
     }
 }
 
@@ -84,14 +82,13 @@ data class RezeptRechnungDto(
 enum class RezeptRechnungStatus {
     ERSTELLT,
     OFFEN,
-    BEZAHLT
+    BEZAHLT,
 }
 
 data class RezeptPosDto(
     val behandlungsart: BehandlungsartDto,
-    val anzahl: Long
-) {
-}
+    val anzahl: Long,
+)
 
 data class BehandlungsartDto(
     val id: UUID,
@@ -99,13 +96,12 @@ data class BehandlungsartDto(
     val preis: Double,
 ) {
     companion object {
-        fun fromBehandlungsart(behandlungsart: Behandlungsart): BehandlungsartDto {
-            return BehandlungsartDto(
+        fun fromBehandlungsart(behandlungsart: Behandlungsart): BehandlungsartDto =
+            BehandlungsartDto(
                 id = behandlungsart.id.id,
                 name = behandlungsart.name,
-                preis = behandlungsart.preis
+                preis = behandlungsart.preis,
             )
-        }
     }
 }
 
@@ -116,8 +112,7 @@ data class RezeptCreateDto(
     val patientId: UUID,
     val ausgestelltAm: LocalDate,
     val positionen: List<RezeptPosCreateDto>,
-) {
-}
+)
 
 /**
  * DTO for updating an existing Rezept
@@ -126,8 +121,7 @@ data class RezeptUpdateDto(
     val patientId: UUID,
     val ausgestelltAm: LocalDate,
     val positionen: List<RezeptPosCreateDto>,
-) {
-}
+)
 
 /**
  * DTO for creating a new RezeptPos

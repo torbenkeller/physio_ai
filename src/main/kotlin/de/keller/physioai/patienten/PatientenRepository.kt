@@ -1,16 +1,15 @@
-package de.keller.physio_ai.patienten
+package de.keller.physioai.patienten
 
-import de.keller.physio_ai.config.SpringDataJdbcConverter
+import de.keller.physioai.config.SpringDataJdbcConverter
 import org.springframework.core.convert.converter.Converter
 import org.springframework.data.convert.ReadingConverter
 import org.springframework.data.convert.WritingConverter
 import org.springframework.data.jdbc.repository.query.Modifying
-import org.springframework.data.repository.CrudRepository
 import org.springframework.stereotype.Component
 import org.springframework.stereotype.Repository
 import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDate
-import java.util.*
+import java.util.UUID
 import org.springframework.data.repository.Repository as SpringDataJdbcRepository
 
 @Transactional(readOnly = true)
@@ -31,7 +30,6 @@ interface PatientenRepository : SpringDataJdbcRepository<Patient, PatientId> {
     @Transactional(readOnly = false)
     @Modifying
     fun deleteById(id: PatientId)
-
 }
 
 @Component

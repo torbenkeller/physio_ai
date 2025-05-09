@@ -1,10 +1,12 @@
-package de.keller.physio_ai.rezepte.domain
+package de.keller.physioai.rezepte.domain
 
 import org.springframework.data.annotation.Id
 import org.springframework.data.relational.core.mapping.Table
-import java.util.*
+import java.util.UUID
 
-public data class ArztId(val id: UUID) {
+public data class ArztId(
+    val id: UUID,
+) {
     companion object {
         fun fromUUID(id: UUID): ArztId = ArztId(id)
 
@@ -16,6 +18,5 @@ public data class ArztId(val id: UUID) {
 data class Arzt(
     @Id
     val id: ArztId,
-    val name: String
-) {
-}
+    val name: String,
+)

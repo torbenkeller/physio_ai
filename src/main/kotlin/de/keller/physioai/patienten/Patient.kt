@@ -1,12 +1,13 @@
-package de.keller.physio_ai.patienten
+package de.keller.physioai.patienten
 
 import org.springframework.data.annotation.Id
 import org.springframework.data.relational.core.mapping.Table
-import java.sql.Date
 import java.time.LocalDate
-import java.util.*
+import java.util.UUID
 
-public data class PatientId(val id: UUID) {
+public data class PatientId(
+    val id: UUID,
+) {
     companion object {
         fun fromUUID(id: UUID): PatientId = PatientId(id)
 
@@ -18,7 +19,7 @@ public data class PatientId(val id: UUID) {
 data class Patient(
     @Id
     val id: PatientId,
-    val titel : String?,
+    val titel: String?,
     val vorname: String,
     val nachname: String,
     val strasse: String?,
@@ -29,5 +30,4 @@ data class Patient(
     val telFestnetz: String?,
     val email: String?,
     val geburtstag: LocalDate?,
-) {
-}
+)

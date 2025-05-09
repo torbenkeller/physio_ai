@@ -1,15 +1,16 @@
-package de.keller.physio_ai.rezepte.domain
+package de.keller.physioai.rezepte.domain
 
-import de.keller.physio_ai.patienten.PatientId
+import de.keller.physioai.patienten.PatientId
 import org.springframework.data.annotation.Id
 import org.springframework.data.annotation.Version
 import org.springframework.data.relational.core.mapping.MappedCollection
 import org.springframework.data.relational.core.mapping.Table
 import java.time.LocalDate
-import java.util.*
+import java.util.UUID
 
-
-data class RezeptId(val id: UUID) {
+data class RezeptId(
+    val id: UUID,
+) {
     companion object {
         fun fromUUID(id: UUID): RezeptId = RezeptId(id)
 
@@ -26,12 +27,10 @@ data class Rezept(
     val ausgestelltVonArztId: ArztId?,
     val preisGesamt: Double,
     val rechnungsnummer: String? = null,
-
     @MappedCollection(idColumn = "rezept_id", keyColumn = "index")
     val positionen: List<RezeptPos>,
-
     @Version
-    val version: Long = 0
+    val version: Long = 0,
 ) {
     fun update(
         patientId: PatientId,
@@ -75,15 +74,19 @@ data class Rezept(
     }
 }
 
-data class RezeptPosSource(val behandlungsart: Behandlungsart, val anzahl: Long) {
-    fun toPosition(): RezeptPos = RezeptPos(
-        id = UUID.randomUUID(),
-        behandlungsartId = behandlungsart.id,
-        anzahl = anzahl,
-        einzelpreis = behandlungsart.preis,
-        preisGesamt = behandlungsart.preis * anzahl,
-        behandlungsartName = behandlungsart.name,
-    )
+data class RezeptPosSource(
+    val behandlungsart: Behandlungsart,
+    val anzahl: Long,
+) {
+    fun toPosition(): RezeptPos =
+        RezeptPos(
+            id = UUID.randomUUID(),
+            behandlungsartId = behandlungsart.id,
+            anzahl = anzahl,
+            einzelpreis = behandlungsart.preis,
+            preisGesamt = behandlungsart.preis * anzahl,
+            behandlungsartName = behandlungsart.name,
+        )
 }
 
 @Table("rezept_pos")
@@ -95,6 +98,4 @@ data class RezeptPos(
     val einzelpreis: Double,
     val preisGesamt: Double,
     val behandlungsartName: String,
-) {
-
-}
+)

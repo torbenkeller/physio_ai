@@ -1,4 +1,4 @@
-package de.keller.physio_ai.patienten
+package de.keller.physioai.patienten
 
 import jakarta.validation.constraints.Email
 import jakarta.validation.constraints.Past
@@ -20,7 +20,4 @@ data class PatientForm(
     @Past
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     val geburtstag: LocalDate?,
-) {
-}
-
-
+)

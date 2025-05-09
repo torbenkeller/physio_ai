@@ -1,19 +1,17 @@
-package de.keller.physio_ai.rezepte.domain
+package de.keller.physioai.rezepte.domain
 
-import de.keller.physio_ai.config.SpringDataJdbcConverter
+import de.keller.physioai.config.SpringDataJdbcConverter
 import org.springframework.core.convert.converter.Converter
 import org.springframework.data.convert.ReadingConverter
 import org.springframework.data.convert.WritingConverter
 import org.springframework.data.repository.CrudRepository
 import org.springframework.stereotype.Component
 import org.springframework.stereotype.Repository
-import java.util.*
-
+import java.util.UUID
 
 @Repository
 interface BehandlungsartenRepository : CrudRepository<Behandlungsart, BehandlungsartId> {
     fun findAllByName(names: Iterable<String>): List<Behandlungsart>
-
 }
 
 @Component

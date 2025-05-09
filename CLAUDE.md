@@ -1,12 +1,9 @@
-# CLAUDE.md
-
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+# Frontend (Flutter)
 
 ## Build Commands
 - Run app: `flutter run`
 - Build app: `flutter build <platform>`
-- Generate code: `flutter pub run build_runner build --delete-conflicting-outputs`
-- Watch generated code: `flutter pub run build_runner watch --delete-conflicting-outputs`
+- Run the Build Runner: `flutter pub run build_runner build --delete-conflicting-outputs`
 
 ## Lint Commands
 - Lint code: `flutter analyze`
@@ -16,11 +13,6 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ## Test Commands
 - Run all tests: `flutter test`
 - Run a specific test: `flutter test test/<path_to_test_file>.dart`
-
-## Backend Commands (Spring Boot)
-- Run: `./mvnw spring-boot:run` or `./gradlew bootRun`
-- Test: `./mvnw test` or `./gradlew test`
-- Test single class: `./mvnw -Dtest=TestClass test` or `./gradlew test --tests TestClass`
 
 ## Code Style Guidelines
 - Flutter: Follow the [very_good_analysis](https://pub.dev/packages/very_good_analysis) style guide
@@ -32,10 +24,31 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - Error handling should use proper Exception types and logging
 - Internationalization using flutter_intl with German as main locale
 - Repository pattern for data access with retrofit for API calls
-- Use dart's and kotlin's strong typing features throughout the codebase
+- Use dart's strong typing features throughout the codebase
 - Use always IList from fast_immutable_collections.dart instead of List
 - only doc comments are necessary
 - clean up build methods by extracting widget trees into separate new widgets
 
-## General Workflow
+# Backend  (Spring Boot)
+
+## Build Commands
+
+- Run: `./mvnw spring-boot:run`
+- Build Backend: `./mvnw package`
+
+## Test Commands
+
+- Test: `./mvnw test`
+- Test single class: `./mvnw -Dtest=<TestClass> test`
+
+## Code Style Guidelines
+
+- Do use constructor injection over property injection
+- Use the Mockk package for mocking in tests
+- Do use ONLY the necessary test configuration for each test
+- Use Spring Data JDBC with Kotlins immutable data classes for Persistence
+- Follow the "Clean Code" paradigm
+-
+
+# General Workflow
 After each Prompt, run the tests. If the tests pass, create a new git commit with the changes. The message must match the Promt.

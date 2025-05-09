@@ -1,4 +1,4 @@
-package de.keller.physio_ai
+package de.keller.physioai
 
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.runApplication

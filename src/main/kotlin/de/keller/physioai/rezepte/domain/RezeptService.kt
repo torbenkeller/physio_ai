@@ -32,6 +32,11 @@ class RezeptService
                     ?: throw IllegalArgumentException("Patient with ID ${rezeptCreateDto.patientId} not found")
             logger.debug("Found patient: {}", patient)
 
+            // Validate rezept has at least one position
+            if (rezeptCreateDto.positionen.isEmpty()) {
+                throw IllegalArgumentException("A rezept must have at least one position")
+            }
+
             // Validate all behandlungsarten exist
             val behandlungsartIds =
                 rezeptCreateDto.positionen.map { BehandlungsartId.fromUUID(it.behandlungsartId) }.toSet()
@@ -85,6 +90,11 @@ class RezeptService
                     ?: throw IllegalArgumentException("Patient with ID ${rezeptUpdateDto.patientId} not found")
             logger.debug("Found patient: {}", patient)
 
+            // Validate rezept has at least one position
+            if (rezeptUpdateDto.positionen.isEmpty()) {
+                throw IllegalArgumentException("A rezept must have at least one position")
+            }
+
             // Validate all behandlungsarten exist
             val behandlungsartIds =
                 rezeptUpdateDto.positionen.map { BehandlungsartId.fromUUID(it.behandlungsartId) }.toSet()
@@ -95,10 +105,10 @@ class RezeptService
             logger.debug("Found all behandlungsarten: {}", behandlungsarten)
 
             val posSources =
-                rezeptUpdateDto.positionen.map {
+                rezeptUpdateDto.positionen.map { pos ->
                     RezeptPosSource(
-                        behandlungsart = behandlungsarten.find { b -> BehandlungsartId.fromUUID(id) == b.id }!!,
-                        it.anzahl,
+                        behandlungsart = behandlungsarten.find { b -> BehandlungsartId.fromUUID(pos.behandlungsartId) == b.id }!!,
+                        pos.anzahl,
                     )
                 }
 

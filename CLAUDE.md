@@ -48,7 +48,18 @@
 - Do use ONLY the necessary test configuration for each test
 - Use Spring Data JDBC with Kotlins immutable data classes for Persistence
 - Follow the "Clean Code" paradigm
--
 
-# General Workflow
-After each Prompt, run the tests. If the tests pass, create a new git commit with the changes. The message must match the Promt.
+## General Workflow
+
+**We practice TDD. That means**
+
+- Write tests before writing the implementation code
+- Only write enough code to make the failing test pass
+- Refactor code continuously while ensuring tests still pass
+- Write a failing test that defines a desired function or improvement
+- Run only the created test to confirm it fails as expected
+- Write minimal code to make the test pass
+- Run the test to confirm success
+- Refactor code to improve design while keeping tests green
+- Repeat the cycle for each new feature or bugfix
+- Tests MUST cover the functionality being implemented.

@@ -363,7 +363,7 @@ class RezepteControllerTest {
                 path = "/rezepte/tmp/some-file.jpg",
             )
 
-            every { rezeptAiService.rezeptEinlesen(any()) } returns expectedResponse
+            every { rezeptService.rezeptEinlesen(any()) } returns expectedResponse
 
             // Act & Assert
             mockMvc
@@ -377,7 +377,7 @@ class RezepteControllerTest {
                 .andExpect(jsonPath("$.rezept.ausgestelltAm").value("2023-01-01"))
                 .andExpect(jsonPath("$.path").value("/rezepte/tmp/some-file.jpg"))
 
-            verify { rezeptAiService.rezeptEinlesen(any()) }
+            verify { rezeptService.rezeptEinlesen(any()) }
         }
 
         @Test
@@ -390,7 +390,7 @@ class RezepteControllerTest {
                 "test image content".toByteArray(),
             )
 
-            every { rezeptAiService.rezeptEinlesen(any()) } returns null
+            every { rezeptService.rezeptEinlesen(any()) } returns null
 
             // Act & Assert
             mockMvc
@@ -400,7 +400,7 @@ class RezepteControllerTest {
                 ).andExpect(status().isOk)
                 .andExpect(jsonPath("$").doesNotExist())
 
-            verify { rezeptAiService.rezeptEinlesen(any()) }
+            verify { rezeptService.rezeptEinlesen(any()) }
         }
     }
 

@@ -118,7 +118,7 @@ class RezepteController
         @PostMapping("/createFromImage", consumes = [MediaType.MULTIPART_FORM_DATA_VALUE])
         fun createFromImage(
             @RequestParam("file") file: MultipartFile,
-        ): RezeptEinlesenResponse? = rezeptAiService.rezeptEinlesen(file)
+        ): RezeptEinlesenResponse? = rezeptService.rezeptEinlesen(file)
 
         @GetMapping("/tmp/{filename:.+}")
         @ResponseBody

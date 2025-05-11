@@ -2,13 +2,20 @@ package de.keller.physioai.rezepte.domain
 
 import de.keller.physioai.patienten.PatientId
 import de.keller.physioai.patienten.PatientenRepository
+import de.keller.physioai.patienten.web.PatientDto
+import de.keller.physioai.rezepte.web.BehandlungsartDto
 import de.keller.physioai.rezepte.web.RezeptCreateDto
 import de.keller.physioai.rezepte.web.RezeptUpdateDto
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import org.springframework.web.multipart.MultipartFile
+import java.nio.file.Files
+import java.nio.file.Path
+import java.nio.file.StandardCopyOption
 import java.util.UUID
 
 @Service
@@ -18,6 +25,8 @@ class RezeptService
         private val rezeptRepository: RezeptRepository,
         private val behandlungsartenRepository: BehandlungsartenRepository,
         private val patientenRepository: PatientenRepository,
+        private val rezeptAiService: RezeptAiService,
+        @Value("\${rezepte.path}") val rezeptePath: String,
     ) {
         val logger: Logger = LoggerFactory.getLogger(RezeptService::class.java)
 
@@ -126,4 +135,101 @@ class RezeptService
 
             return savedRezept
         }
+
+        /**
+         * Saves a file to the specified location
+         * @param file The file to save
+         * @param location The location to save the file to
+         */
+        private fun saveFile(
+            file: MultipartFile,
+            location: String,
+        ) {
+            Files.copy(file.inputStream, Path.of(location), StandardCopyOption.REPLACE_EXISTING)
+        }
+
+        /**
+         * Processes the prescription data from the AI service
+         * @param rezeptData The prescription data from the AI service
+         * @param filePath The path to the saved file
+         * @return The processed prescription data
+         */
+        fun processRezeptData(
+            rezeptData: RezeptAiResponse,
+            filePath: String,
+        ): RezeptEinlesenResponse {
+            val path = "/tmp/${UUID.randomUUID()}.${filePath.split(".").last()}"
+
+            val matchingPatienten = patientenRepository.findPatientByGeburtstag(rezeptData.geburtstag)
+
+            val matchingPatient =
+                matchingPatienten.firstOrNull { it.nachname == rezeptData.nachname }
+                    ?: matchingPatienten.firstOrNull {
+                        it.strasse == rezeptData.strasse &&
+                            it.hausnummer == rezeptData.hausnummer &&
+                            it.plz == rezeptData.postleitzahl &&
+                            it.stadt == rezeptData.stadt
+                    }
+
+            val behandlungsarten =
+                behandlungsartenRepository.findAllByName(rezeptData.rezeptpositionen.map { it.behandlung })
+
+            return RezeptEinlesenResponse(
+                existingPatient = matchingPatient?.let { PatientDto.fromPatient(it) },
+                patient = EingelesenerPatientDto(
+                    titel = rezeptData.titel,
+                    vorname = rezeptData.vorname,
+                    nachname = rezeptData.nachname,
+                    strasse = rezeptData.strasse,
+                    hausnummer = rezeptData.hausnummer,
+                    postleitzahl = rezeptData.postleitzahl,
+                    stadt = rezeptData.stadt,
+                    geburtstag = rezeptData.geburtstag,
+                ),
+                rezept = EingelesenesRezeptDto(
+                    ausgestelltAm = rezeptData.ausgestelltAm,
+                    rezeptpositionen = rezeptData.rezeptpositionen.map { pos ->
+                        EingelesenesRezeptPosDto(
+                            anzahl = pos.anzahl,
+                            behandlungsart =
+                                behandlungsarten
+                                    .first { it.name == pos.behandlung }
+                                    .let { BehandlungsartDto.fromBehandlungsart(it) },
+                        )
+                    },
+                ),
+                path = "/rezepte$path",
+            )
+        }
+
+        /**
+         * Processes a prescription image
+         * @param file The prescription image
+         * @param rezeptData The prescription data from the AI service
+         * @return The processed prescription data
+         */
+        fun processRezeptImage(
+            file: MultipartFile,
+            rezeptData: RezeptAiResponse,
+        ): RezeptEinlesenResponse? {
+            val path = "/tmp/${UUID.randomUUID()}.${file.originalFilename?.split(".")?.last()}"
+
+            saveFile(file, "$rezeptePath$path")
+
+            return processRezeptData(rezeptData, path)
+        }
+
+        /**
+         * Processes a prescription image using AI and returns the extracted data
+         * @param file The prescription image
+         * @return The processed prescription data, or null if processing failed
+         */
+        fun rezeptEinlesen(file: MultipartFile): RezeptEinlesenResponse? {
+        logger.debug("Processing prescription image: {}", file.originalFilename)
+
+        val rezeptData = rezeptAiService.analyzeRezeptImage(file) ?: return null
+        logger.debug("Successfully analyzed prescription image")
+
+        return processRezeptImage(file, rezeptData)
+    }
     }

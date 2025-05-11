@@ -10,17 +10,22 @@ import io.mockk.clearAllMocks
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
 import io.mockk.junit5.MockKExtension
+import io.mockk.mockkStatic
 import io.mockk.slot
 import io.mockk.verify
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
+import org.springframework.mock.web.MockMultipartFile
+import java.nio.file.Files
+import java.nio.file.Path
 import java.time.LocalDate
 import java.util.UUID
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
 import kotlin.test.assertNotNull
+import kotlin.test.assertNull
 
 @ExtendWith(MockKExtension::class)
 class RezeptServiceTest {
@@ -32,6 +37,9 @@ class RezeptServiceTest {
 
     @MockK
     private lateinit var patientenRepository: PatientenRepository
+
+    @MockK
+    private lateinit var rezeptAiService: RezeptAiService
 
     private lateinit var rezeptService: RezeptService
 
@@ -80,6 +88,8 @@ class RezeptServiceTest {
             rezeptRepository,
             behandlungsartenRepository,
             patientenRepository,
+            rezeptAiService,
+            "/tmp/rezepte",
         )
     }
 
@@ -207,6 +217,87 @@ class RezeptServiceTest {
             verify { patientenRepository.findById(patientId) }
             verify { behandlungsartenRepository.findAllById(setOf(nonExistentBehandlungsartId)) }
             verify(exactly = 0) { rezeptRepository.save(any()) }
+        }
+    }
+
+    @Nested
+    inner class RezeptEinlesen {
+        @Test
+        fun `should process prescription image successfully`() {
+            // Arrange
+            val file = MockMultipartFile(
+                "file",
+                "test.jpg",
+                "image/jpeg",
+                "test image content".toByteArray(),
+            )
+
+            val rezeptAiResponse = RezeptAiResponse(
+                ausgestelltAm = LocalDate.of(2023, 1, 1),
+                titel = null,
+                vorname = "Max",
+                nachname = "Mustermann",
+                strasse = "Musterstraße",
+                hausnummer = "1",
+                postleitzahl = "12345",
+                stadt = "Musterstadt",
+                geburtstag = LocalDate.of(1980, 1, 1),
+                rezeptpositionen = listOf(
+                    RezeptPosAiResponse(
+                        anzahl = 6,
+                        behandlung = "Manuelle Therapie",
+                    ),
+                ),
+            )
+
+            // Setup mock behavior
+            every { rezeptAiService.analyzeRezeptImage(file) } returns rezeptAiResponse
+            every { patientenRepository.findPatientByGeburtstag(any()) } returns listOf(patient)
+            every { behandlungsartenRepository.findAllByName(any()) } returns listOf(behandlungsart1)
+
+            // Mock file system operations
+            mockkStatic(Files::class)
+            every { Files.copy(any<java.io.InputStream>(), any<Path>(), any()) } returns 0L
+
+            // Act
+            val result = rezeptService.rezeptEinlesen(file)
+
+            // Assert
+            assertNotNull(result)
+            assertEquals("Max", result?.patient?.vorname)
+            assertEquals("Mustermann", result?.patient?.nachname)
+            assertEquals(1, result?.rezept?.rezeptpositionen?.size)
+
+            // Verify interactions
+            verify { rezeptAiService.analyzeRezeptImage(file) }
+            verify { patientenRepository.findPatientByGeburtstag(any()) }
+            verify { behandlungsartenRepository.findAllByName(any()) }
+            verify { Files.copy(any<java.io.InputStream>(), any<Path>(), any()) }
+        }
+
+        @Test
+        fun `should return null when AI analysis fails`() {
+            // Arrange
+            val file = MockMultipartFile(
+                "file",
+                "test.jpg",
+                "image/jpeg",
+                "test image content".toByteArray(),
+            )
+
+            // Setup mock behavior
+            every { rezeptAiService.analyzeRezeptImage(file) } returns null
+
+            // Act
+            val result = rezeptService.rezeptEinlesen(file)
+
+            // Assert
+            assertNull(result)
+
+            // Verify interactions
+            verify { rezeptAiService.analyzeRezeptImage(file) }
+            verify(exactly = 0) { patientenRepository.findPatientByGeburtstag(any()) }
+            verify(exactly = 0) { behandlungsartenRepository.findAllByName(any()) }
         }
     }
 

@@ -30,9 +30,9 @@ class RezeptFormContainer extends FormContainer {
     );
 
     final positionen = rezept?.positionen
-            .map((pos) => RezeptPositionFormField.fromPosition(rezeptPos: pos))
+            .map((pos) => RezeptPositionFormGroup.fromPosition(rezeptPos: pos))
             .toIList() ??
-        IListConst([RezeptPositionFormField.empty(initialBehandlungsart: initialBehandlungsart)]);
+        IListConst([RezeptPositionFormGroup.empty(initialBehandlungsart: initialBehandlungsart)]);
 
     return RezeptFormContainer._(
       ausgestelltAm: ausgestelltAm,
@@ -44,13 +44,13 @@ class RezeptFormContainer extends FormContainer {
 
   final FormFieldContainer<DateTime> ausgestelltAm;
   final FormFieldContainer<String?> patientId;
-  IList<RezeptPositionFormField> positionen;
+  IList<RezeptPositionFormGroup> positionen;
 
   final Behandlungsart _initialBehandlungsart;
 
   void addPosition() {
     final newPosition =
-        RezeptPositionFormField.empty(initialBehandlungsart: _initialBehandlungsart);
+        RezeptPositionFormGroup.empty(initialBehandlungsart: _initialBehandlungsart);
     positionen = positionen.add(newPosition);
   }
 
@@ -102,8 +102,8 @@ class RezeptFormContainer extends FormContainer {
       ];
 }
 
-class RezeptPositionFormField {
-  RezeptPositionFormField._({
+class RezeptPositionFormGroup {
+  RezeptPositionFormGroup._({
     required int initialAnzahl,
     required Behandlungsart initialBehandlungsart,
   })  : anzahl = FormFieldContainer<String>(
@@ -115,15 +115,15 @@ class RezeptPositionFormField {
           validators: [validateRequired],
         );
 
-  factory RezeptPositionFormField.empty({required Behandlungsart initialBehandlungsart}) {
-    return RezeptPositionFormField._(
+  factory RezeptPositionFormGroup.empty({required Behandlungsart initialBehandlungsart}) {
+    return RezeptPositionFormGroup._(
       initialAnzahl: 1,
       initialBehandlungsart: initialBehandlungsart,
     );
   }
 
-  factory RezeptPositionFormField.fromPosition({required RezeptPos rezeptPos}) {
-    return RezeptPositionFormField._(
+  factory RezeptPositionFormGroup.fromPosition({required RezeptPos rezeptPos}) {
+    return RezeptPositionFormGroup._(
       initialAnzahl: rezeptPos.anzahl,
       initialBehandlungsart: rezeptPos.behandlungsart,
     );

@@ -1,6 +1,6 @@
 {
   "mcpServers": {
-    "flutterInspector": {
+    "flutter": {
       "command": "node",
       "args": [
         "/Users/torben/Desktop/Projects/mcp_flutter/mcp_server/build/index.js"
@@ -11,7 +11,7 @@
       },
       "disabled": false
     },
-    "PubDevMCP": {
+    "pubdev": {
       "command": "dart",
       "args": [
         "/Users/torben/Desktop/Projects/pubdev_mcp/bin/pubdev_mcp.dart"

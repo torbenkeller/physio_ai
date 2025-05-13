@@ -2,8 +2,8 @@ import 'package:fast_immutable_collections/fast_immutable_collections.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:physio_ai/rezepte/rezept.dart';
-import 'package:physio_ai/rezepte/rezept_repository.dart';
+import 'package:physio_ai/rezepte/infrastructure/rezept_repository.dart';
+import 'package:physio_ai/rezepte/model/rezept.dart';
 
 final rezepteProvider = FutureProvider((ref) async {
   final repo = ref.watch(rezeptRepositoryProvider);

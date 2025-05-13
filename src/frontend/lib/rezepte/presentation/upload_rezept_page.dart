@@ -5,8 +5,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:physio_ai/rezepte/infrastructure/rezept_repository.dart';
 import 'package:physio_ai/rezepte/model/rezept_einlesen_response.dart';
-import 'package:physio_ai/rezepte/rezept_repository.dart';
 
 class UploadRezeptPage extends StatelessWidget {
   const UploadRezeptPage({super.key});

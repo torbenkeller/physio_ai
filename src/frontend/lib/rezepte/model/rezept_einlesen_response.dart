@@ -1,7 +1,7 @@
 import 'package:fast_immutable_collections/fast_immutable_collections.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:physio_ai/patienten/domain/patient.dart';
-import 'package:physio_ai/rezepte/rezept.dart';
+import 'package:physio_ai/rezepte/model/rezept.dart';
 
 part 'generated/rezept_einlesen_response.freezed.dart';
 part 'generated/rezept_einlesen_response.g.dart';

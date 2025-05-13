@@ -1,7 +1,7 @@
 import 'package:fast_immutable_collections/fast_immutable_collections.dart';
 import 'package:flutter/material.dart';
 import 'package:physio_ai/rezepte/infrastructure/rezept_form_dto.dart';
-import 'package:physio_ai/rezepte/rezept.dart';
+import 'package:physio_ai/rezepte/model/rezept.dart';
 import 'package:physio_ai/shared_kernel/presentation/form_container.dart';
 import 'package:physio_ai/shared_kernel/presentation/form_field_container.dart';
 import 'package:physio_ai/shared_kernel/presentation/validation/validators.dart';

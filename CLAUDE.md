@@ -5,7 +5,7 @@
 ### Frontend (Flutter) -> Commands -> Build Commands
 - Run app: `flutter run`
 - Build app: `flutter build <platform>`
-- Run the Build Runner: `flutter pub run build_runner build --delete-conflicting-outputs`
+- Run the Build Runner: `dart run build_runner build --delete-conflicting-outputs`
 
 ### Frontend (Flutter) -> Commands -> Lint Commands
 - Lint code: `flutter analyze`

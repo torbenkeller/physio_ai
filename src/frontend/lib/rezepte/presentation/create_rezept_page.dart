@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:physio_ai/rezepte/model/rezept.dart';
 import 'package:physio_ai/rezepte/presentation/rezept_form.dart';
-import 'package:physio_ai/rezepte/rezept.dart';
 
 class CreateRezeptPage extends StatelessWidget {
   const CreateRezeptPage({

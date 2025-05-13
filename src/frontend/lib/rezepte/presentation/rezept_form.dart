@@ -6,9 +6,9 @@ import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:physio_ai/patienten/domain/patient.dart';
 import 'package:physio_ai/patienten/presentation/patienten_page.dart';
+import 'package:physio_ai/rezepte/infrastructure/rezept_repository.dart';
+import 'package:physio_ai/rezepte/model/rezept.dart';
 import 'package:physio_ai/rezepte/presentation/rezept_form_container.dart';
-import 'package:physio_ai/rezepte/rezept.dart';
-import 'package:physio_ai/rezepte/rezept_repository.dart';
 import 'package:physio_ai/rezepte/rezepte_page.dart';
 
 final rezeptFormContainerProvider =

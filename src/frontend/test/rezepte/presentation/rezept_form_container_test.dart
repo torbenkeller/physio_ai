@@ -3,8 +3,8 @@ import 'package:fast_immutable_collections/fast_immutable_collections.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:physio_ai/rezepte/infrastructure/rezept_form_dto.dart';
+import 'package:physio_ai/rezepte/model/rezept.dart';
 import 'package:physio_ai/rezepte/presentation/rezept_form_container.dart';
-import 'package:physio_ai/rezepte/rezept.dart';
 
 void main() {
   group('RezeptFormContainer', () {
@@ -88,7 +88,7 @@ void main() {
       expect(container.positionen.length, equals(1));
 
       container.addPosition();
-      
+
       expect(container.positionen.length, equals(2));
       expect(container.positionen[1].anzahl.initialValue, equals('1'));
       expect(container.positionen[1].behandlungsart.initialValue, equals(testBehandlungsart));
@@ -101,7 +101,7 @@ void main() {
       )
         ..addPosition()
         ..removePosition(0);
-      
+
       expect(container.positionen.length, equals(1));
       expect(container.positionen[0].anzahl.initialValue, equals('1'));
     });
@@ -111,13 +111,13 @@ void main() {
         rezept: null,
         initialBehandlungsart: testBehandlungsart,
       );
-      
+
       expect(container.positionen.length, equals(1));
 
       container
         ..removePosition(-1)
         ..removePosition(1);
-      
+
       expect(container.positionen.length, equals(1));
     });
 
@@ -241,7 +241,7 @@ void main() {
         rezept: null,
         initialBehandlungsart: testBehandlungsart,
       );
-      
+
       // Build test widget
       await tester.pumpWidget(
         MaterialApp(
@@ -266,13 +266,13 @@ void main() {
           ),
         ),
       );
-      
+
       // Initial price check (1 x 25.0 = 25.0)
       expect(container.price, equals(25.0));
-      
+
       // Add second position
       container.addPosition();
-      
+
       // Update widget to include new position field
       await tester.pumpWidget(
         MaterialApp(
@@ -307,14 +307,14 @@ void main() {
           ),
         ),
       );
-      
+
       // Update the anzahl for the second position
       container.positionen[1].anzahl.key.currentState!.didChange('2');
       // Update the behandlungsart using the key state
       container.positionen[1].behandlungsart.key.currentState!.didChange(testBehandlungsart2);
-      
+
       await tester.pump();
-      
+
       // Price should be: 1 x 25.0 + 2 x 30.0 = 25.0 + 60.0 = 85.0
       expect(container.price, equals(85.0));
     });

@@ -9,6 +9,7 @@
 
 ### Frontend (Flutter) -> Commands -> Lint Commands
 - Lint code: `flutter analyze`
+- Format code: `dart format <directory / files / . for all>`
 - Fix lint issues: `dart fix --apply`
 - Custom lint: `dart run custom_lint`
 
@@ -23,6 +24,7 @@
 - Max line length is 120 (default 80-char limit is disabled)
 - Use dart's strong typing features throughout the codebase
 - Do NOT modify files inside `**/generated/**` folders
+- Always add trailing commas
 
 ### Frontend (Flutter) -> Decisions -> Packages
 - Use freezed for immutable models and json_serializable for DTOs
@@ -38,6 +40,7 @@
 - Use immutable data classes for state management
 - Use Repositories to access API's
 - Create new widgets when the build method gets too long
+- You MUST always format the code before finishing a task
 
 ### Frontend (Flutter) -> Decisions -> Testing the Frontend
 - There are no unit tests of Repositories because their functionality is highly dependent on the backend responses

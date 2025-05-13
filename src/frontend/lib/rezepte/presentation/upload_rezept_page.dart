@@ -54,7 +54,7 @@ class _UploadRezeptContentState extends ConsumerState<UploadRezeptContent> {
     return Center(
       child: SingleChildScrollView(
         child: Padding(
-          padding: const EdgeInsets.all(24.0),
+          padding: const EdgeInsets.all(24),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
@@ -167,8 +167,8 @@ class _UploadRezeptContentState extends ConsumerState<UploadRezeptContent> {
     });
 
     try {
-      String fileName = _selectedFile!.path.split('/').last;
-      String extension = fileName.split('.').last.toLowerCase();
+      final fileName = _selectedFile!.path.split('/').last;
+      final extension = fileName.split('.').last.toLowerCase();
 
       // Map file extension to mime type
       String mimeType;
@@ -176,19 +176,14 @@ class _UploadRezeptContentState extends ConsumerState<UploadRezeptContent> {
         case 'jpg':
         case 'jpeg':
           mimeType = 'image/jpeg';
-          break;
         case 'png':
           mimeType = 'image/png';
-          break;
         case 'gif':
           mimeType = 'image/gif';
-          break;
         case 'webp':
           mimeType = 'image/webp';
-          break;
         case 'heic':
           mimeType = 'image/heic';
-          break;
         default:
           mimeType = 'application/octet-stream';
       }

@@ -1,33 +1,48 @@
 # Frontend (Flutter)
 
-## Build Commands
+## Frontend (Flutter) -> Commands
+
+### Frontend (Flutter) -> Commands -> Build Commands
 - Run app: `flutter run`
 - Build app: `flutter build <platform>`
 - Run the Build Runner: `flutter pub run build_runner build --delete-conflicting-outputs`
 
-## Lint Commands
+### Frontend (Flutter) -> Commands -> Lint Commands
 - Lint code: `flutter analyze`
 - Fix lint issues: `dart fix --apply`
 - Custom lint: `dart run custom_lint`
 
-## Test Commands
+### Frontend (Flutter) -> Commands -> Test Commands
 - Run all tests: `flutter test`
 - Run a specific test: `flutter test test/<path_to_test_file>.dart`
 
-## Code Style Guidelines
+## Frontend (Flutter) -> Decisions
+
+### Frontend (Flutter) -> Decisions -> Code Style
 - Flutter: Follow the [very_good_analysis](https://pub.dev/packages/very_good_analysis) style guide
 - Max line length is 120 (default 80-char limit is disabled)
-- Imports organized in groups: dart/kotlin stdlib, flutter/spring, packages, project imports
-- Use freezed for immutable models and json_serializable for DTOs
-- Use Riverpod for state management in Flutter
-- Use go_router for navigation
-- Error handling should use proper Exception types and logging
-- Internationalization using flutter_intl with German as main locale
-- Repository pattern for data access with retrofit for API calls
 - Use dart's strong typing features throughout the codebase
-- Use always IList from fast_immutable_collections.dart instead of List
-- only doc comments are necessary
-- clean up build methods by extracting widget trees into separate new widgets
+- Do NOT modify files inside `**/generated/**` folders
+
+### Frontend (Flutter) -> Decisions -> Packages
+- Use freezed for immutable models and json_serializable for DTOs
+- Use flutter_riverpod for state management in Flutter
+- Use go_router for navigation
+- Use retrofit for repositories
+- Use IList from fast_immutable_collections instead of List
+- Use flutter_intl for Localizations with German as main locale
+
+### Frontend (Flutter) -> Decisions -> Guidelines
+- Error handling should use proper Exception types and logging
+- Use only dart-doc comments when commenting code
+- Use immutable data classes for state management
+- Use Repositories to access API's
+- Create new widgets when the build method gets too long
+
+### Frontend (Flutter) -> Decisions -> Testing the Frontend
+- There are no unit tests of Repositories because their functionality is highly dependent on the backend responses
+- End-to-End Tests MUST test the important user journeys of the product
+- Unit Test the all `FormContainer` implementations
 
 # Backend  (Spring Boot)
 
@@ -49,7 +64,7 @@
 - Use Spring Data JDBC with Kotlins immutable data classes for Persistence
 - Follow the "Clean Code" paradigm
 
-## General Workflow
+# General
 
 **We practice TDD. That means**
 
@@ -62,4 +77,4 @@
 - Run the test to confirm success
 - Refactor code to improve design while keeping tests green
 - Repeat the cycle for each new feature or bugfix
-- Tests MUST cover the functionality being implemented.
+- Tests MUST cover the functionality being implemented

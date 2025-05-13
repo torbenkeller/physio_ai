@@ -9,10 +9,10 @@ part 'generated/rezept_einlesen_response.g.dart';
 @freezed
 abstract class RezeptEinlesenResponse with _$RezeptEinlesenResponse {
   const factory RezeptEinlesenResponse({
-    Patient? existingPatient,
     required EingelesenerPatient patient,
     required EingelesenesRezept rezept,
     required String path,
+    Patient? existingPatient,
   }) = _RezeptEinlesenResponse;
 
   const RezeptEinlesenResponse._();
@@ -29,7 +29,7 @@ abstract class RezeptEinlesenResponse with _$RezeptEinlesenResponse {
         nachname: existingPatient?.nachname ?? patient.nachname,
       ),
       ausgestelltAm: rezept.ausgestelltAm,
-      preisGesamt: 0.0,
+      preisGesamt: 0,
       positionen: rezept.rezeptpositionen
           .map((pos) => RezeptPos(
                 anzahl: pos.anzahl,
@@ -43,7 +43,6 @@ abstract class RezeptEinlesenResponse with _$RezeptEinlesenResponse {
 @freezed
 abstract class EingelesenerPatient with _$EingelesenerPatient {
   const factory EingelesenerPatient({
-    String? titel,
     required String vorname,
     required String nachname,
     required String strasse,
@@ -51,6 +50,7 @@ abstract class EingelesenerPatient with _$EingelesenerPatient {
     required String postleitzahl,
     required String stadt,
     required DateTime geburtstag,
+    String? titel,
   }) = _EingelesenerPatient;
 
   const EingelesenerPatient._();

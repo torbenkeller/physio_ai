@@ -53,7 +53,6 @@ class _PatientFormState extends ConsumerState<PatientForm> {
             children: [
               Flexible(
                 fit: FlexFit.tight,
-                flex: 1,
                 child: TextFormField(
                   key: formContainer.titel.key,
                   decoration: const InputDecoration(labelText: 'Titel'),

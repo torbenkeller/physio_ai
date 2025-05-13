@@ -158,7 +158,7 @@ final _tabletRouterConfig = RoutingConfig(
                     // Get rezept if passed as extra
                     Rezept? rezept;
                     if (state.extra != null && state.extra is Rezept) {
-                      rezept = state.extra as Rezept;
+                      rezept = state.extra! as Rezept;
                     }
 
                     return MaterialPage(
@@ -258,7 +258,7 @@ final _desktopRouterConfig = RoutingConfig(
                 // Get rezept if passed as extra
                 Rezept? rezept;
                 if (state.extra != null && state.extra is Rezept) {
-                  rezept = state.extra as Rezept;
+                  rezept = state.extra! as Rezept;
                 }
 
                 return NoTransitionPage(

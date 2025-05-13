@@ -3,6 +3,7 @@ import 'package:fast_immutable_collections/fast_immutable_collections.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:logger/logger.dart';
 import 'package:physio_ai/main.dart';
+import 'package:physio_ai/rezepte/infrastructure/rezept_form_dto.dart';
 import 'package:physio_ai/rezepte/model/rezept_einlesen_response.dart';
 import 'package:physio_ai/rezepte/rezept.dart';
 import 'package:retrofit/error_logger.dart';
@@ -15,9 +16,9 @@ final errorLoggerProvider = Provider<ParseErrorLogger>(
 );
 
 class ErrorLogger implements ParseErrorLogger {
-  final Logger logger;
 
   const ErrorLogger(this.logger);
+  final Logger logger;
 
   @override
   void logError(Object error, StackTrace stackTrace, RequestOptions options) {
@@ -50,10 +51,10 @@ abstract class RezeptRepository {
   Future<List<Rezept>> getRezepte();
 
   @POST('')
-  Future<Rezept> createRezept(@Body() Map<String, dynamic> rezeptCreate);
+  Future<Rezept> createRezept(@Body() RezeptFormDto rezeptCreate);
 
   @PATCH('/{id}')
-  Future<Rezept> updateRezept(@Path('id') String id, @Body() Map<String, dynamic> rezeptUpdate);
+  Future<Rezept> updateRezept(@Path('id') String id, @Body() RezeptFormDto rezeptUpdate);
 
   @DELETE('/{id}')
   Future<void> deleteRezept(@Path('id') String id);

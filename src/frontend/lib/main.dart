@@ -21,11 +21,7 @@ final dioProvider = Provider<Dio>((ref) {
     PrettyDioLogger(
       compact: false,
       requestHeader: true,
-      error: true,
-      enabled: true,
-      request: true,
       requestBody: true,
-      responseBody: true,
       responseHeader: true,
     ),
     RetryInterceptor(dio: dio),

@@ -2,6 +2,7 @@ import 'package:date_field/date_field.dart';
 import 'package:fast_immutable_collections/fast_immutable_collections.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:physio_ai/rezepte/infrastructure/rezept_form_dto.dart';
 import 'package:physio_ai/rezepte/presentation/rezept_form_container.dart';
 import 'package:physio_ai/rezepte/rezept.dart';
 
@@ -138,36 +139,35 @@ void main() {
       expect(result.preisGesamt, equals(50.0));
     });
 
-    test('toRezeptCreateDto converts container fields to DTO correctly', () {
+    test('toFormDto converts container fields to DTO correctly', () {
       final rezept = createTestRezept();
       final container = RezeptFormContainer.fromRezept(
         rezept: rezept,
         initialBehandlungsart: testBehandlungsart,
       );
 
-      final dto = container.toRezeptCreateDto();
+      final dto = container.toFormDto();
 
-      expect(dto, isA<Map<String, dynamic>>());
-      expect(dto['patientId'], equals('p1'));
-      expect(dto['ausgestelltAm'], equals('2023-01-01'));
-      expect(dto['preisGesamt'], equals(50.0));
-      expect(dto['positionen'], isA<List<dynamic>>());
-      final positions = dto['positionen'] as List<dynamic>;
-      final position = positions[0] as Map<String, dynamic>;
-      expect(position['behandlungsartId'], equals('b1'));
-      expect(position['anzahl'], equals(2));
+      expect(dto, isA<RezeptFormDto>());
+      expect(dto.patientId, equals('p1'));
+      expect(dto.ausgestelltAm, equals(testDateTime));
+      expect(dto.preisGesamt, equals(50.0));
+      expect(dto.positionen, isA<List<RezeptPositionDto>>());
+      expect(dto.positionen.length, equals(1));
+      expect(dto.positionen[0].behandlungsartId, equals('b1'));
+      expect(dto.positionen[0].anzahl, equals(2));
     });
 
-    test('toRezeptCreateDto throws exception when patientId is null', () {
+    test('toFormDto throws exception when patientId is null', () {
       final container = RezeptFormContainer.fromRezept(
         rezept: null,
         initialBehandlungsart: testBehandlungsart,
       );
 
-      expect(container.toRezeptCreateDto, throwsException);
+      expect(container.toFormDto, throwsException);
     });
 
-    testWidgets('toRezeptCreateDto returns updated field values when form fields are changed',
+    testWidgets('toFormDto returns updated field values when form fields are changed',
         (WidgetTester tester) async {
       final rezept = createTestRezept();
       final container = RezeptFormContainer.fromRezept(
@@ -225,18 +225,14 @@ void main() {
       await tester.pump();
 
       // Convert to DTO and verify updated values
-      final dto = container.toRezeptCreateDto();
+      final dto = container.toFormDto();
 
-      expect(dto, isA<Map<String, dynamic>>());
-
-      final dtoMap = dto;
-      expect(dtoMap['patientId'], equals('p2'));
-      expect(dtoMap['ausgestelltAm'], equals('2023-05-15'));
-
-      final positions = dtoMap['positionen'] as List<dynamic>;
-      final position = positions[0] as Map<String, dynamic>;
-      expect(position['behandlungsartId'], equals('b2'));
-      expect(position['anzahl'], equals(3));
+      expect(dto, isA<RezeptFormDto>());
+      expect(dto.patientId, equals('p2'));
+      expect(dto.ausgestelltAm, equals(updatedDate));
+      expect(dto.positionen.length, equals(1));
+      expect(dto.positionen[0].behandlungsartId, equals('b2'));
+      expect(dto.positionen[0].anzahl, equals(3));
     });
 
     testWidgets('price calculation updates when position fields change',

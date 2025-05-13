@@ -1,5 +1,6 @@
 import 'package:fast_immutable_collections/fast_immutable_collections.dart';
 import 'package:flutter/material.dart';
+import 'package:physio_ai/rezepte/infrastructure/rezept_form_dto.dart';
 import 'package:physio_ai/rezepte/rezept.dart';
 import 'package:physio_ai/shared_kernel/presentation/form_container.dart';
 import 'package:physio_ai/shared_kernel/presentation/form_field_container.dart';
@@ -60,7 +61,7 @@ class RezeptFormContainer extends FormContainer {
     }
   }
 
-  Map<String, dynamic> toRezeptCreateDto() {
+  RezeptFormDto toFormDto() {
     final selectedPatientId = patientId.value;
     if (selectedPatientId == null || selectedPatientId.isEmpty) {
       throw Exception('Bitte wählen Sie einen Patienten aus');
@@ -68,18 +69,18 @@ class RezeptFormContainer extends FormContainer {
 
     final positionenDto = positionen.map((pos) {
       final behandlungsart = pos.behandlungsart.value;
-      return {
-        'behandlungsartId': behandlungsart.id,
-        'anzahl': int.parse(pos.anzahl.value),
-      };
+      return RezeptPositionDto(
+        behandlungsartId: behandlungsart.id,
+        anzahl: int.parse(pos.anzahl.value),
+      );
     }).toList();
 
-    return {
-      'patientId': selectedPatientId,
-      'ausgestelltAm': ausgestelltAm.value.toIso8601String().split('T')[0],
-      'preisGesamt': price,
-      'positionen': positionenDto,
-    };
+    return RezeptFormDto(
+      patientId: selectedPatientId,
+      ausgestelltAm: ausgestelltAm.value,
+      preisGesamt: price,
+      positionen: positionenDto,
+    );
   }
 
   Rezept toRezept({String? existingId}) {

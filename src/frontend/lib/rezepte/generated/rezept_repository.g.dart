@@ -49,12 +49,11 @@ class _RezeptRepository implements RezeptRepository {
   }
 
   @override
-  Future<Rezept> createRezept(Map<String, dynamic> rezeptCreate) async {
+  Future<Rezept> createRezept(RezeptFormDto rezeptCreate) async {
     final _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{};
     final _headers = <String, dynamic>{};
-    final _data = <String, dynamic>{};
-    _data.addAll(rezeptCreate);
+    final _data = rezeptCreate;
     final _options = _setStreamType<Rezept>(
       Options(method: 'POST', headers: _headers, extra: _extra)
           .compose(
@@ -77,15 +76,11 @@ class _RezeptRepository implements RezeptRepository {
   }
 
   @override
-  Future<Rezept> updateRezept(
-    String id,
-    Map<String, dynamic> rezeptUpdate,
-  ) async {
+  Future<Rezept> updateRezept(String id, RezeptFormDto rezeptUpdate) async {
     final _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{};
     final _headers = <String, dynamic>{};
-    final _data = <String, dynamic>{};
-    _data.addAll(rezeptUpdate);
+    final _data = rezeptUpdate;
     final _options = _setStreamType<Rezept>(
       Options(method: 'PATCH', headers: _headers, extra: _extra)
           .compose(

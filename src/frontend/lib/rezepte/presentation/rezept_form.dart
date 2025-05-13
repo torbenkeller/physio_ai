@@ -99,7 +99,7 @@ class _RezeptFormState extends ConsumerState<RezeptForm> {
       },
       child: Column(
         children: [
-          _buildPatientSelector(formContainer, patientenAsync.value ?? IList<Patient>([])),
+          _buildPatientSelector(formContainer, patientenAsync.value ?? IList<Patient>(const [])),
           const SizedBox(height: 24),
           DateTimeFormField(
             key: formContainer.ausgestelltAm.key,
@@ -260,14 +260,12 @@ class _RezeptFormState extends ConsumerState<RezeptForm> {
 
   TableRow _buildPositionRow(int index, ThemeData theme, RezeptFormContainer formContainer) {
     final position = formContainer.positionen[index];
-    final behandlungsarten = ref.watch(behandlungsartenProvider).value!;
 
     return TableRow(
       decoration: BoxDecoration(
         border: Border(
           bottom: BorderSide(
-            color: Theme.of(context).colorScheme.outline.withOpacity(0.1),
-            width: 1,
+            color: Theme.of(context).colorScheme.outline.withAlpha(25),
           ),
         ),
       ),
@@ -317,7 +315,7 @@ class _RezeptFormState extends ConsumerState<RezeptForm> {
                   );
                 },
                 menuChildren:
-                    (ref.watch(behandlungsartenProvider).value ?? IList<Behandlungsart>([]))
+                    (ref.watch(behandlungsartenProvider).value ?? IList<Behandlungsart>(const []))
                         .map((behandlungsart) {
                   return MenuItemButton(
                     onPressed: () {
@@ -437,12 +435,12 @@ class _RezeptFormState extends ConsumerState<RezeptForm> {
     });
 
     try {
-      final rezeptPayload = formContainer.toRezeptCreateDto();
+      final rezeptDto = formContainer.toFormDto();
 
       if (widget.rezept == null) {
-        await repo.createRezept(rezeptPayload);
+        await repo.createRezept(rezeptDto);
       } else {
-        await repo.updateRezept(widget.rezept!.id, rezeptPayload);
+        await repo.updateRezept(widget.rezept!.id, rezeptDto);
       }
 
       if (mounted) {

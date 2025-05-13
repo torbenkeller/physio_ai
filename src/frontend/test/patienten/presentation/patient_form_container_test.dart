@@ -7,7 +7,7 @@ import 'package:physio_ai/patienten/presentation/patient_form_container.dart';
 
 void main() {
   group('PatientFormContainer', () {
-    final testDateTime = DateTime(1990, 1, 1);
+    final testDateTime = DateTime(1990);
 
     Patient createTestPatient() {
       return Patient(

@@ -130,7 +130,8 @@ class RezeptListTile extends ConsumerWidget {
       },
       title: Text('Rezept vom $formattedDate'),
       subtitle: Text(
-          '${rezept.positionen.length} Positionen, ${rezept.preisGesamt.toStringAsFixed(2)} €'),
+        '${rezept.positionen.length} Positionen, ${rezept.preisGesamt.toStringAsFixed(2)} €',
+      ),
       trailing: IconButton(
         icon: const Icon(Icons.delete),
         onPressed: () async {

@@ -8,7 +8,7 @@ class CreatePatientPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Patient Erstellen'),
+        title: const Text('Patient Erstellen'),
       ),
       body: const CreatePatientContent(),
     );

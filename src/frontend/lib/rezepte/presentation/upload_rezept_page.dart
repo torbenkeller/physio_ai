@@ -1,12 +1,11 @@
 import 'dart:io' if (dart.library.html) 'package:web/web.dart' show File;
 
-import 'package:dio/dio.dart' show DioMediaType, MultipartFile;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:image_picker/image_picker.dart';
-import 'package:physio_ai/rezepte/infrastructure/rezept_repository.dart';
 import 'package:physio_ai/rezepte/model/rezept_einlesen_response.dart';
+import 'package:physio_ai/rezepte/presentation/patient_selection_view.dart';
+import 'package:physio_ai/rezepte/presentation/upload_rezept_notifier.dart';
 
 class UploadRezeptPage extends StatelessWidget {
   const UploadRezeptPage({super.key});
@@ -22,35 +21,31 @@ class UploadRezeptPage extends StatelessWidget {
   }
 }
 
-class UploadRezeptContent extends ConsumerStatefulWidget {
+class UploadRezeptContent extends ConsumerWidget {
   const UploadRezeptContent({super.key});
 
   @override
-  ConsumerState<UploadRezeptContent> createState() => _UploadRezeptContentState();
+  Widget build(BuildContext context, WidgetRef ref) {
+    final state = ref.watch(uploadRezeptNotifierProvider);
+
+    // Using type-based switch expression for pattern matching
+    return switch (state) {
+      UploadRezeptStateInitial() => const InitialStateWidget(),
+      UploadRezeptStateLoading() => const LoadingStateWidget(),
+      UploadRezeptStateImageSelected(selectedFile: final file) =>
+        ImageSelectedStateWidget(selectedFile: file),
+      UploadRezeptStatePatientSelection(response: final response) =>
+        PatientSelectionStateWidget(response: response),
+      UploadRezeptStateError(message: final message) => ErrorStateWidget(message: message),
+    };
+  }
 }
 
-class _UploadRezeptContentState extends ConsumerState<UploadRezeptContent> {
-  bool _loading = false;
-  File? _selectedFile;
-  RezeptEinlesenResponse? _response;
+class InitialStateWidget extends ConsumerWidget {
+  const InitialStateWidget({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
-
-    if (_loading) {
-      return const Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            CircularProgressIndicator(),
-            SizedBox(height: 16),
-            Text('Rezept wird analysiert... (Das kann bis zu 30 Sekunden dauern)'),
-          ],
-        ),
-      );
-    }
-
+  Widget build(BuildContext context, WidgetRef ref) {
     return Center(
       child: SingleChildScrollView(
         child: Padding(
@@ -58,168 +53,175 @@ class _UploadRezeptContentState extends ConsumerState<UploadRezeptContent> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              if (_selectedFile != null) ...[
-                Image.file(
-                  _selectedFile!,
-                  height: 300,
-                  fit: BoxFit.contain,
-                ),
-                const SizedBox(height: 16),
-                ElevatedButton.icon(
-                  onPressed: _uploadImage,
-                  icon: const Icon(Icons.upload),
-                  label: const Text('Bild hochladen und analysieren'),
-                ),
-                TextButton(
-                  onPressed: () => setState(() => _selectedFile = null),
-                  child: const Text('Anderes Bild auswählen'),
-                ),
-              ] else ...[
-                const Text(
-                  'Laden Sie ein Foto eines Rezepts hoch, um es automatisch zu analysieren',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(fontSize: 16),
-                ),
-                const SizedBox(height: 24),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    ElevatedButton.icon(
-                      onPressed: _pickImage,
-                      icon: const Icon(Icons.photo_library),
-                      label: const Text('Aus Galerie'),
-                    ),
-                    const SizedBox(width: 16),
-                    ElevatedButton.icon(
-                      onPressed: _takePhoto,
-                      icon: const Icon(Icons.camera_alt),
-                      label: const Text('Kamera'),
-                    ),
-                  ],
-                ),
-              ],
+              const Text(
+                'Laden Sie ein Foto eines Rezepts hoch, um es automatisch zu analysieren',
+                textAlign: TextAlign.center,
+                style: TextStyle(fontSize: 16),
+              ),
+              const SizedBox(height: 24),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  ElevatedButton.icon(
+                    onPressed: () => ref.read(uploadRezeptNotifierProvider.notifier).pickImage(),
+                    icon: const Icon(Icons.photo_library),
+                    label: const Text('Aus Galerie'),
+                  ),
+                  const SizedBox(width: 16),
+                  ElevatedButton.icon(
+                    onPressed: () => ref.read(uploadRezeptNotifierProvider.notifier).takePhoto(),
+                    icon: const Icon(Icons.camera_alt),
+                    label: const Text('Kamera'),
+                  ),
+                ],
+              ),
             ],
           ),
         ),
       ),
     );
   }
+}
 
-  Future<void> _pickImage() async {
-    try {
-      final picker = ImagePicker();
-      final pickedFile = await picker.pickImage(
-        source: ImageSource.gallery,
-        maxWidth: 1800,
-        maxHeight: 1800,
-      );
+class LoadingStateWidget extends StatelessWidget {
+  const LoadingStateWidget({super.key});
 
-      if (pickedFile != null) {
-        setState(() {
-          _selectedFile = File(pickedFile.path);
-        });
-      }
-    } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Fehler beim Auswählen der Datei: $e'),
-            backgroundColor: Colors.red,
+  @override
+  Widget build(BuildContext context) {
+    return const Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          CircularProgressIndicator(),
+          SizedBox(height: 16),
+          Text('Rezept wird analysiert... (Das kann bis zu 30 Sekunden dauern)'),
+        ],
+      ),
+    );
+  }
+}
+
+class ImageSelectedStateWidget extends ConsumerWidget {
+  const ImageSelectedStateWidget({
+    required this.selectedFile,
+    super.key,
+  });
+
+  final File selectedFile;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    return Center(
+      child: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.all(24),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Image.file(
+                selectedFile,
+                height: 300,
+                fit: BoxFit.contain,
+              ),
+              const SizedBox(height: 16),
+              ElevatedButton.icon(
+                onPressed: () =>
+                    ref.read(uploadRezeptNotifierProvider.notifier).uploadImage(selectedFile),
+                icon: const Icon(Icons.upload),
+                label: const Text('Bild hochladen und analysieren'),
+              ),
+              TextButton(
+                onPressed: () => ref.read(uploadRezeptNotifierProvider.notifier).reset(),
+                child: const Text('Anderes Bild auswählen'),
+              ),
+            ],
           ),
-        );
-      }
-      print('Error picking image: $e');
-    }
+        ),
+      ),
+    );
+  }
+}
+
+class PatientSelectionStateWidget extends ConsumerWidget {
+  const PatientSelectionStateWidget({
+    required this.response,
+    super.key,
+  });
+
+  final RezeptEinlesenResponse response;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    return PatientSelectionView(
+      response: response,
+      onUseExistingPatient: (patientId) => _handleUseExistingPatient(
+        context,
+        ref,
+        patientId,
+        response,
+      ),
+      onCreateNewPatient: () => _handleCreateNewPatient(
+        context,
+        ref,
+        response,
+      ),
+    );
   }
 
-  Future<void> _takePhoto() async {
-    try {
-      final picker = ImagePicker();
-      final pickedFile = await picker.pickImage(
-        source: ImageSource.camera,
-        maxWidth: 1800,
-        maxHeight: 1800,
-      );
+  void _handleUseExistingPatient(
+    BuildContext context,
+    WidgetRef ref,
+    String patientId,
+    RezeptEinlesenResponse response,
+  ) {
+    final notifier = ref.read(uploadRezeptNotifierProvider.notifier);
+    final rezept = notifier.createRezeptFromExistingPatient(patientId, response);
 
-      if (pickedFile != null) {
-        setState(() {
-          _selectedFile = File(pickedFile.path);
-        });
-      }
-    } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Fehler beim Aufnehmen des Fotos: $e'),
-            backgroundColor: Colors.red,
-          ),
-        );
-      }
-      print('Error taking photo: $e');
-    }
+    // Navigate to create rezept page with the pre-filled data
+    context.go('/rezepte/create', extra: rezept);
   }
 
-  Future<void> _uploadImage() async {
-    if (_selectedFile == null) return;
+  void _handleCreateNewPatient(
+    BuildContext context,
+    WidgetRef ref,
+    RezeptEinlesenResponse response,
+  ) {
+    final notifier = ref.read(uploadRezeptNotifierProvider.notifier);
+    final patientData = notifier.createNewPatientData(response);
 
-    setState(() {
-      _loading = true;
-    });
-
-    try {
-      final fileName = _selectedFile!.path.split('/').last;
-      final extension = fileName.split('.').last.toLowerCase();
-
-      // Map file extension to mime type
-      String mimeType;
-      switch (extension) {
-        case 'jpg':
-        case 'jpeg':
-          mimeType = 'image/jpeg';
-        case 'png':
-          mimeType = 'image/png';
-        case 'gif':
-          mimeType = 'image/gif';
-        case 'webp':
-          mimeType = 'image/webp';
-        case 'heic':
-          mimeType = 'image/heic';
-        default:
-          mimeType = 'application/octet-stream';
-      }
-
-      // Create form data
-      final file = await MultipartFile.fromFile(
-        _selectedFile!.path,
-        filename: fileName,
-        contentType: DioMediaType.parse(mimeType),
-      );
-
-      final repo = ref.read(rezeptRepositoryProvider);
-      final response = await repo.uploadRezeptImage([file]);
-
-      if (mounted) {
-        final rezept = response.toRezept();
-
-        context.go('/rezepte/create', extra: rezept);
-      }
-    } catch (e) {
-      if (mounted) {
-        setState(() {
-          _loading = false;
-        });
-
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Fehler beim Upload: $e'),
-            backgroundColor: Colors.red,
-          ),
-        );
-      }
-    }
+    // Navigate to create patient page with the pre-filled data
+    context.go('/patienten/create', extra: patientData);
   }
+}
 
-  String _formatDate(DateTime date) {
-    return '${date.day.toString().padLeft(2, '0')}.${date.month.toString().padLeft(2, '0')}.${date.year}';
+class ErrorStateWidget extends ConsumerWidget {
+  const ErrorStateWidget({
+    required this.message,
+    super.key,
+  });
+
+  final String message;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          const Icon(Icons.error_outline, size: 48, color: Colors.red),
+          const SizedBox(height: 16),
+          Text(
+            message,
+            textAlign: TextAlign.center,
+            style: const TextStyle(color: Colors.red),
+          ),
+          const SizedBox(height: 24),
+          ElevatedButton(
+            onPressed: () => ref.read(uploadRezeptNotifierProvider.notifier).reset(),
+            child: const Text('Erneut versuchen'),
+          ),
+        ],
+      ),
+    );
   }
 }

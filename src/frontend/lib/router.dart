@@ -1,13 +1,18 @@
+import 'package:fast_immutable_collections/fast_immutable_collections.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:physio_ai/home_scaffold.dart';
+import 'package:physio_ai/patienten/domain/patient.dart';
 import 'package:physio_ai/patienten/presentation/create_patient_page.dart';
 import 'package:physio_ai/patienten/presentation/patient_detail_page.dart';
 import 'package:physio_ai/patienten/presentation/patienten_page.dart';
 import 'package:physio_ai/rezepte/home_page.dart';
 import 'package:physio_ai/rezepte/model/rezept.dart';
+import 'package:physio_ai/rezepte/model/rezept_einlesen_response.dart';
 import 'package:physio_ai/rezepte/presentation/create_rezept_page.dart';
+import 'package:physio_ai/rezepte/presentation/patient_selection_page.dart';
+import 'package:physio_ai/rezepte/presentation/patient_selection_view.dart';
 import 'package:physio_ai/rezepte/presentation/rezept_detail_page.dart';
 import 'package:physio_ai/rezepte/presentation/upload_rezept_page.dart';
 import 'package:physio_ai/rezepte/rezepte_page.dart';
@@ -88,6 +93,32 @@ final _mobileRouterConfig = RoutingConfig(
                     fullscreenDialog: true,
                     child: UploadRezeptPage(),
                   ),
+                ),
+                GoRoute(
+                  path: 'patient-selection',
+                  pageBuilder: (context, state) {
+                    // Get response if passed as extra
+                    final response = state.extra as RezeptEinlesenResponse?;
+
+                    if (response == null) {
+                      // Handle navigation without response parameter
+                      return const MaterialPage(
+                        fullscreenDialog: true,
+                        child: Scaffold(
+                          body: Center(
+                            child: Text('Error: No response data provided'),
+                          ),
+                        ),
+                      );
+                    }
+
+                    return MaterialPage(
+                      fullscreenDialog: true,
+                      child: PatientSelectionPage(
+                        response: response,
+                      ),
+                    );
+                  },
                 ),
                 GoRoute(
                   path: ':id',
@@ -175,6 +206,32 @@ final _tabletRouterConfig = RoutingConfig(
                     fullscreenDialog: true,
                     child: UploadRezeptPage(),
                   ),
+                ),
+                GoRoute(
+                  path: 'patient-selection',
+                  pageBuilder: (context, state) {
+                    // Get response if passed as extra
+                    final response = state.extra as RezeptEinlesenResponse?;
+
+                    if (response == null) {
+                      // Handle navigation without response parameter
+                      return const MaterialPage(
+                        fullscreenDialog: true,
+                        child: Scaffold(
+                          body: Center(
+                            child: Text('Error: No response data provided'),
+                          ),
+                        ),
+                      );
+                    }
+
+                    return MaterialPage(
+                      fullscreenDialog: true,
+                      child: PatientSelectionPage(
+                        response: response,
+                      ),
+                    );
+                  },
                 ),
                 GoRoute(
                   path: ':id',
@@ -281,6 +338,81 @@ final _desktopRouterConfig = RoutingConfig(
                   isContextCreate: true,
                 ),
               ),
+            ),
+            GoRoute(
+              path: '/rezepte/patient-selection',
+              pageBuilder: (context, state) {
+                // Get response if passed as extra
+                final response = state.extra as RezeptEinlesenResponse?;
+
+                if (response == null) {
+                  // Handle navigation without response parameter
+                  return const NoTransitionPage(
+                    key: ValueKey('rezeptePatientSelectionPage'),
+                    child: SplittedRezeptePage(
+                      rightPane: Center(
+                        child: Text('Error: No response data provided'),
+                      ),
+                      isContextCreate: true,
+                    ),
+                  );
+                }
+
+                return NoTransitionPage(
+                  key: const ValueKey('rezeptePatientSelectionPage'),
+                  child: SplittedRezeptePage(
+                    rightPane: PatientSelectionView(
+                      response: response,
+                      onUseExistingPatient: (patientId) {
+                        // Create a rezept from the response with the existing patient
+                        final rezept = Rezept(
+                          id: '',
+                          patient: RezeptPatient(
+                            id: patientId,
+                            vorname: response.existingPatient!.vorname,
+                            nachname: response.existingPatient!.nachname,
+                          ),
+                          ausgestelltAm: response.rezept.ausgestelltAm,
+                          preisGesamt: 0,
+                          positionen: response.rezept.rezeptpositionen
+                              .map((pos) => RezeptPos(
+                                    anzahl: pos.anzahl,
+                                    behandlungsart: pos.behandlungsart,
+                                  ))
+                              .toIList(),
+                        );
+
+                        // Navigate to create rezept page with the pre-filled data
+                        context.go('/rezepte/create', extra: rezept);
+                      },
+                      onCreateNewPatient: () {
+                        // Create a new patient from the analyzed data
+                        final newPatient = Patient(
+                          id: '',
+                          vorname: response.patient.vorname,
+                          nachname: response.patient.nachname,
+                          geburtstag: response.patient.geburtstag,
+                          titel: response.patient.titel,
+                          strasse: response.patient.strasse,
+                          hausnummer: response.patient.hausnummer,
+                          plz: response.patient.postleitzahl,
+                          stadt: response.patient.stadt,
+                        );
+
+                        // Pass the original response as well for later rezept creation
+                        final patientWithRezeptData = PatientSelectionData(
+                          patient: newPatient,
+                          response: response,
+                        );
+
+                        // Navigate to create patient page with the pre-filled data
+                        context.go('/patienten/create', extra: patientWithRezeptData);
+                      },
+                    ),
+                    isContextCreate: true,
+                  ),
+                );
+              },
             ),
             GoRoute(
               path: '/rezepte/:id',

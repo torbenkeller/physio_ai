@@ -6,6 +6,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:physio_ai/patienten/domain/patient.dart';
+import 'package:physio_ai/patienten/infrastructure/patient_form_dto.dart';
+import 'package:physio_ai/patienten/infrastructure/patient_repository.dart';
 import 'package:physio_ai/rezepte/infrastructure/rezept_repository.dart';
 import 'package:physio_ai/rezepte/model/rezept.dart';
 import 'package:physio_ai/rezepte/model/rezept_einlesen_response.dart';
@@ -13,8 +15,12 @@ import 'package:physio_ai/rezepte/model/rezept_einlesen_response.dart';
 part 'generated/upload_rezept_notifier.freezed.dart';
 
 // Provider for the notifier
-final uploadRezeptNotifierProvider = StateNotifierProvider<UploadRezeptNotifier, UploadRezeptState>(
-  (ref) => UploadRezeptNotifier(ref.read(rezeptRepositoryProvider)),
+final uploadRezeptNotifierProvider =
+    StateNotifierProvider<UploadRezeptNotifier, UploadRezeptState>(
+  (ref) => UploadRezeptNotifier(
+    rezeptRepository: ref.read(rezeptRepositoryProvider),
+    patientRepository: ref.read(patientRepositoryProvider),
+  ),
 );
 
 // State class for the upload process
@@ -46,9 +52,15 @@ class PatientSelectionData {
 
 // Notifier class that manages the state and business logic
 class UploadRezeptNotifier extends StateNotifier<UploadRezeptState> {
-  UploadRezeptNotifier(this._rezeptRepository) : super(const UploadRezeptState.initial());
+  UploadRezeptNotifier({
+    required RezeptRepository rezeptRepository,
+    required PatientRepository patientRepository,
+  })  : _rezeptRepository = rezeptRepository,
+        _patientRepository = patientRepository,
+        super(const UploadRezeptState.initial());
 
   final RezeptRepository _rezeptRepository;
+  final PatientRepository _patientRepository;
 
   // Reset state to initial
   void reset() {
@@ -71,7 +83,8 @@ class UploadRezeptNotifier extends StateNotifier<UploadRezeptState> {
         );
       }
     } on Exception catch (e) {
-      state = UploadRezeptState.error(message: 'Fehler beim Auswählen der Datei: $e');
+      state = UploadRezeptState.error(
+          message: 'Fehler beim Auswählen der Datei: $e');
     }
   }
 
@@ -91,7 +104,8 @@ class UploadRezeptNotifier extends StateNotifier<UploadRezeptState> {
         );
       }
     } on Exception catch (e) {
-      state = UploadRezeptState.error(message: 'Fehler beim Aufnehmen des Fotos: $e');
+      state = UploadRezeptState.error(
+          message: 'Fehler beim Aufnehmen des Fotos: $e');
     }
   }
 
@@ -137,7 +151,8 @@ class UploadRezeptNotifier extends StateNotifier<UploadRezeptState> {
   }
 
   // Create a rezept from the response with an existing patient
-  Rezept createRezeptFromExistingPatient(String patientId, RezeptEinlesenResponse response) {
+  Rezept createRezeptFromExistingPatient(
+      String patientId, RezeptEinlesenResponse response) {
     return Rezept(
       id: '',
       patient: RezeptPatient(
@@ -176,5 +191,61 @@ class UploadRezeptNotifier extends StateNotifier<UploadRezeptState> {
       patient: newPatient,
       response: response,
     );
+  }
+
+  // Create a new patient and return a Rezept ready for creation
+  Future<Rezept> createNewPatientAndReturnRezept(
+      RezeptEinlesenResponse response) async {
+    try {
+      final patientFormDto = PatientFormDto(
+        vorname: response.patient.vorname,
+        nachname: response.patient.nachname,
+        geburtstag: response.patient.geburtstag,
+        titel: response.patient.titel,
+        strasse: response.patient.strasse,
+        hausnummer: response.patient.hausnummer,
+        plz: response.patient.postleitzahl,
+        stadt: response.patient.stadt,
+      );
+
+      // Create the patient
+      await _patientRepository.createPatient(patientFormDto);
+
+      // Get all patients to find the newly created one
+      final allPatients = await _patientRepository.getPatienten();
+
+      // Find the newly created patient by matching name and birth date
+      final createdPatient = allPatients.firstWhere(
+        (p) =>
+            p.vorname == response.patient.vorname &&
+            p.nachname == response.patient.nachname &&
+            p.geburtstag.year == response.patient.geburtstag.year &&
+            p.geburtstag.month == response.patient.geburtstag.month &&
+            p.geburtstag.day == response.patient.geburtstag.day,
+        orElse: () => throw Exception('Newly created patient not found'),
+      );
+
+      // Create the rezept with the new patient
+      return Rezept(
+        id: '',
+        patient: RezeptPatient(
+          id: createdPatient.id,
+          vorname: createdPatient.vorname,
+          nachname: createdPatient.nachname,
+        ),
+        ausgestelltAm: response.rezept.ausgestelltAm,
+        preisGesamt: 0,
+        positionen: response.rezept.rezeptpositionen
+            .map(
+              (pos) => RezeptPos(
+                anzahl: pos.anzahl,
+                behandlungsart: pos.behandlungsart,
+              ),
+            )
+            .toIList(),
+      );
+    } on Exception catch (e) {
+      throw Exception('Fehler beim Erstellen des Patienten: $e');
+    }
   }
 }

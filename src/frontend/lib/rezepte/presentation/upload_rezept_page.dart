@@ -36,7 +36,8 @@ class UploadRezeptContent extends ConsumerWidget {
         ImageSelectedStateWidget(selectedFile: file),
       UploadRezeptStatePatientSelection(response: final response) =>
         PatientSelectionStateWidget(response: response),
-      UploadRezeptStateError(message: final message) => ErrorStateWidget(message: message),
+      UploadRezeptStateError(message: final message) =>
+        ErrorStateWidget(message: message),
     };
   }
 }
@@ -63,13 +64,17 @@ class InitialStateWidget extends ConsumerWidget {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   ElevatedButton.icon(
-                    onPressed: () => ref.read(uploadRezeptNotifierProvider.notifier).pickImage(),
+                    onPressed: () => ref
+                        .read(uploadRezeptNotifierProvider.notifier)
+                        .pickImage(),
                     icon: const Icon(Icons.photo_library),
                     label: const Text('Aus Galerie'),
                   ),
                   const SizedBox(width: 16),
                   ElevatedButton.icon(
-                    onPressed: () => ref.read(uploadRezeptNotifierProvider.notifier).takePhoto(),
+                    onPressed: () => ref
+                        .read(uploadRezeptNotifierProvider.notifier)
+                        .takePhoto(),
                     icon: const Icon(Icons.camera_alt),
                     label: const Text('Kamera'),
                   ),
@@ -94,7 +99,8 @@ class LoadingStateWidget extends StatelessWidget {
         children: [
           CircularProgressIndicator(),
           SizedBox(height: 16),
-          Text('Rezept wird analysiert... (Das kann bis zu 30 Sekunden dauern)'),
+          Text(
+              'Rezept wird analysiert... (Das kann bis zu 30 Sekunden dauern)'),
         ],
       ),
     );
@@ -125,13 +131,15 @@ class ImageSelectedStateWidget extends ConsumerWidget {
               ),
               const SizedBox(height: 16),
               ElevatedButton.icon(
-                onPressed: () =>
-                    ref.read(uploadRezeptNotifierProvider.notifier).uploadImage(selectedFile),
+                onPressed: () => ref
+                    .read(uploadRezeptNotifierProvider.notifier)
+                    .uploadImage(selectedFile),
                 icon: const Icon(Icons.upload),
                 label: const Text('Bild hochladen und analysieren'),
               ),
               TextButton(
-                onPressed: () => ref.read(uploadRezeptNotifierProvider.notifier).reset(),
+                onPressed: () =>
+                    ref.read(uploadRezeptNotifierProvider.notifier).reset(),
                 child: const Text('Anderes Bild auswählen'),
               ),
             ],
@@ -175,22 +183,30 @@ class PatientSelectionStateWidget extends ConsumerWidget {
     RezeptEinlesenResponse response,
   ) {
     final notifier = ref.read(uploadRezeptNotifierProvider.notifier);
-    final rezept = notifier.createRezeptFromExistingPatient(patientId, response);
+    final rezept =
+        notifier.createRezeptFromExistingPatient(patientId, response);
 
     // Navigate to create rezept page with the pre-filled data
     context.go('/rezepte/create', extra: rezept);
   }
 
-  void _handleCreateNewPatient(
+  Future<void> _handleCreateNewPatient(
     BuildContext context,
     WidgetRef ref,
     RezeptEinlesenResponse response,
-  ) {
-    final notifier = ref.read(uploadRezeptNotifierProvider.notifier);
-    final patientData = notifier.createNewPatientData(response);
+  ) async {
+    try {
+      final notifier = ref.read(uploadRezeptNotifierProvider.notifier);
+      final rezept = await notifier.createNewPatientAndReturnRezept(response);
 
-    // Navigate to create patient page with the pre-filled data
-    context.go('/patienten/create', extra: patientData);
+      // Navigate directly to create rezept page with the pre-filled data
+      if (context.mounted) {
+        context.go('/rezepte/create', extra: rezept);
+      }
+    } catch (e) {
+      // Error is handled by the button widget
+      rethrow;
+    }
   }
 }
 
@@ -217,7 +233,8 @@ class ErrorStateWidget extends ConsumerWidget {
           ),
           const SizedBox(height: 24),
           ElevatedButton(
-            onPressed: () => ref.read(uploadRezeptNotifierProvider.notifier).reset(),
+            onPressed: () =>
+                ref.read(uploadRezeptNotifierProvider.notifier).reset(),
             child: const Text('Erneut versuchen'),
           ),
         ],

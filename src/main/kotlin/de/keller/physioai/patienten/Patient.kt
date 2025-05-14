@@ -1,6 +1,7 @@
 package de.keller.physioai.patienten
 
 import org.springframework.data.annotation.Id
+import org.springframework.data.annotation.Version
 import org.springframework.data.relational.core.mapping.Table
 import java.time.LocalDate
 import java.util.UUID
@@ -30,4 +31,6 @@ data class Patient(
     val telFestnetz: String?,
     val email: String?,
     val geburtstag: LocalDate?,
+    @Version
+    val version: Int = 0,
 )

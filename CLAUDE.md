@@ -11,7 +11,7 @@
 - Lint code: `flutter analyze`
 - Format code: `dart format <directory / files / . for all>`
 - Fix lint issues: `dart fix --apply`
-- Custom lint: `dart run custom_lint`
+- Custom lint: `dart r8un custom_lint`
 
 ### Frontend (Flutter) -> Commands -> Test Commands
 - Run all tests: `flutter test`

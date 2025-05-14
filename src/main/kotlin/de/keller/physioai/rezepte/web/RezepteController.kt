@@ -52,7 +52,7 @@ class RezepteController
             val aerzte = aerzteRepository.findAllByIdIn(aerzteIds).toList()
 
             val patientenIds = rezepte.map { it.patientId }.toList()
-            val patienten = patientenRepository.findAllById(patientenIds)
+            val patienten = patientenRepository.findAllByIdIn(patientenIds)
 
             return rezepte.map { r ->
                 RezeptDto.fromRezept(

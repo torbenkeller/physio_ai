@@ -11,13 +11,15 @@ create table patienten
     tel_mobil    varchar,
     tel_festnetz varchar,
     email        varchar,
-    geburtstag   date
+    geburtstag   date,
+    version      int     not null default 0
 );
 
 create table aerzte
 (
-    id   uuid    not null primary key,
-    name varchar not null unique
+    id      uuid    not null primary key,
+    name    varchar not null unique,
+    version int     not null default 0
 );
 
 create table rezepte
@@ -33,9 +35,10 @@ create table rezepte
 
 create table behandlungsarten
 (
-    id    uuid             not null primary key,
-    name  varchar          not null,
-    preis double precision not null
+    id      uuid             not null primary key,
+    name    varchar          not null,
+    preis   double precision not null,
+    version int              not null default 0
 );
 
 create table rezept_pos
@@ -44,7 +47,7 @@ create table rezept_pos
     rezept_id           uuid             not null references rezepte (id),
     index               int              not null,
     anzahl              int              not null,
-    einzel_preis        double precision not null,
+    einzelpreis         double precision not null,
     preis_gesamt        double precision not null,
     behandlungsart_name varchar          not null,
     behandlungsart_id   uuid             not null references behandlungsarten (id)

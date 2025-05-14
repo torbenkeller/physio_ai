@@ -10,16 +10,15 @@ import org.springframework.stereotype.Repository
 import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDate
 import java.util.UUID
-import org.springframework.data.repository.Repository as SpringDataJdbcRepository
 
 @Transactional(readOnly = true)
 @Repository
-interface PatientenRepository : SpringDataJdbcRepository<Patient, PatientId> {
+interface PatientenRepository : org.springframework.data.repository.Repository<Patient, PatientId> {
     fun findAll(): List<Patient>
 
     fun findById(id: PatientId): Patient?
 
-    fun findAllById(ids: Iterable<PatientId>): List<Patient>
+    fun findAllByIdIn(ids: Collection<PatientId>): List<Patient>
 
     fun findPatientByGeburtstag(geburtstag: LocalDate): List<Patient>
 

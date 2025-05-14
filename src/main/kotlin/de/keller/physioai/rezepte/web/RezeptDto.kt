@@ -87,7 +87,7 @@ enum class RezeptRechnungStatus {
 
 data class RezeptPosDto(
     val behandlungsart: BehandlungsartDto,
-    val anzahl: Long,
+    val anzahl: Int,
 )
 
 data class BehandlungsartDto(
@@ -128,5 +128,5 @@ data class RezeptUpdateDto(
  */
 data class RezeptPosCreateDto(
     val behandlungsartId: UUID,
-    val anzahl: Long,
+    val anzahl: Int,
 )

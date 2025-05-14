@@ -253,7 +253,7 @@ class RezeptServiceTest {
             // Setup mock behavior
             every { rezeptAiService.analyzeRezeptImage(file) } returns rezeptAiResponse
             every { patientenRepository.findPatientByGeburtstag(any()) } returns listOf(patient)
-            every { behandlungsartenRepository.findAllByName(any()) } returns listOf(behandlungsart1)
+            every { behandlungsartenRepository.findAllByNameIn(any()) } returns listOf(behandlungsart1)
 
             // Mock file system operations
             mockkStatic(Files::class)
@@ -271,7 +271,7 @@ class RezeptServiceTest {
             // Verify interactions
             verify { rezeptAiService.analyzeRezeptImage(file) }
             verify { patientenRepository.findPatientByGeburtstag(any()) }
-            verify { behandlungsartenRepository.findAllByName(any()) }
+            verify { behandlungsartenRepository.findAllByNameIn(any()) }
             verify { Files.copy(any<java.io.InputStream>(), any<Path>(), any()) }
         }
 
@@ -297,7 +297,7 @@ class RezeptServiceTest {
             // Verify interactions
             verify { rezeptAiService.analyzeRezeptImage(file) }
             verify(exactly = 0) { patientenRepository.findPatientByGeburtstag(any()) }
-            verify(exactly = 0) { behandlungsartenRepository.findAllByName(any()) }
+            verify(exactly = 0) { behandlungsartenRepository.findAllByNameIn(any()) }
         }
     }
 

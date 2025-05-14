@@ -3,8 +3,6 @@ package de.keller.physioai.patienten
 import de.keller.physioai.patienten.web.PatientDto
 import org.apache.logging.log4j.util.Strings
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.data.jdbc.core.JdbcAggregateTemplate
-import org.springframework.web.bind.annotation.CrossOrigin
 import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PatchMapping
@@ -15,13 +13,11 @@ import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 import java.util.UUID
 
-@CrossOrigin
 @RestController
 @RequestMapping("/patienten")
 class PatientenController
     @Autowired
     constructor(
-        val jdbcTemplate: JdbcAggregateTemplate,
         private val repository: PatientenRepository,
     ) {
         @GetMapping
@@ -51,7 +47,7 @@ class PatientenController
                     geburtstag = patientForm.geburtstag,
                 )
 
-            jdbcTemplate.insert(p)
+            repository.save(p)
 
             return PatientDto.fromPatient(p)
         }

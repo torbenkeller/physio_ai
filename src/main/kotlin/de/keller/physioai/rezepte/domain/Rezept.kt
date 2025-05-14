@@ -30,7 +30,7 @@ data class Rezept(
     @MappedCollection(idColumn = "rezept_id", keyColumn = "index")
     val positionen: List<RezeptPos>,
     @Version
-    val version: Long = 0,
+    val version: Int = 0,
 ) {
     fun update(
         patientId: PatientId,
@@ -76,7 +76,7 @@ data class Rezept(
 
 data class RezeptPosSource(
     val behandlungsart: Behandlungsart,
-    val anzahl: Long,
+    val anzahl: Int,
 ) {
     fun toPosition(): RezeptPos =
         RezeptPos(
@@ -94,7 +94,7 @@ data class RezeptPos(
     @Id
     val id: UUID,
     val behandlungsartId: BehandlungsartId,
-    val anzahl: Long,
+    val anzahl: Int,
     val einzelpreis: Double,
     val preisGesamt: Double,
     val behandlungsartName: String,

@@ -22,7 +22,7 @@ VALUES ('e5f6a7b8-c9d0-1e2f-3a4b-5c6d7e8f9a0b', 'a1b2c3d4-e5f6-7a8b-9c0d-1e2f3a4
 ON CONFLICT DO NOTHING;
 
 -- Insert prescription positions (rezept_pos)
-INSERT INTO rezept_pos (id, rezept_id, index, anzahl, einzel_preis, preis_gesamt, behandlungsart_name, behandlungsart_id)
+INSERT INTO rezept_pos (id, rezept_id, index, anzahl, einzelpreis, preis_gesamt, behandlungsart_name, behandlungsart_id)
 VALUES ('c9d0e1f2-a3b4-5c6d-7e8f-9a0b1c2d3e4f', 'e5f6a7b8-c9d0-1e2f-3a4b-5c6d7e8f9a0b', 0, 3, 22.84, 68.52, 'Klassische Massagetherapie', 'cfdc701b-c5f9-4000-8d4b-85ed7aa7a141'),
        ('d0e1f2a3-b4c5-6d7e-8f9a-0b1c2d3e4f5a', 'e5f6a7b8-c9d0-1e2f-3a4b-5c6d7e8f9a0b', 1, 1, 37.60, 37.60, 'Manuelle Therapie', 'f5571a9f-c679-4422-8750-5faa760e8ea7'),
        

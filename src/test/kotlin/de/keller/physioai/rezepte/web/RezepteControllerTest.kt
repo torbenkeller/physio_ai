@@ -175,7 +175,7 @@ class RezepteControllerTest {
 
             verify { rezeptRepository.findAll() }
             verify(exactly = 0) { aerzteRepository.findAllByIdIn(any()) }
-            verify(exactly = 0) { patientenRepository.findAllById(any()) }
+            verify(exactly = 0) { patientenRepository.findAllByIdIn(any()) }
         }
 
         @Test
@@ -183,7 +183,7 @@ class RezepteControllerTest {
             // Arrange
             every { rezeptRepository.findAll() } returns listOf(rezept1, rezept2)
             every { aerzteRepository.findAllByIdIn(listOf(arztId)) } returns listOf(arzt)
-            every { patientenRepository.findAllById(listOf(patientId, patientId)) } returns listOf(patient)
+            every { patientenRepository.findAllByIdIn(listOf(patientId, patientId)) } returns listOf(patient)
 
             // Act & Assert
             mockMvc
@@ -201,7 +201,7 @@ class RezepteControllerTest {
 
             verify { rezeptRepository.findAll() }
             verify { aerzteRepository.findAllByIdIn(listOf(arztId)) }
-            verify { patientenRepository.findAllById(listOf(patientId, patientId)) }
+            verify { patientenRepository.findAllByIdIn(listOf(patientId, patientId)) }
         }
     }
 

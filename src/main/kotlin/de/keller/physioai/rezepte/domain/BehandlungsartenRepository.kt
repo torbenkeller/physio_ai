@@ -11,7 +11,7 @@ import java.util.UUID
 
 @Repository
 interface BehandlungsartenRepository : CrudRepository<Behandlungsart, BehandlungsartId> {
-    fun findAllByName(names: Iterable<String>): List<Behandlungsart>
+    fun findAllByNameIn(names: Collection<String>): List<Behandlungsart>
 }
 
 @Component

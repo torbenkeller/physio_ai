@@ -172,7 +172,7 @@ class RezeptService
                     }
 
             val behandlungsarten =
-                behandlungsartenRepository.findAllByName(rezeptData.rezeptpositionen.map { it.behandlung })
+                behandlungsartenRepository.findAllByNameIn(rezeptData.rezeptpositionen.map { it.behandlung })
 
             return RezeptEinlesenResponse(
                 existingPatient = matchingPatient?.let { PatientDto.fromPatient(it) },
@@ -225,11 +225,11 @@ class RezeptService
          * @return The processed prescription data, or null if processing failed
          */
         fun rezeptEinlesen(file: MultipartFile): RezeptEinlesenResponse? {
-        logger.debug("Processing prescription image: {}", file.originalFilename)
+            logger.debug("Processing prescription image: {}", file.originalFilename)
 
-        val rezeptData = rezeptAiService.analyzeRezeptImage(file) ?: return null
-        logger.debug("Successfully analyzed prescription image")
+            val rezeptData = rezeptAiService.analyzeRezeptImage(file) ?: return null
+            logger.debug("Successfully analyzed prescription image")
 
-        return processRezeptImage(file, rezeptData)
-    }
+            return processRezeptImage(file, rezeptData)
+        }
     }

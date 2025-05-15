@@ -8,7 +8,7 @@ import 'package:physio_ai/patienten/presentation/patienten_page.dart';
 import 'package:physio_ai/rezepte/home_page.dart';
 import 'package:physio_ai/rezepte/presentation/create_rezept_page.dart';
 import 'package:physio_ai/rezepte/presentation/rezept_detail_page.dart';
-import 'package:physio_ai/rezepte/presentation/upload_rezept_page.dart';
+import 'package:physio_ai/rezepte/presentation/upload_rezept/upload_rezept_page.dart';
 import 'package:physio_ai/rezepte/rezepte_page.dart';
 
 final _rootNavigatorKey = GlobalKey<NavigatorState>();

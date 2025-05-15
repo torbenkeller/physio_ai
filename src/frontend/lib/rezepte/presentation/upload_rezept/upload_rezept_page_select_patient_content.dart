@@ -4,10 +4,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:physio_ai/rezepte/model/rezept_einlesen_response.dart';
-import 'package:physio_ai/rezepte/presentation/upload_rezept_notifier.dart';
+import 'package:physio_ai/rezepte/presentation/upload_rezept/upload_rezept_notifier.dart';
 
-class PatientSelectionView extends ConsumerStatefulWidget {
-  const PatientSelectionView({
+class UploadRezeptPageSelectPatientContent extends ConsumerStatefulWidget {
+  const UploadRezeptPageSelectPatientContent({
     required this.response,
     required this.selectedImage,
     super.key,
@@ -18,10 +18,10 @@ class PatientSelectionView extends ConsumerStatefulWidget {
   final File selectedImage;
 
   @override
-  ConsumerState<PatientSelectionView> createState() => _PatientSelectionViewState();
+  ConsumerState<UploadRezeptPageSelectPatientContent> createState() => _PatientSelectionViewState();
 }
 
-class _PatientSelectionViewState extends ConsumerState<PatientSelectionView> {
+class _PatientSelectionViewState extends ConsumerState<UploadRezeptPageSelectPatientContent> {
   bool _isCreateNewPatientLoading = false;
 
   @override

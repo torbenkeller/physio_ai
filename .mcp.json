@@ -1,6 +1,6 @@
 {
   "mcpServers": {
-    "flutter": {
+    "flutterInspector": {
       "command": "node",
       "args": [
         "/Users/torben/Desktop/Projects/mcp_flutter/mcp_server/build/index.js"

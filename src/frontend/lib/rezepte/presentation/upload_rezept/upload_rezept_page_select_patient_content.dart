@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
+import 'package:physio_ai/rezepte/model/rezept.dart';
 import 'package:physio_ai/rezepte/model/rezept_einlesen_response.dart';
 import 'package:physio_ai/rezepte/presentation/upload_rezept/upload_rezept_notifier.dart';
 
@@ -18,10 +19,12 @@ class UploadRezeptPageSelectPatientContent extends ConsumerStatefulWidget {
   final File selectedImage;
 
   @override
-  ConsumerState<UploadRezeptPageSelectPatientContent> createState() => _PatientSelectionViewState();
+  ConsumerState<UploadRezeptPageSelectPatientContent> createState() =>
+      _PatientSelectionViewState();
 }
 
-class _PatientSelectionViewState extends ConsumerState<UploadRezeptPageSelectPatientContent> {
+class _PatientSelectionViewState
+    extends ConsumerState<UploadRezeptPageSelectPatientContent> {
   bool _isCreateNewPatientLoading = false;
 
   @override
@@ -43,10 +46,25 @@ class _PatientSelectionViewState extends ConsumerState<UploadRezeptPageSelectPat
             ),
             const SizedBox(height: 12),
             _PatientDataCard(
-              name: '${widget.response.patient.vorname} ${widget.response.patient.nachname}',
-              address: '${widget.response.patient.strasse} ${widget.response.patient.hausnummer}\n'
+              name:
+                  '${widget.response.patient.vorname} ${widget.response.patient.nachname}',
+              address:
+                  '${widget.response.patient.strasse} ${widget.response.patient.hausnummer}\n'
                   '${widget.response.patient.postleitzahl} ${widget.response.patient.stadt}',
               birthDate: dateFormat.format(widget.response.patient.geburtstag),
+            ),
+            const SizedBox(height: 24),
+
+            // Analyzed rezept data section
+            Text(
+              'Analyzed Rezept Data',
+              style: theme.textTheme.titleLarge,
+            ),
+            const SizedBox(height: 12),
+            _RezeptDataCard(
+              ausgestelltAm:
+                  dateFormat.format(widget.response.rezept.ausgestelltAm),
+              rezeptpositionen: widget.response.rezept.rezeptpositionen,
             ),
             const SizedBox(height: 24),
 
@@ -62,7 +80,8 @@ class _PatientSelectionViewState extends ConsumerState<UploadRezeptPageSelectPat
                     '${widget.response.existingPatient!.vorname} ${widget.response.existingPatient!.nachname} '
                     '(${widget.response.existingPatient!.id})',
                 address: widget.response.existingPatient!.address,
-                birthDate: dateFormat.format(widget.response.existingPatient!.geburtstag),
+                birthDate: dateFormat
+                    .format(widget.response.existingPatient!.geburtstag),
                 extraInfo: widget.response.existingPatient!.email ?? '',
               ),
               const SizedBox(height: 24),
@@ -169,7 +188,9 @@ class _PatientSelectionViewState extends ConsumerState<UploadRezeptPageSelectPat
   }
 
   void _handleUseExistingPatient(WidgetRef ref) {
-    ref.read(uploadRezeptNotifierProvider.notifier).selectSuggestedPatient(widget.response);
+    ref
+        .read(uploadRezeptNotifierProvider.notifier)
+        .selectSuggestedPatient(widget.response);
   }
 
   Future<void> _handleCreateNewPatient(WidgetRef ref) async {
@@ -177,7 +198,9 @@ class _PatientSelectionViewState extends ConsumerState<UploadRezeptPageSelectPat
       _isCreateNewPatientLoading = true;
     });
 
-    await ref.read(uploadRezeptNotifierProvider.notifier).createNewPatient(widget.response);
+    await ref
+        .read(uploadRezeptNotifierProvider.notifier)
+        .createNewPatient(widget.response);
 
     if (!mounted) {
       return;
@@ -259,6 +282,87 @@ class _PatientDataCard extends StatelessWidget {
                 ],
               ),
             ],
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _RezeptDataCard extends StatelessWidget {
+  const _RezeptDataCard({
+    required this.ausgestelltAm,
+    required this.rezeptpositionen,
+    super.key,
+  });
+
+  final String ausgestelltAm;
+  final List<EingelesenesRezeptPos> rezeptpositionen;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
+    return Card(
+      elevation: 2,
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                const Icon(Icons.receipt_long, size: 20),
+                const SizedBox(width: 8),
+                Text(
+                  'Prescription',
+                  style: theme.textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ],
+            ),
+            const Divider(),
+            const SizedBox(height: 8),
+            Row(
+              children: [
+                const Icon(Icons.calendar_today, size: 18),
+                const SizedBox(width: 8),
+                Text(
+                  'Issued on: $ausgestelltAm',
+                  style: theme.textTheme.bodyMedium,
+                ),
+              ],
+            ),
+            const SizedBox(height: 16),
+            Text(
+              'Treatments:',
+              style: theme.textTheme.titleSmall,
+            ),
+            const SizedBox(height: 8),
+            ListView.builder(
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              itemCount: rezeptpositionen.length,
+              itemBuilder: (context, index) {
+                final position = rezeptpositionen[index];
+                return Padding(
+                  padding: const EdgeInsets.only(bottom: 8),
+                  child: Row(
+                    children: [
+                      const Icon(Icons.medical_services_outlined, size: 18),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: Text(
+                          '${position.anzahl}x ${position.behandlungsart.name}',
+                          style: theme.textTheme.bodyMedium,
+                        ),
+                      ),
+                    ],
+                  ),
+                );
+              },
+            ),
           ],
         ),
       ),

@@ -68,12 +68,12 @@ class _PatientRepository implements PatientRepository {
   }
 
   @override
-  Future<void> createPatient(PatientFormDto patient) async {
+  Future<Patient> createPatient(PatientFormDto patient) async {
     final _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{};
     final _headers = <String, dynamic>{};
     final _data = patient;
-    final _options = _setStreamType<void>(
+    final _options = _setStreamType<Patient>(
       Options(method: 'POST', headers: _headers, extra: _extra)
           .compose(
             _dio.options,
@@ -83,7 +83,15 @@ class _PatientRepository implements PatientRepository {
           )
           .copyWith(baseUrl: _combineBaseUrls(_dio.options.baseUrl, baseUrl)),
     );
-    await _dio.fetch<void>(_options);
+    final _result = await _dio.fetch<Map<String, dynamic>>(_options);
+    late Patient _value;
+    try {
+      _value = Patient.fromJson(_result.data!);
+    } on Object catch (e, s) {
+      errorLogger?.logError(e, s, _options);
+      rethrow;
+    }
+    return _value;
   }
 
   @override

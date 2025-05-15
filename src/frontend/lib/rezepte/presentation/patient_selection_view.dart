@@ -1,18 +1,28 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:physio_ai/rezepte/model/rezept_einlesen_response.dart';
+import 'package:physio_ai/rezepte/presentation/upload_rezept_notifier.dart';
 
-class PatientSelectionView extends StatelessWidget {
+class PatientSelectionView extends ConsumerStatefulWidget {
   const PatientSelectionView({
     required this.response,
-    required this.onUseExistingPatient,
-    required this.onCreateNewPatient,
+    required this.selectedImage,
     super.key,
   });
 
   final RezeptEinlesenResponse response;
-  final Function(String patientId) onUseExistingPatient;
-  final Future<void> Function() onCreateNewPatient;
+
+  final File selectedImage;
+
+  @override
+  ConsumerState<PatientSelectionView> createState() => _PatientSelectionViewState();
+}
+
+class _PatientSelectionViewState extends ConsumerState<PatientSelectionView> {
+  bool _isCreateNewPatientLoading = false;
 
   @override
   Widget build(BuildContext context) {
@@ -33,16 +43,15 @@ class PatientSelectionView extends StatelessWidget {
             ),
             const SizedBox(height: 12),
             _PatientDataCard(
-              name: '${response.patient.vorname} ${response.patient.nachname}',
-              address:
-                  '${response.patient.strasse} ${response.patient.hausnummer}\n'
-                  '${response.patient.postleitzahl} ${response.patient.stadt}',
-              birthDate: dateFormat.format(response.patient.geburtstag),
+              name: '${widget.response.patient.vorname} ${widget.response.patient.nachname}',
+              address: '${widget.response.patient.strasse} ${widget.response.patient.hausnummer}\n'
+                  '${widget.response.patient.postleitzahl} ${widget.response.patient.stadt}',
+              birthDate: dateFormat.format(widget.response.patient.geburtstag),
             ),
             const SizedBox(height: 24),
 
             // Existing patient match section (or no match info)
-            if (response.existingPatient != null) ...[
+            if (widget.response.existingPatient != null) ...[
               Text(
                 'Matching Patient',
                 style: theme.textTheme.titleLarge,
@@ -50,27 +59,43 @@ class PatientSelectionView extends StatelessWidget {
               const SizedBox(height: 12),
               _PatientDataCard(
                 name:
-                    '${response.existingPatient!.vorname} ${response.existingPatient!.nachname} '
-                    '(${response.existingPatient!.id})',
-                address: response.existingPatient!.address,
-                birthDate:
-                    dateFormat.format(response.existingPatient!.geburtstag),
-                extraInfo: response.existingPatient!.email ?? '',
+                    '${widget.response.existingPatient!.vorname} ${widget.response.existingPatient!.nachname} '
+                    '(${widget.response.existingPatient!.id})',
+                address: widget.response.existingPatient!.address,
+                birthDate: dateFormat.format(widget.response.existingPatient!.geburtstag),
+                extraInfo: widget.response.existingPatient!.email ?? '',
               ),
               const SizedBox(height: 24),
-              Row(
+              Column(
                 children: [
-                  Expanded(
-                    child: ElevatedButton(
-                      onPressed: () =>
-                          onUseExistingPatient(response.existingPatient!.id),
-                      child: const Text('Use Existing Patient'),
-                    ),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: ElevatedButton(
+                          onPressed: () => _handleUseExistingPatient(ref),
+                          child: const Text('Use Existing Patient'),
+                        ),
+                      ),
+                      const SizedBox(width: 16),
+                      Expanded(
+                        child: OutlinedButton(
+                          onPressed: () => _handleCreateNewPatient(ref),
+                          child: const Text('Create New Patient'),
+                        ),
+                      ),
+                    ],
                   ),
-                  const SizedBox(width: 16),
-                  Expanded(
-                    child: _CreateNewPatientButton(
-                      onCreateNewPatient: onCreateNewPatient,
+                  const SizedBox(height: 16),
+                  SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton.icon(
+                      onPressed: () => _handleCreateNewPatient(ref),
+                      icon: const Icon(Icons.flash_on),
+                      label: const Text('Create Directly'),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.green,
+                        foregroundColor: Colors.white,
+                      ),
                     ),
                   ),
                 ],
@@ -82,13 +107,34 @@ class PatientSelectionView extends StatelessWidget {
               ),
               const SizedBox(height: 12),
               Text(
-                'We couldn\'t find a matching patient in our records. '
+                'We could not find a matching patient in our records. '
                 'You can create a new patient with the extracted data.',
                 style: theme.textTheme.bodyMedium,
               ),
               const SizedBox(height: 24),
-              _CreateNewPatientButton(
-                onCreateNewPatient: onCreateNewPatient,
+              Column(
+                children: [
+                  SizedBox(
+                    width: double.infinity,
+                    child: OutlinedButton(
+                      onPressed: () => _handleCreateNewPatient(ref),
+                      child: const Text('Create New Patient'),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton.icon(
+                      onPressed: () => _handleCreateNewPatient(ref),
+                      icon: const Icon(Icons.flash_on),
+                      label: const Text('Create Directly'),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.green,
+                        foregroundColor: Colors.white,
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ],
 
@@ -101,8 +147,8 @@ class PatientSelectionView extends StatelessWidget {
             const SizedBox(height: 12),
             ClipRRect(
               borderRadius: BorderRadius.circular(8),
-              child: Image.network(
-                response.path,
+              child: Image.file(
+                widget.selectedImage,
                 height: 200,
                 fit: BoxFit.contain,
                 errorBuilder: (context, error, stackTrace) {
@@ -121,67 +167,25 @@ class PatientSelectionView extends StatelessWidget {
       ),
     );
   }
-}
 
-class _CreateNewPatientButton extends StatefulWidget {
-  const _CreateNewPatientButton({
-    required this.onCreateNewPatient,
-    Key? key,
-  }) : super(key: key);
-
-  final Future<void> Function() onCreateNewPatient;
-
-  @override
-  State<_CreateNewPatientButton> createState() =>
-      _CreateNewPatientButtonState();
-}
-
-class _CreateNewPatientButtonState extends State<_CreateNewPatientButton> {
-  bool _isLoading = false;
-
-  Future<void> _handleCreateNewPatient() async {
-    if (_isLoading) return;
-
-    setState(() {
-      _isLoading = true;
-    });
-
-    try {
-      await widget.onCreateNewPatient();
-    } catch (e) {
-      // If we catch an error, we should show it to the user and reset the button state
-      if (mounted) {
-        setState(() {
-          _isLoading = false;
-        });
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Error creating patient: $e'),
-            backgroundColor: Colors.red,
-          ),
-        );
-      }
-    }
+  void _handleUseExistingPatient(WidgetRef ref) {
+    ref.read(uploadRezeptNotifierProvider.notifier).selectSuggestedPatient(widget.response);
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return _isLoading
-        ? OutlinedButton.icon(
-            onPressed: null,
-            icon: const SizedBox(
-              width: 16,
-              height: 16,
-              child: CircularProgressIndicator(
-                strokeWidth: 2,
-              ),
-            ),
-            label: const Text('Creating...'),
-          )
-        : OutlinedButton(
-            onPressed: _handleCreateNewPatient,
-            child: const Text('Create New Patient'),
-          );
+  Future<void> _handleCreateNewPatient(WidgetRef ref) async {
+    setState(() {
+      _isCreateNewPatientLoading = true;
+    });
+
+    await ref.read(uploadRezeptNotifierProvider.notifier).createNewPatient(widget.response);
+
+    if (!mounted) {
+      return;
+    }
+
+    setState(() {
+      _isCreateNewPatientLoading = false;
+    });
   }
 }
 
@@ -191,8 +195,9 @@ class _PatientDataCard extends StatelessWidget {
     required this.address,
     required this.birthDate,
     this.extraInfo = '',
-    Key? key,
-  }) : super(key: key);
+    super.key,
+  });
+
   final String name;
   final String address;
   final String birthDate;

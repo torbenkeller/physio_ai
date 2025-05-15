@@ -2,8 +2,6 @@ import 'dart:io' if (dart.library.html) 'package:web/web.dart' show File;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
-import 'package:physio_ai/rezepte/model/rezept_einlesen_response.dart';
 import 'package:physio_ai/rezepte/presentation/patient_selection_view.dart';
 import 'package:physio_ai/rezepte/presentation/upload_rezept_notifier.dart';
 
@@ -32,12 +30,26 @@ class UploadRezeptContent extends ConsumerWidget {
     return switch (state) {
       UploadRezeptStateInitial() => const InitialStateWidget(),
       UploadRezeptStateLoading() => const LoadingStateWidget(),
-      UploadRezeptStateImageSelected(selectedFile: final file) =>
-        ImageSelectedStateWidget(selectedFile: file),
-      UploadRezeptStatePatientSelection(response: final response) =>
-        PatientSelectionStateWidget(response: response),
-      UploadRezeptStateError(message: final message) =>
-        ErrorStateWidget(message: message),
+      UploadRezeptStateImageSelected(selectedImage: final image) =>
+        ImageSelectedStateWidget(selectedImage: image),
+      UploadRezeptStateRezeptEingelesen(
+        response: final response,
+        selectedImage: final selectedImage
+      ) =>
+        PatientSelectionView(
+          response: response,
+          selectedImage: selectedImage,
+        ),
+      UploadRezeptStatePatientSelected(
+        response: final response,
+        selectedPatient: final selectedPatient,
+        selectedImage: final selectedImage
+      ) =>
+        PatientSelectionView(
+          response: response,
+          selectedImage: selectedImage,
+        ),
+      UploadRezeptStateError(message: final message) => ErrorStateWidget(message: message),
     };
   }
 }
@@ -64,17 +76,13 @@ class InitialStateWidget extends ConsumerWidget {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   ElevatedButton.icon(
-                    onPressed: () => ref
-                        .read(uploadRezeptNotifierProvider.notifier)
-                        .pickImage(),
+                    onPressed: () => ref.read(uploadRezeptNotifierProvider.notifier).pickImage(),
                     icon: const Icon(Icons.photo_library),
                     label: const Text('Aus Galerie'),
                   ),
                   const SizedBox(width: 16),
                   ElevatedButton.icon(
-                    onPressed: () => ref
-                        .read(uploadRezeptNotifierProvider.notifier)
-                        .takePhoto(),
+                    onPressed: () => ref.read(uploadRezeptNotifierProvider.notifier).takePhoto(),
                     icon: const Icon(Icons.camera_alt),
                     label: const Text('Kamera'),
                   ),
@@ -99,8 +107,7 @@ class LoadingStateWidget extends StatelessWidget {
         children: [
           CircularProgressIndicator(),
           SizedBox(height: 16),
-          Text(
-              'Rezept wird analysiert... (Das kann bis zu 30 Sekunden dauern)'),
+          Text('Rezept wird analysiert... (Das kann bis zu 30 Sekunden dauern)'),
         ],
       ),
     );
@@ -109,11 +116,11 @@ class LoadingStateWidget extends StatelessWidget {
 
 class ImageSelectedStateWidget extends ConsumerWidget {
   const ImageSelectedStateWidget({
-    required this.selectedFile,
+    required this.selectedImage,
     super.key,
   });
 
-  final File selectedFile;
+  final File selectedImage;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -125,21 +132,19 @@ class ImageSelectedStateWidget extends ConsumerWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Image.file(
-                selectedFile,
+                selectedImage,
                 height: 300,
                 fit: BoxFit.contain,
               ),
               const SizedBox(height: 16),
               ElevatedButton.icon(
-                onPressed: () => ref
-                    .read(uploadRezeptNotifierProvider.notifier)
-                    .uploadImage(selectedFile),
+                onPressed: () =>
+                    ref.read(uploadRezeptNotifierProvider.notifier).uploadImage(selectedImage),
                 icon: const Icon(Icons.upload),
                 label: const Text('Bild hochladen und analysieren'),
               ),
               TextButton(
-                onPressed: () =>
-                    ref.read(uploadRezeptNotifierProvider.notifier).reset(),
+                onPressed: () => ref.read(uploadRezeptNotifierProvider.notifier).reset(),
                 child: const Text('Anderes Bild auswählen'),
               ),
             ],
@@ -147,66 +152,6 @@ class ImageSelectedStateWidget extends ConsumerWidget {
         ),
       ),
     );
-  }
-}
-
-class PatientSelectionStateWidget extends ConsumerWidget {
-  const PatientSelectionStateWidget({
-    required this.response,
-    super.key,
-  });
-
-  final RezeptEinlesenResponse response;
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    return PatientSelectionView(
-      response: response,
-      onUseExistingPatient: (patientId) => _handleUseExistingPatient(
-        context,
-        ref,
-        patientId,
-        response,
-      ),
-      onCreateNewPatient: () => _handleCreateNewPatient(
-        context,
-        ref,
-        response,
-      ),
-    );
-  }
-
-  void _handleUseExistingPatient(
-    BuildContext context,
-    WidgetRef ref,
-    String patientId,
-    RezeptEinlesenResponse response,
-  ) {
-    final notifier = ref.read(uploadRezeptNotifierProvider.notifier);
-    final rezept =
-        notifier.createRezeptFromExistingPatient(patientId, response);
-
-    // Navigate to create rezept page with the pre-filled data
-    context.go('/rezepte/create', extra: rezept);
-  }
-
-  Future<void> _handleCreateNewPatient(
-    BuildContext context,
-    WidgetRef ref,
-    RezeptEinlesenResponse response,
-  ) async {
-    try {
-      final notifier = ref.read(uploadRezeptNotifierProvider.notifier);
-      final rezept = await notifier.createNewPatientAndReturnRezept(response);
-
-      // Navigate directly to create rezept page with the pre-filled data
-      if (context.mounted) {
-        context.go('/rezepte/create', extra: rezept);
-      }
-    } catch (e) {
-      // Error is handled by the button widget
-      rethrow;
-    }
   }
 }
 
@@ -233,8 +178,7 @@ class ErrorStateWidget extends ConsumerWidget {
           ),
           const SizedBox(height: 24),
           ElevatedButton(
-            onPressed: () =>
-                ref.read(uploadRezeptNotifierProvider.notifier).reset(),
+            onPressed: () => ref.read(uploadRezeptNotifierProvider.notifier).reset(),
             child: const Text('Erneut versuchen'),
           ),
         ],

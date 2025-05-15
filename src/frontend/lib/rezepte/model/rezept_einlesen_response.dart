@@ -1,4 +1,3 @@
-import 'package:fast_immutable_collections/fast_immutable_collections.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:physio_ai/patienten/domain/patient.dart';
 import 'package:physio_ai/rezepte/model/rezept.dart';
@@ -11,7 +10,6 @@ abstract class RezeptEinlesenResponse with _$RezeptEinlesenResponse {
   const factory RezeptEinlesenResponse({
     required EingelesenerPatient patient,
     required EingelesenesRezept rezept,
-    required String path,
     Patient? existingPatient,
   }) = _RezeptEinlesenResponse;
 
@@ -19,25 +17,6 @@ abstract class RezeptEinlesenResponse with _$RezeptEinlesenResponse {
 
   factory RezeptEinlesenResponse.fromJson(Map<String, dynamic> json) =>
       _$RezeptEinlesenResponseFromJson(json);
-
-  Rezept toRezept() {
-    return Rezept(
-      id: '',
-      patient: RezeptPatient(
-        id: existingPatient?.id ?? '',
-        vorname: existingPatient?.vorname ?? patient.vorname,
-        nachname: existingPatient?.nachname ?? patient.nachname,
-      ),
-      ausgestelltAm: rezept.ausgestelltAm,
-      preisGesamt: 0,
-      positionen: rezept.rezeptpositionen
-          .map((pos) => RezeptPos(
-                anzahl: pos.anzahl,
-                behandlungsart: pos.behandlungsart,
-              ))
-          .toIList(),
-    );
-  }
 }
 
 @freezed

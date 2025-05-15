@@ -13,7 +13,6 @@ _RezeptEinlesenResponse _$RezeptEinlesenResponseFromJson(
           EingelesenerPatient.fromJson(json['patient'] as Map<String, dynamic>),
       rezept:
           EingelesenesRezept.fromJson(json['rezept'] as Map<String, dynamic>),
-      path: json['path'] as String,
       existingPatient: json['existingPatient'] == null
           ? null
           : Patient.fromJson(json['existingPatient'] as Map<String, dynamic>),
@@ -24,7 +23,6 @@ Map<String, dynamic> _$RezeptEinlesenResponseToJson(
     <String, dynamic>{
       'patient': instance.patient,
       'rezept': instance.rezept,
-      'path': instance.path,
       'existingPatient': instance.existingPatient,
     };
 

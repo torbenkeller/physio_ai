@@ -1,13 +1,13 @@
 import 'dart:io' if (dart.library.html) 'package:web/web.dart' show File;
 
 import 'package:dio/dio.dart' show DioMediaType, MultipartFile;
-import 'package:fast_immutable_collections/fast_immutable_collections.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:physio_ai/patienten/domain/patient.dart';
 import 'package:physio_ai/patienten/infrastructure/patient_form_dto.dart';
 import 'package:physio_ai/patienten/infrastructure/patient_repository.dart';
+import 'package:physio_ai/rezepte/infrastructure/rezept_form_dto.dart';
 import 'package:physio_ai/rezepte/infrastructure/rezept_repository.dart';
 import 'package:physio_ai/rezepte/model/rezept.dart';
 import 'package:physio_ai/rezepte/model/rezept_einlesen_response.dart';
@@ -15,11 +15,11 @@ import 'package:physio_ai/rezepte/model/rezept_einlesen_response.dart';
 part 'generated/upload_rezept_notifier.freezed.dart';
 
 // Provider for the notifier
-final uploadRezeptNotifierProvider =
-    StateNotifierProvider<UploadRezeptNotifier, UploadRezeptState>(
+final uploadRezeptNotifierProvider = StateNotifierProvider<UploadRezeptNotifier, UploadRezeptState>(
   (ref) => UploadRezeptNotifier(
     rezeptRepository: ref.read(rezeptRepositoryProvider),
     patientRepository: ref.read(patientRepositoryProvider),
+    imagePicker: ImagePicker(),
   ),
 );
 
@@ -27,13 +27,24 @@ final uploadRezeptNotifierProvider =
 @freezed
 sealed class UploadRezeptState with _$UploadRezeptState {
   const factory UploadRezeptState.initial() = UploadRezeptStateInitial;
+
   const factory UploadRezeptState.loading() = UploadRezeptStateLoading;
+
   const factory UploadRezeptState.imageSelected({
-    required File selectedFile,
+    required File selectedImage,
   }) = UploadRezeptStateImageSelected;
-  const factory UploadRezeptState.patientSelection({
+
+  const factory UploadRezeptState.rezeptEingelesen({
+    required File selectedImage,
     required RezeptEinlesenResponse response,
-  }) = UploadRezeptStatePatientSelection;
+  }) = UploadRezeptStateRezeptEingelesen;
+
+  const factory UploadRezeptState.patientSelected({
+    required File selectedImage,
+    required RezeptEinlesenResponse response,
+    required Patient selectedPatient,
+  }) = UploadRezeptStatePatientSelected;
+
   const factory UploadRezeptState.error({
     required String message,
   }) = UploadRezeptStateError;
@@ -55,12 +66,15 @@ class UploadRezeptNotifier extends StateNotifier<UploadRezeptState> {
   UploadRezeptNotifier({
     required RezeptRepository rezeptRepository,
     required PatientRepository patientRepository,
+    required ImagePicker imagePicker,
   })  : _rezeptRepository = rezeptRepository,
         _patientRepository = patientRepository,
+        _imagePicker = imagePicker,
         super(const UploadRezeptState.initial());
 
   final RezeptRepository _rezeptRepository;
   final PatientRepository _patientRepository;
+  final ImagePicker _imagePicker;
 
   // Reset state to initial
   void reset() {
@@ -79,12 +93,11 @@ class UploadRezeptNotifier extends StateNotifier<UploadRezeptState> {
 
       if (pickedFile != null) {
         state = UploadRezeptState.imageSelected(
-          selectedFile: File(pickedFile.path),
+          selectedImage: File(pickedFile.path),
         );
       }
     } on Exception catch (e) {
-      state = UploadRezeptState.error(
-          message: 'Fehler beim Auswählen der Datei: $e');
+      state = UploadRezeptState.error(message: 'Fehler beim Auswählen der Datei: $e');
     }
   }
 
@@ -100,12 +113,11 @@ class UploadRezeptNotifier extends StateNotifier<UploadRezeptState> {
 
       if (pickedFile != null) {
         state = UploadRezeptState.imageSelected(
-          selectedFile: File(pickedFile.path),
+          selectedImage: File(pickedFile.path),
         );
       }
     } on Exception catch (e) {
-      state = UploadRezeptState.error(
-          message: 'Fehler beim Aufnehmen des Fotos: $e');
+      state = UploadRezeptState.error(message: 'Fehler beim Aufnehmen des Fotos: $e');
     }
   }
 
@@ -144,58 +156,17 @@ class UploadRezeptNotifier extends StateNotifier<UploadRezeptState> {
 
       final response = await _rezeptRepository.uploadRezeptImage([file]);
 
-      state = UploadRezeptState.patientSelection(response: response);
+      state = UploadRezeptState.rezeptEingelesen(
+        response: response,
+        selectedImage: selectedFile,
+      );
     } on Exception catch (e) {
       state = UploadRezeptState.error(message: 'Fehler beim Upload: $e');
     }
   }
 
-  // Create a rezept from the response with an existing patient
-  Rezept createRezeptFromExistingPatient(
-      String patientId, RezeptEinlesenResponse response) {
-    return Rezept(
-      id: '',
-      patient: RezeptPatient(
-        id: patientId,
-        vorname: response.existingPatient!.vorname,
-        nachname: response.existingPatient!.nachname,
-      ),
-      ausgestelltAm: response.rezept.ausgestelltAm,
-      preisGesamt: 0,
-      positionen: response.rezept.rezeptpositionen
-          .map(
-            (pos) => RezeptPos(
-              anzahl: pos.anzahl,
-              behandlungsart: pos.behandlungsart,
-            ),
-          )
-          .toIList(),
-    );
-  }
-
-  // Create a new patient from the analyzed data
-  PatientSelectionData createNewPatientData(RezeptEinlesenResponse response) {
-    final newPatient = Patient(
-      id: '',
-      vorname: response.patient.vorname,
-      nachname: response.patient.nachname,
-      geburtstag: response.patient.geburtstag,
-      titel: response.patient.titel,
-      strasse: response.patient.strasse,
-      hausnummer: response.patient.hausnummer,
-      plz: response.patient.postleitzahl,
-      stadt: response.patient.stadt,
-    );
-
-    return PatientSelectionData(
-      patient: newPatient,
-      response: response,
-    );
-  }
-
   // Create a new patient and return a Rezept ready for creation
-  Future<Rezept> createNewPatientAndReturnRezept(
-      RezeptEinlesenResponse response) async {
+  Future<void> createNewPatient(RezeptEinlesenResponse response) async {
     try {
       final patientFormDto = PatientFormDto(
         vorname: response.patient.vorname,
@@ -209,43 +180,39 @@ class UploadRezeptNotifier extends StateNotifier<UploadRezeptState> {
       );
 
       // Create the patient
-      await _patientRepository.createPatient(patientFormDto);
-
-      // Get all patients to find the newly created one
-      final allPatients = await _patientRepository.getPatienten();
-
-      // Find the newly created patient by matching name and birth date
-      final createdPatient = allPatients.firstWhere(
-        (p) =>
-            p.vorname == response.patient.vorname &&
-            p.nachname == response.patient.nachname &&
-            p.geburtstag.year == response.patient.geburtstag.year &&
-            p.geburtstag.month == response.patient.geburtstag.month &&
-            p.geburtstag.day == response.patient.geburtstag.day,
-        orElse: () => throw Exception('Newly created patient not found'),
-      );
-
-      // Create the rezept with the new patient
-      return Rezept(
-        id: '',
-        patient: RezeptPatient(
-          id: createdPatient.id,
-          vorname: createdPatient.vorname,
-          nachname: createdPatient.nachname,
-        ),
-        ausgestelltAm: response.rezept.ausgestelltAm,
-        preisGesamt: 0,
-        positionen: response.rezept.rezeptpositionen
-            .map(
-              (pos) => RezeptPos(
-                anzahl: pos.anzahl,
-                behandlungsart: pos.behandlungsart,
-              ),
-            )
-            .toIList(),
+      final patient = await _patientRepository.createPatient(patientFormDto);
+      state = UploadRezeptState.patientSelected(
+        response: response,
+        selectedImage: switch (state) {
+          UploadRezeptStateImageSelected(selectedImage: final file) => file,
+          UploadRezeptStateRezeptEingelesen(selectedImage: final file) => file,
+          _ => throw Exception('Invalid state for image selection'),
+        },
+        selectedPatient: patient,
       );
     } on Exception catch (e) {
-      throw Exception('Fehler beim Erstellen des Patienten: $e');
+      state = UploadRezeptState.error(message: 'Fehler beim Erstellen des Patienten: $e');
+      rethrow;
+    }
+  }
+
+  void selectSuggestedPatient(RezeptEinlesenResponse response) {
+    state = UploadRezeptState.patientSelected(
+      response: response,
+      selectedImage: switch (state) {
+        UploadRezeptStateRezeptEingelesen(selectedImage: final file) => file,
+        _ => throw Exception('Invalid state for image selection'),
+      },
+      selectedPatient: response.existingPatient!,
+    );
+  }
+
+  Future<Rezept> createRezept(RezeptFormDto rezept) async {
+    try {
+      return await _rezeptRepository.createRezept(rezept);
+    } on Exception catch (e) {
+      state = UploadRezeptState.error(message: 'Fehler beim Erstellen des Rezepts: $e');
+      rethrow;
     }
   }
 }

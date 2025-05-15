@@ -17,7 +17,6 @@ T _$identity<T>(T value) => value;
 mixin _$RezeptEinlesenResponse {
   EingelesenerPatient get patient;
   EingelesenesRezept get rezept;
-  String get path;
   Patient? get existingPatient;
 
   /// Create a copy of RezeptEinlesenResponse
@@ -38,7 +37,6 @@ mixin _$RezeptEinlesenResponse {
             other is RezeptEinlesenResponse &&
             (identical(other.patient, patient) || other.patient == patient) &&
             (identical(other.rezept, rezept) || other.rezept == rezept) &&
-            (identical(other.path, path) || other.path == path) &&
             (identical(other.existingPatient, existingPatient) ||
                 other.existingPatient == existingPatient));
   }
@@ -46,11 +44,11 @@ mixin _$RezeptEinlesenResponse {
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   int get hashCode =>
-      Object.hash(runtimeType, patient, rezept, path, existingPatient);
+      Object.hash(runtimeType, patient, rezept, existingPatient);
 
   @override
   String toString() {
-    return 'RezeptEinlesenResponse(patient: $patient, rezept: $rezept, path: $path, existingPatient: $existingPatient)';
+    return 'RezeptEinlesenResponse(patient: $patient, rezept: $rezept, existingPatient: $existingPatient)';
   }
 }
 
@@ -63,7 +61,6 @@ abstract mixin class $RezeptEinlesenResponseCopyWith<$Res> {
   $Res call(
       {EingelesenerPatient patient,
       EingelesenesRezept rezept,
-      String path,
       Patient? existingPatient});
 
   $EingelesenerPatientCopyWith<$Res> get patient;
@@ -86,7 +83,6 @@ class _$RezeptEinlesenResponseCopyWithImpl<$Res>
   $Res call({
     Object? patient = null,
     Object? rezept = null,
-    Object? path = null,
     Object? existingPatient = freezed,
   }) {
     return _then(_self.copyWith(
@@ -98,10 +94,6 @@ class _$RezeptEinlesenResponseCopyWithImpl<$Res>
           ? _self.rezept
           : rezept // ignore: cast_nullable_to_non_nullable
               as EingelesenesRezept,
-      path: null == path
-          ? _self.path
-          : path // ignore: cast_nullable_to_non_nullable
-              as String,
       existingPatient: freezed == existingPatient
           ? _self.existingPatient
           : existingPatient // ignore: cast_nullable_to_non_nullable
@@ -148,10 +140,7 @@ class _$RezeptEinlesenResponseCopyWithImpl<$Res>
 @JsonSerializable()
 class _RezeptEinlesenResponse extends RezeptEinlesenResponse {
   const _RezeptEinlesenResponse(
-      {required this.patient,
-      required this.rezept,
-      required this.path,
-      this.existingPatient})
+      {required this.patient, required this.rezept, this.existingPatient})
       : super._();
   factory _RezeptEinlesenResponse.fromJson(Map<String, dynamic> json) =>
       _$RezeptEinlesenResponseFromJson(json);
@@ -160,8 +149,6 @@ class _RezeptEinlesenResponse extends RezeptEinlesenResponse {
   final EingelesenerPatient patient;
   @override
   final EingelesenesRezept rezept;
-  @override
-  final String path;
   @override
   final Patient? existingPatient;
 
@@ -188,7 +175,6 @@ class _RezeptEinlesenResponse extends RezeptEinlesenResponse {
             other is _RezeptEinlesenResponse &&
             (identical(other.patient, patient) || other.patient == patient) &&
             (identical(other.rezept, rezept) || other.rezept == rezept) &&
-            (identical(other.path, path) || other.path == path) &&
             (identical(other.existingPatient, existingPatient) ||
                 other.existingPatient == existingPatient));
   }
@@ -196,11 +182,11 @@ class _RezeptEinlesenResponse extends RezeptEinlesenResponse {
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   int get hashCode =>
-      Object.hash(runtimeType, patient, rezept, path, existingPatient);
+      Object.hash(runtimeType, patient, rezept, existingPatient);
 
   @override
   String toString() {
-    return 'RezeptEinlesenResponse(patient: $patient, rezept: $rezept, path: $path, existingPatient: $existingPatient)';
+    return 'RezeptEinlesenResponse(patient: $patient, rezept: $rezept, existingPatient: $existingPatient)';
   }
 }
 
@@ -215,7 +201,6 @@ abstract mixin class _$RezeptEinlesenResponseCopyWith<$Res>
   $Res call(
       {EingelesenerPatient patient,
       EingelesenesRezept rezept,
-      String path,
       Patient? existingPatient});
 
   @override
@@ -241,7 +226,6 @@ class __$RezeptEinlesenResponseCopyWithImpl<$Res>
   $Res call({
     Object? patient = null,
     Object? rezept = null,
-    Object? path = null,
     Object? existingPatient = freezed,
   }) {
     return _then(_RezeptEinlesenResponse(
@@ -253,10 +237,6 @@ class __$RezeptEinlesenResponseCopyWithImpl<$Res>
           ? _self.rezept
           : rezept // ignore: cast_nullable_to_non_nullable
               as EingelesenesRezept,
-      path: null == path
-          ? _self.path
-          : path // ignore: cast_nullable_to_non_nullable
-              as String,
       existingPatient: freezed == existingPatient
           ? _self.existingPatient
           : existingPatient // ignore: cast_nullable_to_non_nullable

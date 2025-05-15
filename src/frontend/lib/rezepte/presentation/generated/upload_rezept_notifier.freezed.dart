@@ -79,9 +79,9 @@ class UploadRezeptStateLoading implements UploadRezeptState {
 /// @nodoc
 
 class UploadRezeptStateImageSelected implements UploadRezeptState {
-  const UploadRezeptStateImageSelected({required this.selectedFile});
+  const UploadRezeptStateImageSelected({required this.selectedImage});
 
-  final File selectedFile;
+  final File selectedImage;
 
   /// Create a copy of UploadRezeptState
   /// with the given fields replaced by the non-null parameter values.
@@ -96,16 +96,16 @@ class UploadRezeptStateImageSelected implements UploadRezeptState {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
             other is UploadRezeptStateImageSelected &&
-            (identical(other.selectedFile, selectedFile) ||
-                other.selectedFile == selectedFile));
+            (identical(other.selectedImage, selectedImage) ||
+                other.selectedImage == selectedImage));
   }
 
   @override
-  int get hashCode => Object.hash(runtimeType, selectedFile);
+  int get hashCode => Object.hash(runtimeType, selectedImage);
 
   @override
   String toString() {
-    return 'UploadRezeptState.imageSelected(selectedFile: $selectedFile)';
+    return 'UploadRezeptState.imageSelected(selectedImage: $selectedImage)';
   }
 }
 
@@ -117,7 +117,7 @@ abstract mixin class $UploadRezeptStateImageSelectedCopyWith<$Res>
           $Res Function(UploadRezeptStateImageSelected) _then) =
       _$UploadRezeptStateImageSelectedCopyWithImpl;
   @useResult
-  $Res call({File selectedFile});
+  $Res call({File selectedImage});
 }
 
 /// @nodoc
@@ -132,12 +132,12 @@ class _$UploadRezeptStateImageSelectedCopyWithImpl<$Res>
   /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   $Res call({
-    Object? selectedFile = null,
+    Object? selectedImage = null,
   }) {
     return _then(UploadRezeptStateImageSelected(
-      selectedFile: null == selectedFile
-          ? _self.selectedFile
-          : selectedFile // ignore: cast_nullable_to_non_nullable
+      selectedImage: null == selectedImage
+          ? _self.selectedImage
+          : selectedImage // ignore: cast_nullable_to_non_nullable
               as File,
     ));
   }
@@ -145,65 +145,74 @@ class _$UploadRezeptStateImageSelectedCopyWithImpl<$Res>
 
 /// @nodoc
 
-class UploadRezeptStatePatientSelection implements UploadRezeptState {
-  const UploadRezeptStatePatientSelection({required this.response});
+class UploadRezeptStateRezeptEingelesen implements UploadRezeptState {
+  const UploadRezeptStateRezeptEingelesen(
+      {required this.selectedImage, required this.response});
 
+  final File selectedImage;
   final RezeptEinlesenResponse response;
 
   /// Create a copy of UploadRezeptState
   /// with the given fields replaced by the non-null parameter values.
   @JsonKey(includeFromJson: false, includeToJson: false)
   @pragma('vm:prefer-inline')
-  $UploadRezeptStatePatientSelectionCopyWith<UploadRezeptStatePatientSelection>
-      get copyWith => _$UploadRezeptStatePatientSelectionCopyWithImpl<
-          UploadRezeptStatePatientSelection>(this, _$identity);
+  $UploadRezeptStateRezeptEingelesenCopyWith<UploadRezeptStateRezeptEingelesen>
+      get copyWith => _$UploadRezeptStateRezeptEingelesenCopyWithImpl<
+          UploadRezeptStateRezeptEingelesen>(this, _$identity);
 
   @override
   bool operator ==(Object other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
-            other is UploadRezeptStatePatientSelection &&
+            other is UploadRezeptStateRezeptEingelesen &&
+            (identical(other.selectedImage, selectedImage) ||
+                other.selectedImage == selectedImage) &&
             (identical(other.response, response) ||
                 other.response == response));
   }
 
   @override
-  int get hashCode => Object.hash(runtimeType, response);
+  int get hashCode => Object.hash(runtimeType, selectedImage, response);
 
   @override
   String toString() {
-    return 'UploadRezeptState.patientSelection(response: $response)';
+    return 'UploadRezeptState.rezeptEingelesen(selectedImage: $selectedImage, response: $response)';
   }
 }
 
 /// @nodoc
-abstract mixin class $UploadRezeptStatePatientSelectionCopyWith<$Res>
+abstract mixin class $UploadRezeptStateRezeptEingelesenCopyWith<$Res>
     implements $UploadRezeptStateCopyWith<$Res> {
-  factory $UploadRezeptStatePatientSelectionCopyWith(
-          UploadRezeptStatePatientSelection value,
-          $Res Function(UploadRezeptStatePatientSelection) _then) =
-      _$UploadRezeptStatePatientSelectionCopyWithImpl;
+  factory $UploadRezeptStateRezeptEingelesenCopyWith(
+          UploadRezeptStateRezeptEingelesen value,
+          $Res Function(UploadRezeptStateRezeptEingelesen) _then) =
+      _$UploadRezeptStateRezeptEingelesenCopyWithImpl;
   @useResult
-  $Res call({RezeptEinlesenResponse response});
+  $Res call({File selectedImage, RezeptEinlesenResponse response});
 
   $RezeptEinlesenResponseCopyWith<$Res> get response;
 }
 
 /// @nodoc
-class _$UploadRezeptStatePatientSelectionCopyWithImpl<$Res>
-    implements $UploadRezeptStatePatientSelectionCopyWith<$Res> {
-  _$UploadRezeptStatePatientSelectionCopyWithImpl(this._self, this._then);
+class _$UploadRezeptStateRezeptEingelesenCopyWithImpl<$Res>
+    implements $UploadRezeptStateRezeptEingelesenCopyWith<$Res> {
+  _$UploadRezeptStateRezeptEingelesenCopyWithImpl(this._self, this._then);
 
-  final UploadRezeptStatePatientSelection _self;
-  final $Res Function(UploadRezeptStatePatientSelection) _then;
+  final UploadRezeptStateRezeptEingelesen _self;
+  final $Res Function(UploadRezeptStateRezeptEingelesen) _then;
 
   /// Create a copy of UploadRezeptState
   /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   $Res call({
+    Object? selectedImage = null,
     Object? response = null,
   }) {
-    return _then(UploadRezeptStatePatientSelection(
+    return _then(UploadRezeptStateRezeptEingelesen(
+      selectedImage: null == selectedImage
+          ? _self.selectedImage
+          : selectedImage // ignore: cast_nullable_to_non_nullable
+              as File,
       response: null == response
           ? _self.response
           : response // ignore: cast_nullable_to_non_nullable
@@ -218,6 +227,119 @@ class _$UploadRezeptStatePatientSelectionCopyWithImpl<$Res>
   $RezeptEinlesenResponseCopyWith<$Res> get response {
     return $RezeptEinlesenResponseCopyWith<$Res>(_self.response, (value) {
       return _then(_self.copyWith(response: value));
+    });
+  }
+}
+
+/// @nodoc
+
+class UploadRezeptStatePatientSelected implements UploadRezeptState {
+  const UploadRezeptStatePatientSelected(
+      {required this.selectedImage,
+      required this.response,
+      required this.selectedPatient});
+
+  final File selectedImage;
+  final RezeptEinlesenResponse response;
+  final Patient selectedPatient;
+
+  /// Create a copy of UploadRezeptState
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @pragma('vm:prefer-inline')
+  $UploadRezeptStatePatientSelectedCopyWith<UploadRezeptStatePatientSelected>
+      get copyWith => _$UploadRezeptStatePatientSelectedCopyWithImpl<
+          UploadRezeptStatePatientSelected>(this, _$identity);
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is UploadRezeptStatePatientSelected &&
+            (identical(other.selectedImage, selectedImage) ||
+                other.selectedImage == selectedImage) &&
+            (identical(other.response, response) ||
+                other.response == response) &&
+            (identical(other.selectedPatient, selectedPatient) ||
+                other.selectedPatient == selectedPatient));
+  }
+
+  @override
+  int get hashCode =>
+      Object.hash(runtimeType, selectedImage, response, selectedPatient);
+
+  @override
+  String toString() {
+    return 'UploadRezeptState.patientSelected(selectedImage: $selectedImage, response: $response, selectedPatient: $selectedPatient)';
+  }
+}
+
+/// @nodoc
+abstract mixin class $UploadRezeptStatePatientSelectedCopyWith<$Res>
+    implements $UploadRezeptStateCopyWith<$Res> {
+  factory $UploadRezeptStatePatientSelectedCopyWith(
+          UploadRezeptStatePatientSelected value,
+          $Res Function(UploadRezeptStatePatientSelected) _then) =
+      _$UploadRezeptStatePatientSelectedCopyWithImpl;
+  @useResult
+  $Res call(
+      {File selectedImage,
+      RezeptEinlesenResponse response,
+      Patient selectedPatient});
+
+  $RezeptEinlesenResponseCopyWith<$Res> get response;
+  $PatientCopyWith<$Res> get selectedPatient;
+}
+
+/// @nodoc
+class _$UploadRezeptStatePatientSelectedCopyWithImpl<$Res>
+    implements $UploadRezeptStatePatientSelectedCopyWith<$Res> {
+  _$UploadRezeptStatePatientSelectedCopyWithImpl(this._self, this._then);
+
+  final UploadRezeptStatePatientSelected _self;
+  final $Res Function(UploadRezeptStatePatientSelected) _then;
+
+  /// Create a copy of UploadRezeptState
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  $Res call({
+    Object? selectedImage = null,
+    Object? response = null,
+    Object? selectedPatient = null,
+  }) {
+    return _then(UploadRezeptStatePatientSelected(
+      selectedImage: null == selectedImage
+          ? _self.selectedImage
+          : selectedImage // ignore: cast_nullable_to_non_nullable
+              as File,
+      response: null == response
+          ? _self.response
+          : response // ignore: cast_nullable_to_non_nullable
+              as RezeptEinlesenResponse,
+      selectedPatient: null == selectedPatient
+          ? _self.selectedPatient
+          : selectedPatient // ignore: cast_nullable_to_non_nullable
+              as Patient,
+    ));
+  }
+
+  /// Create a copy of UploadRezeptState
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $RezeptEinlesenResponseCopyWith<$Res> get response {
+    return $RezeptEinlesenResponseCopyWith<$Res>(_self.response, (value) {
+      return _then(_self.copyWith(response: value));
+    });
+  }
+
+  /// Create a copy of UploadRezeptState
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $PatientCopyWith<$Res> get selectedPatient {
+    return $PatientCopyWith<$Res>(_self.selectedPatient, (value) {
+      return _then(_self.copyWith(selectedPatient: value));
     });
   }
 }

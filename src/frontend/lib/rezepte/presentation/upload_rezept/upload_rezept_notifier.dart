@@ -15,7 +15,8 @@ import 'package:physio_ai/rezepte/model/rezept_einlesen_response.dart';
 part 'generated/upload_rezept_notifier.freezed.dart';
 
 // Provider for the notifier
-final uploadRezeptNotifierProvider = StateNotifierProvider<UploadRezeptNotifier, UploadRezeptState>(
+final uploadRezeptNotifierProvider =
+    StateNotifierProvider.autoDispose<UploadRezeptNotifier, UploadRezeptState>(
   (ref) => UploadRezeptNotifier(
     rezeptRepository: ref.read(rezeptRepositoryProvider),
     patientRepository: ref.read(patientRepositoryProvider),

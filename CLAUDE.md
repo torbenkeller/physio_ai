@@ -29,6 +29,8 @@
 - Use dart's strong typing features throughout the codebase
 - Do NOT modify files inside `**/generated/**` folders
 - Always add trailing commas
+- Always use the latest language features
+- Always use the text styles and colors from the App Theme 
 
 ### Packages
 - Use freezed for immutable models and json_serializable for DTOs
@@ -38,7 +40,7 @@
 - Use IList from fast_immutable_collections instead of List
 - Use flutter_intl for Localizations with German as main locale
 
-### Guidelines
+### Rules
 - Error handling should use proper Exception types and logging
 - Use only dart-doc comments when commenting code
 - Use immutable data classes for state management

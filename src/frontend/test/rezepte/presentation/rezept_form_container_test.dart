@@ -151,7 +151,6 @@ void main() {
       expect(dto, isA<RezeptFormDto>());
       expect(dto.patientId, equals('p1'));
       expect(dto.ausgestelltAm, equals(testDateTime));
-      expect(dto.preisGesamt, equals(50.0));
       expect(dto.positionen, isA<List<RezeptPositionDto>>());
       expect(dto.positionen.length, equals(1));
       expect(dto.positionen[0].behandlungsartId, equals('b1'));

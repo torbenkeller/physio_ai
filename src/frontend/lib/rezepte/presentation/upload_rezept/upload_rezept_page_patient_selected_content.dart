@@ -178,10 +178,12 @@ class _UploadRezeptPagePatientSelectedContentState
         patientId: widget.selectedPatient.id,
         ausgestelltAm: widget.response.rezept.ausgestelltAm,
         positionen: widget.response.rezept.rezeptpositionen
-            .map((pos) => RezeptPositionDto(
-                  behandlungsartId: pos.behandlungsart.id,
-                  anzahl: pos.anzahl,
-                ))
+            .map(
+              (pos) => RezeptPositionDto(
+                behandlungsartId: pos.behandlungsart.id,
+                anzahl: pos.anzahl,
+              ),
+            )
             .toList(),
       );
 
@@ -211,17 +213,14 @@ class _PatientDataCard extends StatelessWidget {
     required this.name,
     required this.address,
     required this.birthDate,
-    this.extraInfo = '',
     this.title,
     this.icon,
     this.iconColor,
-    super.key,
   });
 
   final String name;
   final String address;
   final String birthDate;
-  final String extraInfo;
   final String? title;
   final IconData? icon;
   final Color? iconColor;
@@ -290,19 +289,6 @@ class _PatientDataCard extends StatelessWidget {
                 ),
               ],
             ),
-            if (extraInfo.isNotEmpty) ...[
-              const SizedBox(height: 8),
-              Row(
-                children: [
-                  const Icon(Icons.email_outlined, size: 18),
-                  const SizedBox(width: 8),
-                  Text(
-                    extraInfo,
-                    style: theme.textTheme.bodyMedium,
-                  ),
-                ],
-              ),
-            ],
           ],
         ),
       ),
@@ -314,7 +300,6 @@ class _RezeptDataCard extends StatelessWidget {
   const _RezeptDataCard({
     required this.ausgestelltAm,
     required this.rezeptpositionen,
-    super.key,
   });
 
   final String ausgestelltAm;

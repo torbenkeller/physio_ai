@@ -168,17 +168,14 @@ class _PatientDataCard extends StatelessWidget {
     required this.name,
     required this.address,
     required this.birthDate,
-    this.extraInfo = '',
-    this.title,
     required this.onButtonPressed,
     required this.isLoading,
-    super.key,
+    this.title,
   });
 
   final String name;
   final String address;
   final String birthDate;
-  final String extraInfo;
   final String? title;
   final VoidCallback onButtonPressed;
   final bool isLoading;
@@ -235,19 +232,6 @@ class _PatientDataCard extends StatelessWidget {
                 ),
               ],
             ),
-            if (extraInfo.isNotEmpty) ...[
-              const SizedBox(height: 8),
-              Row(
-                children: [
-                  const Icon(Icons.email_outlined, size: 18),
-                  const SizedBox(width: 8),
-                  Text(
-                    extraInfo,
-                    style: theme.textTheme.bodyMedium,
-                  ),
-                ],
-              ),
-            ],
             const SizedBox(height: 16),
             SizedBox(
               width: double.infinity,
@@ -267,7 +251,6 @@ class _RezeptDataCard extends StatelessWidget {
   const _RezeptDataCard({
     required this.ausgestelltAm,
     required this.rezeptpositionen,
-    super.key,
   });
 
   final String ausgestelltAm;

@@ -15,7 +15,7 @@
     "pubdev": {
       "command": "dart",
       "args": [
-        "/Users/torben/Desktop/Projects/pubdev_mcp/bin/pubdev_mcp.dart"
+        "run"
       ],
       "workingDirectory": "/Users/torben/Desktop/Projects/pubdev_mcp",
       "disabled": false

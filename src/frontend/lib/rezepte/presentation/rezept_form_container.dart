@@ -78,7 +78,6 @@ class RezeptFormContainer extends FormContainer {
     return RezeptFormDto(
       patientId: selectedPatientId,
       ausgestelltAm: ausgestelltAm.value,
-      preisGesamt: price,
       positionen: positionenDto,
     );
   }

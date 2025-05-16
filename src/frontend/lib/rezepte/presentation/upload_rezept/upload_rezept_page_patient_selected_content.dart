@@ -2,28 +2,33 @@ import 'dart:io' if (dart.library.html) 'package:web/web.dart' show File;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
+import 'package:physio_ai/patienten/domain/patient.dart';
+import 'package:physio_ai/rezepte/infrastructure/rezept_form_dto.dart';
 import 'package:physio_ai/rezepte/model/rezept_einlesen_response.dart';
-import 'package:physio_ai/rezepte/presentation/upload_rezept/comparison_patient_data_dard.dart';
 import 'package:physio_ai/rezepte/presentation/upload_rezept/upload_rezept_notifier.dart';
 
-class UploadRezeptPageSelectPatientContent extends ConsumerStatefulWidget {
-  const UploadRezeptPageSelectPatientContent({
+class UploadRezeptPagePatientSelectedContent extends ConsumerStatefulWidget {
+  const UploadRezeptPagePatientSelectedContent({
     required this.response,
+    required this.selectedPatient,
     required this.selectedImage,
     super.key,
   });
 
   final RezeptEinlesenResponse response;
-
+  final Patient selectedPatient;
   final File selectedImage;
 
   @override
-  ConsumerState<UploadRezeptPageSelectPatientContent> createState() => _PatientSelectionViewState();
+  ConsumerState<UploadRezeptPagePatientSelectedContent> createState() =>
+      _UploadRezeptPagePatientSelectedContentState();
 }
 
-class _PatientSelectionViewState extends ConsumerState<UploadRezeptPageSelectPatientContent> {
-  bool _isCreateNewPatientLoading = false;
+class _UploadRezeptPagePatientSelectedContentState
+    extends ConsumerState<UploadRezeptPagePatientSelectedContent> {
+  bool _isCreatingRezept = false;
 
   @override
   Widget build(BuildContext context) {
@@ -62,70 +67,47 @@ class _PatientSelectionViewState extends ConsumerState<UploadRezeptPageSelectPat
             ),
             const SizedBox(height: 32),
 
-            // Patient information section
-            Text(
-              'Patient Information',
-              style: theme.textTheme.titleLarge,
+            // Selected patient information section with confirmation
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  'Selected Patient',
+                  style: theme.textTheme.titleLarge,
+                ),
+                TextButton.icon(
+                  onPressed: _handleGoBack,
+                  icon: const Icon(Icons.arrow_back),
+                  label: const Text('Change Patient'),
+                ),
+              ],
             ),
             const SizedBox(height: 12),
 
-            if (widget.response.existingPatient != null) ...[
-              // Side-by-side patient data cards when we have a match
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // Analyzed patient data
-                  Expanded(
-                    child: ComparisonPatientDataCard(
-                      title: 'Analyzed Patient Data',
-                      analyzedPatient: widget.response.patient,
-                      existingPatient: widget.response.existingPatient!,
-                      dateFormat: dateFormat,
-                      isAnalyzed: true,
-                      onButtonPressed: () => _handleCreateNewPatient(ref),
-                      isLoading: _isCreateNewPatientLoading,
-                    ),
-                  ),
-                  const SizedBox(width: 16),
-                  // Existing patient data
-                  Expanded(
-                    child: ComparisonPatientDataCard(
-                      title: 'Existing Patient',
-                      analyzedPatient: widget.response.patient,
-                      existingPatient: widget.response.existingPatient!,
-                      dateFormat: dateFormat,
-                      isAnalyzed: false,
-                      onButtonPressed: () => _handleUseExistingPatient(ref),
-                      isLoading: false,
-                    ),
-                  ),
-                ],
+            // Selected patient card with highlighted border
+            Container(
+              decoration: BoxDecoration(
+                border: Border.all(
+                  color: theme.colorScheme.primary,
+                  width: 2,
+                ),
+                borderRadius: BorderRadius.circular(8),
               ),
-              const SizedBox(height: 24),
-            ] else ...[
-              // When no existing patient match is found
-              // Single patient data card with analyzed data only
-              _PatientDataCard(
-                name: '${widget.response.patient.vorname} ${widget.response.patient.nachname}',
-                address:
-                    '${widget.response.patient.strasse} ${widget.response.patient.hausnummer}\n'
-                    '${widget.response.patient.postleitzahl} ${widget.response.patient.stadt}',
-                birthDate: dateFormat.format(widget.response.patient.geburtstag),
-                title: 'Analyzed Patient Data',
-                onButtonPressed: () => _handleCreateNewPatient(ref),
-                isLoading: _isCreateNewPatientLoading,
+              child: _PatientDataCard(
+                name: '${widget.selectedPatient.vorname} ${widget.selectedPatient.nachname}',
+                address: '${widget.selectedPatient.strasse} '
+                    '${widget.selectedPatient.hausnummer}\n'
+                    '${widget.selectedPatient.plz} '
+                    '${widget.selectedPatient.stadt}',
+                birthDate: dateFormat.format(widget.selectedPatient.geburtstag),
+                title: 'Patient Information',
+                icon: Icons.check_circle,
+                iconColor: theme.colorScheme.primary,
               ),
-              const SizedBox(height: 12),
-              Text(
-                'No matching patient found in our records. '
-                'You can create a new patient with the extracted data.',
-                style: theme.textTheme.bodyMedium,
-              ),
-              const SizedBox(height: 24),
-            ],
+            ),
+            const SizedBox(height: 24),
 
             // Analyzed rezept data section
-            const SizedBox(height: 24),
             Text(
               'Analyzed Rezept Data',
               style: theme.textTheme.titleLarge,
@@ -135,28 +117,89 @@ class _PatientSelectionViewState extends ConsumerState<UploadRezeptPageSelectPat
               ausgestelltAm: dateFormat.format(widget.response.rezept.ausgestelltAm),
               rezeptpositionen: widget.response.rezept.rezeptpositionen,
             ),
-            const SizedBox(height: 24),
+            const SizedBox(height: 32),
+
+            // Create rezept button
+            SizedBox(
+              width: double.infinity,
+              child: FilledButton(
+                onPressed: _isCreatingRezept ? null : _handleCreateRezept,
+                child: _isCreatingRezept
+                    ? Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const SizedBox(
+                            width: 20,
+                            height: 20,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2,
+                              color: Colors.white,
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                          Text(
+                            'Creating Rezept...',
+                            style: theme.textTheme.labelLarge?.copyWith(
+                              color: Colors.white,
+                            ),
+                          ),
+                        ],
+                      )
+                    : Text(
+                        'Create Rezept',
+                        style: theme.textTheme.labelLarge?.copyWith(
+                          color: Colors.white,
+                        ),
+                      ),
+              ),
+            ),
           ],
         ),
       ),
     );
   }
 
-  void _handleUseExistingPatient(WidgetRef ref) {
-    ref.read(uploadRezeptNotifierProvider.notifier).selectSuggestedPatient(widget.response);
+  void _handleGoBack() {
+    // Reset to RezeptEingelesen state to go back to patient selection
+    final notifier = ref.read(uploadRezeptNotifierProvider.notifier);
+    notifier.reset();
+    // We could alternatively set the state back to RezeptEingelesen
+    // but this approach is simpler for now
   }
 
-  Future<void> _handleCreateNewPatient(WidgetRef ref) async {
+  Future<void> _handleCreateRezept() async {
     setState(() {
-      _isCreateNewPatientLoading = true;
+      _isCreatingRezept = true;
     });
 
     try {
-      await ref.read(uploadRezeptNotifierProvider.notifier).createNewPatient(widget.response);
+      // Create RezeptFormDto from the response data
+      final rezeptFormDto = RezeptFormDto(
+        patientId: widget.selectedPatient.id,
+        ausgestelltAm: widget.response.rezept.ausgestelltAm,
+        positionen: widget.response.rezept.rezeptpositionen
+            .map((pos) => RezeptPositionDto(
+                  behandlungsartId: pos.behandlungsart.id,
+                  anzahl: pos.anzahl,
+                ))
+            .toList(),
+      );
+
+      // Create the rezept
+      final rezept =
+          await ref.read(uploadRezeptNotifierProvider.notifier).createRezept(rezeptFormDto);
+
+      // Navigate to the Rezept detail page on success
+      if (mounted) {
+        context.go('/rezepte/${rezept.id}');
+      }
+    } catch (e) {
+      // Error will be handled by the notifier which will set the state to error
+      // The error page will be shown automatically due to the state change
     } finally {
       if (mounted) {
         setState(() {
-          _isCreateNewPatientLoading = false;
+          _isCreatingRezept = false;
         });
       }
     }
@@ -170,8 +213,8 @@ class _PatientDataCard extends StatelessWidget {
     required this.birthDate,
     this.extraInfo = '',
     this.title,
-    required this.onButtonPressed,
-    required this.isLoading,
+    this.icon,
+    this.iconColor,
     super.key,
   });
 
@@ -180,8 +223,8 @@ class _PatientDataCard extends StatelessWidget {
   final String birthDate;
   final String extraInfo;
   final String? title;
-  final VoidCallback onButtonPressed;
-  final bool isLoading;
+  final IconData? icon;
+  final Color? iconColor;
 
   @override
   Widget build(BuildContext context) {
@@ -195,11 +238,23 @@ class _PatientDataCard extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             if (title != null) ...[
-              Text(
-                title!,
-                style: theme.textTheme.titleSmall?.copyWith(
-                  color: theme.colorScheme.secondary,
-                ),
+              Row(
+                children: [
+                  if (icon != null) ...[
+                    Icon(
+                      icon,
+                      size: 20,
+                      color: iconColor ?? theme.colorScheme.secondary,
+                    ),
+                    const SizedBox(width: 8),
+                  ],
+                  Text(
+                    title!,
+                    style: theme.textTheme.titleSmall?.copyWith(
+                      color: theme.colorScheme.secondary,
+                    ),
+                  ),
+                ],
               ),
               const SizedBox(height: 8),
             ],
@@ -248,14 +303,6 @@ class _PatientDataCard extends StatelessWidget {
                 ],
               ),
             ],
-            const SizedBox(height: 16),
-            SizedBox(
-              width: double.infinity,
-              child: OutlinedButton(
-                onPressed: isLoading ? null : onButtonPressed,
-                child: const Text('Create New Patient'),
-              ),
-            ),
           ],
         ),
       ),

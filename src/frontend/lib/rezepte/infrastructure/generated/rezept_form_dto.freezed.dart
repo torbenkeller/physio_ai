@@ -17,7 +17,6 @@ T _$identity<T>(T value) => value;
 mixin _$RezeptFormDto {
   String get patientId;
   DateTime get ausgestelltAm;
-  double get preisGesamt;
   List<RezeptPositionDto> get positionen;
 
   /// Create a copy of RezeptFormDto
@@ -40,8 +39,6 @@ mixin _$RezeptFormDto {
                 other.patientId == patientId) &&
             (identical(other.ausgestelltAm, ausgestelltAm) ||
                 other.ausgestelltAm == ausgestelltAm) &&
-            (identical(other.preisGesamt, preisGesamt) ||
-                other.preisGesamt == preisGesamt) &&
             const DeepCollectionEquality()
                 .equals(other.positionen, positionen));
   }
@@ -49,11 +46,11 @@ mixin _$RezeptFormDto {
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   int get hashCode => Object.hash(runtimeType, patientId, ausgestelltAm,
-      preisGesamt, const DeepCollectionEquality().hash(positionen));
+      const DeepCollectionEquality().hash(positionen));
 
   @override
   String toString() {
-    return 'RezeptFormDto(patientId: $patientId, ausgestelltAm: $ausgestelltAm, preisGesamt: $preisGesamt, positionen: $positionen)';
+    return 'RezeptFormDto(patientId: $patientId, ausgestelltAm: $ausgestelltAm, positionen: $positionen)';
   }
 }
 
@@ -66,7 +63,6 @@ abstract mixin class $RezeptFormDtoCopyWith<$Res> {
   $Res call(
       {String patientId,
       DateTime ausgestelltAm,
-      double preisGesamt,
       List<RezeptPositionDto> positionen});
 }
 
@@ -85,7 +81,6 @@ class _$RezeptFormDtoCopyWithImpl<$Res>
   $Res call({
     Object? patientId = null,
     Object? ausgestelltAm = null,
-    Object? preisGesamt = null,
     Object? positionen = null,
   }) {
     return _then(_self.copyWith(
@@ -97,10 +92,6 @@ class _$RezeptFormDtoCopyWithImpl<$Res>
           ? _self.ausgestelltAm
           : ausgestelltAm // ignore: cast_nullable_to_non_nullable
               as DateTime,
-      preisGesamt: null == preisGesamt
-          ? _self.preisGesamt
-          : preisGesamt // ignore: cast_nullable_to_non_nullable
-              as double,
       positionen: null == positionen
           ? _self.positionen
           : positionen // ignore: cast_nullable_to_non_nullable
@@ -115,7 +106,6 @@ class _RezeptFormDto extends RezeptFormDto {
   const _RezeptFormDto(
       {required this.patientId,
       required this.ausgestelltAm,
-      required this.preisGesamt,
       required final List<RezeptPositionDto> positionen})
       : _positionen = positionen,
         super._();
@@ -126,8 +116,6 @@ class _RezeptFormDto extends RezeptFormDto {
   final String patientId;
   @override
   final DateTime ausgestelltAm;
-  @override
-  final double preisGesamt;
   final List<RezeptPositionDto> _positionen;
   @override
   List<RezeptPositionDto> get positionen {
@@ -160,8 +148,6 @@ class _RezeptFormDto extends RezeptFormDto {
                 other.patientId == patientId) &&
             (identical(other.ausgestelltAm, ausgestelltAm) ||
                 other.ausgestelltAm == ausgestelltAm) &&
-            (identical(other.preisGesamt, preisGesamt) ||
-                other.preisGesamt == preisGesamt) &&
             const DeepCollectionEquality()
                 .equals(other._positionen, _positionen));
   }
@@ -169,11 +155,11 @@ class _RezeptFormDto extends RezeptFormDto {
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   int get hashCode => Object.hash(runtimeType, patientId, ausgestelltAm,
-      preisGesamt, const DeepCollectionEquality().hash(_positionen));
+      const DeepCollectionEquality().hash(_positionen));
 
   @override
   String toString() {
-    return 'RezeptFormDto(patientId: $patientId, ausgestelltAm: $ausgestelltAm, preisGesamt: $preisGesamt, positionen: $positionen)';
+    return 'RezeptFormDto(patientId: $patientId, ausgestelltAm: $ausgestelltAm, positionen: $positionen)';
   }
 }
 
@@ -188,7 +174,6 @@ abstract mixin class _$RezeptFormDtoCopyWith<$Res>
   $Res call(
       {String patientId,
       DateTime ausgestelltAm,
-      double preisGesamt,
       List<RezeptPositionDto> positionen});
 }
 
@@ -207,7 +192,6 @@ class __$RezeptFormDtoCopyWithImpl<$Res>
   $Res call({
     Object? patientId = null,
     Object? ausgestelltAm = null,
-    Object? preisGesamt = null,
     Object? positionen = null,
   }) {
     return _then(_RezeptFormDto(
@@ -219,10 +203,6 @@ class __$RezeptFormDtoCopyWithImpl<$Res>
           ? _self.ausgestelltAm
           : ausgestelltAm // ignore: cast_nullable_to_non_nullable
               as DateTime,
-      preisGesamt: null == preisGesamt
-          ? _self.preisGesamt
-          : preisGesamt // ignore: cast_nullable_to_non_nullable
-              as double,
       positionen: null == positionen
           ? _self._positionen
           : positionen // ignore: cast_nullable_to_non_nullable

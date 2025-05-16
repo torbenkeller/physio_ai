@@ -8,7 +8,6 @@ abstract class RezeptFormDto with _$RezeptFormDto {
   const factory RezeptFormDto({
     required String patientId,
     required DateTime ausgestelltAm,
-    required double preisGesamt,
     required List<RezeptPositionDto> positionen,
   }) = _RezeptFormDto;
 
@@ -26,5 +25,6 @@ abstract class RezeptPositionDto with _$RezeptPositionDto {
 
   const RezeptPositionDto._();
 
-  factory RezeptPositionDto.fromJson(Map<String, dynamic> json) => _$RezeptPositionDtoFromJson(json);
+  factory RezeptPositionDto.fromJson(Map<String, dynamic> json) =>
+      _$RezeptPositionDtoFromJson(json);
 }

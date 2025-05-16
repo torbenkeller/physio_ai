@@ -5,6 +5,7 @@ import 'package:physio_ai/rezepte/presentation/upload_rezept/upload_rezept_page_
 import 'package:physio_ai/rezepte/presentation/upload_rezept/upload_rezept_page_image_selected_content.dart';
 import 'package:physio_ai/rezepte/presentation/upload_rezept/upload_rezept_page_initial_content.dart';
 import 'package:physio_ai/rezepte/presentation/upload_rezept/upload_rezept_page_loading_content.dart';
+import 'package:physio_ai/rezepte/presentation/upload_rezept/upload_rezept_page_patient_selected_content.dart';
 import 'package:physio_ai/rezepte/presentation/upload_rezept/upload_rezept_page_select_patient_content.dart';
 
 class UploadRezeptPage extends StatelessWidget {
@@ -47,8 +48,9 @@ class UploadRezeptContent extends ConsumerWidget {
         selectedPatient: final selectedPatient,
         selectedImage: final selectedImage
       ) =>
-        UploadRezeptPageSelectPatientContent(
+        UploadRezeptPagePatientSelectedContent(
           response: response,
+          selectedPatient: selectedPatient,
           selectedImage: selectedImage,
         ),
       UploadRezeptStateError(message: final message) =>

@@ -11,17 +11,15 @@ import 'package:physio_ai/rezepte/infrastructure/rezept_form_dto.dart';
 import 'package:physio_ai/rezepte/infrastructure/rezept_repository.dart';
 import 'package:physio_ai/rezepte/model/rezept.dart';
 import 'package:physio_ai/rezepte/model/rezept_einlesen_response.dart';
+import 'package:physio_ai/rezepte/rezepte_page.dart';
 
 part 'generated/upload_rezept_notifier.freezed.dart';
 
+final imagePickerProvider = Provider((ref) => ImagePicker());
 // Provider for the notifier
 final uploadRezeptNotifierProvider =
-    StateNotifierProvider.autoDispose<UploadRezeptNotifier, UploadRezeptState>(
-  (ref) => UploadRezeptNotifier(
-    rezeptRepository: ref.read(rezeptRepositoryProvider),
-    patientRepository: ref.read(patientRepositoryProvider),
-    imagePicker: ImagePicker(),
-  ),
+    NotifierProvider.autoDispose<UploadRezeptNotifier, UploadRezeptState>(
+  () => UploadRezeptNotifier(),
 );
 
 // State class for the upload process
@@ -51,31 +49,19 @@ sealed class UploadRezeptState with _$UploadRezeptState {
   }) = UploadRezeptStateError;
 }
 
-// Data class to hold both patient and rezept data when creating a new patient
-class PatientSelectionData {
-  PatientSelectionData({
-    required this.patient,
-    required this.response,
-  });
-
-  final Patient patient;
-  final RezeptEinlesenResponse response;
-}
-
 // Notifier class that manages the state and business logic
-class UploadRezeptNotifier extends StateNotifier<UploadRezeptState> {
-  UploadRezeptNotifier({
-    required RezeptRepository rezeptRepository,
-    required PatientRepository patientRepository,
-    required ImagePicker imagePicker,
-  })  : _rezeptRepository = rezeptRepository,
-        _patientRepository = patientRepository,
-        _imagePicker = imagePicker,
-        super(const UploadRezeptState.initial());
+class UploadRezeptNotifier extends AutoDisposeNotifier<UploadRezeptState> {
+  late RezeptRepository _rezeptRepository;
+  late PatientRepository _patientRepository;
+  late ImagePicker _imagePicker;
 
-  final RezeptRepository _rezeptRepository;
-  final PatientRepository _patientRepository;
-  final ImagePicker _imagePicker;
+  @override
+  UploadRezeptState build() {
+    _rezeptRepository = ref.watch(rezeptRepositoryProvider);
+    _patientRepository = ref.watch(patientRepositoryProvider);
+    _imagePicker = ref.watch(imagePickerProvider);
+    return const UploadRezeptState.initial();
+  }
 
   // Reset state to initial
   void reset() {
@@ -85,8 +71,7 @@ class UploadRezeptNotifier extends StateNotifier<UploadRezeptState> {
   // Pick image from gallery
   Future<void> pickImage() async {
     try {
-      final picker = ImagePicker();
-      final pickedFile = await picker.pickImage(
+      final pickedFile = await _imagePicker.pickImage(
         source: ImageSource.gallery,
         maxWidth: 1800,
         maxHeight: 1800,
@@ -208,9 +193,11 @@ class UploadRezeptNotifier extends StateNotifier<UploadRezeptState> {
     );
   }
 
-  Future<Rezept> createRezept(RezeptFormDto rezept) async {
+  Future<Rezept> createRezept(RezeptFormDto rezeptForm) async {
     try {
-      return await _rezeptRepository.createRezept(rezept);
+      final rezept = await _rezeptRepository.createRezept(rezeptForm);
+      ref.invalidate(rezepteProvider);
+      return rezept;
     } on Exception catch (e) {
       state = UploadRezeptState.error(message: 'Fehler beim Erstellen des Rezepts: $e');
       rethrow;

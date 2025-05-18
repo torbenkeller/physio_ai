@@ -1,6 +1,6 @@
 {
   "mcpServers": {
-    "flutter": {
+    "flutter-inspector": {
       "command": "node",
       "args": [
         "/Users/torben/Desktop/Projects/mcp_flutter/mcp_server/build/index.js"
@@ -9,7 +9,8 @@
         "PORT": "3334",
         "LOG_LEVEL": "critical"
       },
-      "disabled": false
+      "disabled": false,
+      "autoApprove": []
     },
 
     "pubdev": {
@@ -18,7 +19,7 @@
         "run"
       ],
       "workingDirectory": "/Users/torben/Desktop/Projects/pubdev_mcp",
-      "disabled": false
+      "disabled": true
     }
   }
 }

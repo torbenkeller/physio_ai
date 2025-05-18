@@ -97,7 +97,7 @@ class RezepteController
             @PathVariable id: UUID,
             @RequestBody rezeptUpdateDto: RezeptUpdateDto,
         ): RezeptDto {
-            val savedRezept = rezeptService.updateRezept(id, rezeptUpdateDto)
+            val savedRezept = rezeptService.updateRezept(RezeptId.fromUUID(id), rezeptUpdateDto)
 
             val patient =
                 patientenRepository.findById(savedRezept.patientId)

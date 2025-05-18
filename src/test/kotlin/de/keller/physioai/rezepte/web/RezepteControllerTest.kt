@@ -317,7 +317,7 @@ class RezepteControllerTest {
                 .andExpect(jsonPath("$.positionen[0].anzahl").value(12))
 
             // Verify that the service was called
-            verify { rezeptService.updateRezept(rezeptId1.id, any()) }
+            verify { rezeptService.updateRezept(rezeptId1, any()) }
             verify { patientenRepository.findById(patientId) }
             verify { aerzteRepository.findById(arztId) }
         }

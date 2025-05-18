@@ -39,6 +39,10 @@ data class Rezept(
         rechnungsnummer: String?,
         posSources: List<RezeptPosSource>,
     ): Rezept {
+        if (posSources.isEmpty()) {
+            throw IllegalArgumentException("A rezept must have at least one position")
+        }
+
         val positionen = posSources.map(RezeptPosSource::toPosition)
         val preisGesamt = positionen.sumOf { it.preisGesamt }
 

@@ -1,2 +1,13 @@
 GET http://localhost:8080/patienten
 Content-Type: application/json
+
+###
+
+PATCH http://localhost:8080/profiles/123e4567-e89b-12d3-a456-426614174000
+Content-Type: application/json
+
+{
+  "praxisName": "Sample Praxis",
+  "inhaberName": "John Doe",
+  "profilePictureUrl": "https://example.com/profile.jpg"
+}

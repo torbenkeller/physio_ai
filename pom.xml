@@ -144,7 +144,14 @@
             <groupId>org.springframework.modulith</groupId>
             <artifactId>spring-modulith-starter-jdbc</artifactId>
         </dependency>
-<!--        <dependency>-->
+
+        <dependency>
+            <groupId>org.mnode.ical4j</groupId>
+            <artifactId>ical4j</artifactId>
+            <version>4.1.1</version>
+        </dependency>
+
+        <!--        <dependency>-->
 <!--            <groupId>org.springframework.modulith</groupId>-->
 <!--            <artifactId>spring-modulith-observability</artifactId>-->
 <!--            <scope>runtime</scope>-->

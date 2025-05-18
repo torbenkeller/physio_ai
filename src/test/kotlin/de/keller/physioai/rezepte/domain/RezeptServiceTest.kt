@@ -6,6 +6,7 @@ import de.keller.physioai.patienten.PatientenRepository
 import de.keller.physioai.rezepte.web.RezeptCreateDto
 import de.keller.physioai.rezepte.web.RezeptPosCreateDto
 import de.keller.physioai.rezepte.web.RezeptUpdateDto
+import de.keller.physioai.shared.web.AggregateNotFoundException
 import io.mockk.clearAllMocks
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
@@ -352,7 +353,7 @@ class RezeptServiceTest {
             every { rezeptRepository.save(capture(savedRezeptSlot)) } answers { savedRezeptSlot.captured }
 
             // Act
-            val result = rezeptService.updateRezept(rezeptId.id, updateDto)
+            val result = rezeptService.updateRezept(rezeptId, updateDto)
 
             // Assert
             assertNotNull(result)
@@ -425,7 +426,7 @@ class RezeptServiceTest {
             every { rezeptRepository.save(capture(savedRezeptSlot)) } answers { savedRezeptSlot.captured }
 
             // Act
-            val result = rezeptService.updateRezept(rezeptId.id, updateDto)
+            val result = rezeptService.updateRezept(rezeptId, updateDto)
 
             // Assert
             assertNotNull(result)
@@ -458,8 +459,8 @@ class RezeptServiceTest {
             every { rezeptRepository.findById(nonExistentRezeptId) } returns null
 
             // Act & Assert
-            assertFailsWith<IllegalArgumentException> {
-                rezeptService.updateRezept(nonExistentRezeptId.id, updateDto)
+            assertFailsWith<AggregateNotFoundException> {
+                rezeptService.updateRezept(nonExistentRezeptId, updateDto)
             }
 
             // Verify interactions with repositories
@@ -502,8 +503,8 @@ class RezeptServiceTest {
             every { patientenRepository.findById(nonExistentPatientId) } returns null
 
             // Act & Assert
-            assertFailsWith<IllegalArgumentException> {
-                rezeptService.updateRezept(rezeptId.id, updateDto)
+            assertFailsWith<AggregateNotFoundException> {
+                rezeptService.updateRezept(rezeptId, updateDto)
             }
 
             // Verify interactions with repositories
@@ -547,16 +548,17 @@ class RezeptServiceTest {
             // Setup mock behavior
             every { rezeptRepository.findById(rezeptId) } returns originalRezept
             every { patientenRepository.findById(patientId) } returns patient
+            every { behandlungsartenRepository.findAllById(any()) } returns emptyList()
 
             // Act & Assert
             assertFailsWith<IllegalArgumentException> {
-                rezeptService.updateRezept(rezeptId.id, updateDto)
+                rezeptService.updateRezept(rezeptId, updateDto)
             }
 
             // Verify interactions with repositories
             verify { rezeptRepository.findById(rezeptId) }
             verify { patientenRepository.findById(patientId) }
-            verify(exactly = 0) { behandlungsartenRepository.findAllById(any()) }
+            verify { behandlungsartenRepository.findAllById(any()) }
             verify(exactly = 0) { rezeptRepository.save(any()) }
         }
 
@@ -594,8 +596,8 @@ class RezeptServiceTest {
             every { behandlungsartenRepository.findAllById(setOf(nonExistentBehandlungsartId)) } returns emptyList()
 
             // Act & Assert
-            assertFailsWith<IllegalArgumentException> {
-                rezeptService.updateRezept(rezeptId.id, updateDto)
+            assertFailsWith<AggregateNotFoundException> {
+                rezeptService.updateRezept(rezeptId, updateDto)
             }
 
             // Verify interactions with repositories

@@ -6,6 +6,7 @@ import de.keller.physioai.patienten.web.PatientDto
 import de.keller.physioai.rezepte.web.BehandlungsartDto
 import de.keller.physioai.rezepte.web.RezeptCreateDto
 import de.keller.physioai.rezepte.web.RezeptUpdateDto
+import de.keller.physioai.shared.web.AggregateNotFoundException
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
@@ -79,38 +80,35 @@ class RezeptService
         }
 
         @Transactional
+        @Throws(AggregateNotFoundException::class)
         fun updateRezept(
-            id: UUID,
+            rezeptId: RezeptId,
             rezeptUpdateDto: RezeptUpdateDto,
         ): Rezept {
-            logger.debug("Updating rezept with ID: {}, data: {}", id, rezeptUpdateDto)
+            logger.debug("Updating rezept with ID: {}, data: {}", rezeptId, rezeptUpdateDto)
 
-            val rezeptId = RezeptId.fromUUID(id)
             val rezept =
                 rezeptRepository.findById(rezeptId)
-                    ?: throw IllegalArgumentException("Rezept with ID $id not found")
+                    ?: throw AggregateNotFoundException()
 
             logger.debug("Found existing rezept: {}", rezept)
 
             // Validate patient exists
             val patientId = PatientId.fromUUID(rezeptUpdateDto.patientId)
-            val patient =
-                patientenRepository.findById(patientId)
-                    ?: throw IllegalArgumentException("Patient with ID ${rezeptUpdateDto.patientId} not found")
+            val patient = patientenRepository.findById(patientId) ?: throw AggregateNotFoundException()
+
             logger.debug("Found patient: {}", patient)
 
-            // Validate rezept has at least one position
-            if (rezeptUpdateDto.positionen.isEmpty()) {
-                throw IllegalArgumentException("A rezept must have at least one position")
-            }
-
             // Validate all behandlungsarten exist
-            val behandlungsartIds =
-                rezeptUpdateDto.positionen.map { BehandlungsartId.fromUUID(it.behandlungsartId) }.toSet()
+            val behandlungsartIds = rezeptUpdateDto.positionen
+                .map { BehandlungsartId.fromUUID(it.behandlungsartId) }
+                .toSet()
+
             val behandlungsarten = behandlungsartenRepository.findAllById(behandlungsartIds).toList()
             if (behandlungsarten.size != behandlungsartIds.size) {
-                throw IllegalArgumentException("One or more BehandlungsartId not found")
+                throw AggregateNotFoundException()
             }
+
             logger.debug("Found all behandlungsarten: {}", behandlungsarten)
 
             val posSources =

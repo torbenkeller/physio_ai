@@ -8,6 +8,7 @@ import 'package:physio_ai/patienten/presentation/patienten_page.dart';
 import 'package:physio_ai/rezepte/home_page.dart';
 import 'package:physio_ai/rezepte/presentation/create_rezept_page.dart';
 import 'package:physio_ai/rezepte/presentation/rezept_detail_page.dart';
+import 'package:physio_ai/rezepte/presentation/rezept_edit_page.dart';
 import 'package:physio_ai/rezepte/presentation/upload_rezept/upload_rezept_page.dart';
 import 'package:physio_ai/rezepte/rezepte_page.dart';
 
@@ -84,6 +85,15 @@ final _mobileRouterConfig = RoutingConfig(
                     fullscreenDialog: true,
                     child: RezeptDetailPage(id: state.pathParameters['id']!),
                   ),
+                  routes: [
+                    GoRoute(
+                      path: 'edit',
+                      pageBuilder: (context, state) => MaterialPage(
+                        fullscreenDialog: true,
+                        child: RezeptEditPage(id: state.pathParameters['id']!),
+                      ),
+                    ),
+                  ],
                 ),
               ],
             ),
@@ -180,6 +190,16 @@ final _desktopRouterConfig = RoutingConfig(
                 key: ValueKey('rezepteDetailPage-${state.pathParameters['id']}'),
                 child: SplittedRezeptePage(
                   rightPane: RezeptDetailPage(id: state.pathParameters['id']!),
+                  isContextCreate: true,
+                ),
+              ),
+            ),
+            GoRoute(
+              path: '/rezepte/:id/edit',
+              pageBuilder: (context, state) => NoTransitionPage(
+                key: ValueKey('rezepteEditPage-${state.pathParameters['id']}'),
+                child: SplittedRezeptePage(
+                  rightPane: RezeptEditPage(id: state.pathParameters['id']!),
                   isContextCreate: true,
                 ),
               ),

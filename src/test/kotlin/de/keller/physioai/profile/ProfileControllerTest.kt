@@ -28,18 +28,20 @@ class ProfileControllerTest {
     @MockkBean
     private lateinit var profileService: ProfileService
 
+    @MockkBean
+    private lateinit var profileRepository: ProfileRepository
+
     @Test
     fun `getProfile should return null when no profile exists`() {
         // Arrange
-        every { profileService.getProfile() } returns null
+        every { profileRepository.findById(any()) } returns null
 
         // Act & Assert
         mockMvc
-            .perform(get("/profiles"))
-            .andExpect(status().isOk)
-            .andExpect(jsonPath("$").doesNotExist())
+            .perform(get("/profile"))
+            .andExpect(status().isNotFound)
 
-        verify { profileService.getProfile() }
+        verify { profileRepository.findById(any()) }
     }
 
     @Test
@@ -54,11 +56,11 @@ class ProfileControllerTest {
             version = 0,
         )
 
-        every { profileService.getProfile() } returns profile
+        every { profileRepository.findById(profileId) } returns profile
 
-        // Act & Assert
+        // Act & Asserts
         mockMvc
-            .perform(get("/profiles"))
+            .perform(get("/profile"))
             .andExpect(status().isOk)
             .andExpect(content().contentType(MediaType.APPLICATION_JSON))
             .andExpect(jsonPath("$.id").value(profileId.id.toString()))
@@ -66,7 +68,7 @@ class ProfileControllerTest {
             .andExpect(jsonPath("$.inhaberName").value("Carsten Huffmeyer"))
             .andExpect(jsonPath("$.profilePictureUrl").doesNotExist())
 
-        verify { profileService.getProfile() }
+        verify { profileRepository.findById(profileId) }
     }
 
     @Test
@@ -87,7 +89,7 @@ class ProfileControllerTest {
         // Act & Assert
         mockMvc
             .perform(
-                post("/profiles")
+                post("/profile")
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(
                         """
@@ -117,7 +119,7 @@ class ProfileControllerTest {
         // Act & Assert
         mockMvc
             .perform(
-                patch("/profiles/{id}", profileId.id.toString())
+                patch("/profile")
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(
                         """
@@ -151,7 +153,7 @@ class ProfileControllerTest {
         // Act & Assert
         mockMvc
             .perform(
-                patch("/profiles/{id}", profileId.id.toString())
+                patch("/profile")
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(
                         """

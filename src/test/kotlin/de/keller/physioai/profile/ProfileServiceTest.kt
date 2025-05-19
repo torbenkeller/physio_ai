@@ -33,47 +33,6 @@ class ProfileServiceTest {
     }
 
     @Nested
-    inner class GetProfile {
-        @Test
-        fun `should return null when no profile exists`() {
-            // Arrange
-            every { profileRepository.findAll() } returns emptyList()
-
-            // Act
-            val result = profileService.getProfile()
-
-            // Assert
-            assertNull(result)
-            verify { profileRepository.findAll() }
-        }
-
-        @Test
-        fun `should return the first profile when profiles exist`() {
-            // Arrange
-            val profileId = ProfileId(UUID.fromString("d7e8f9a0-b1c2-3d4e-5f6a-7b8c9d0e1f2a"))
-            val profile = Profile(
-                id = profileId,
-                praxisName = "Privatpraxis Carsten Huffmeyer",
-                inhaberName = "Carsten Huffmeyer",
-                profilePictureUrl = null,
-                version = 0,
-            )
-
-            every { profileRepository.findAll() } returns listOf(profile)
-
-            // Act
-            val result = profileService.getProfile()
-
-            // Assert
-            assertNotNull(result)
-            assertEquals(profileId, result.id)
-            assertEquals("Privatpraxis Carsten Huffmeyer", result.praxisName)
-            assertEquals("Carsten Huffmeyer", result.inhaberName)
-            verify { profileRepository.findAll() }
-        }
-    }
-
-    @Nested
     inner class CreateProfile {
         @Test
         fun `should create profile successfully`() {

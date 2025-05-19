@@ -13,9 +13,6 @@ class ProfileService
     constructor(
         private val repository: ProfileRepository,
     ) {
-        @Transactional(readOnly = true)
-        fun getProfile(): Profile? = repository.findAll().firstOrNull()
-
         @Transactional
         fun createProfile(profileForm: ProfileForm): Profile {
             val profile =

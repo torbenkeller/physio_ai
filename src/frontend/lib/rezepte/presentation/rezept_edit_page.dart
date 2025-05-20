@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:physio_ai/home_scaffold.dart';
 import 'package:physio_ai/rezepte/presentation/rezept_detail_page.dart';
 import 'package:physio_ai/rezepte/presentation/rezept_form.dart';
 
@@ -13,10 +14,14 @@ class RezeptEditPage extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final width = MediaQuery.of(context).size.width;
+    final breakpoint = Breakpoint.fromWidth(width);
+
     final asyncRezept = ref.watch(rezeptProvider(id));
 
     return Scaffold(
       appBar: AppBar(
+        leading: breakpoint.isDesktop() ? const CloseButton() : const BackButton(),
         title: const Text('Rezept bearbeiten'),
       ),
       body: asyncRezept.when(

@@ -22,6 +22,10 @@ enum Breakpoint {
       return desktop;
     }
   }
+
+  bool isDesktop() {
+    return this == Breakpoint.desktop;
+  }
 }
 
 final profilePictureUrlProvider = FutureProvider((ref) {

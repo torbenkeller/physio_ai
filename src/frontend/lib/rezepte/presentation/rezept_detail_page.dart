@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
+import 'package:physio_ai/home_scaffold.dart';
 import 'package:physio_ai/rezepte/model/rezept.dart';
 import 'package:physio_ai/rezepte/rezepte_page.dart';
 
@@ -20,6 +21,9 @@ class RezeptDetailPage extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final width = MediaQuery.of(context).size.width;
+    final breakpoint = Breakpoint.fromWidth(width);
+
     final asyncRezept = ref.watch(rezeptProvider(id));
     final theme = Theme.of(context);
 
@@ -30,9 +34,10 @@ class RezeptDetailPage extends ConsumerWidget {
             child: Text('Rezept nicht gefunden'),
           );
         }
-        
+
         return Scaffold(
           appBar: AppBar(
+            leading: breakpoint.isDesktop() ? const CloseButton() : const BackButton(),
             title: const Text('Rezept Details'),
             actions: [
               IconButton(
@@ -110,7 +115,7 @@ class RezeptDetailPage extends ConsumerWidget {
 
   Widget _buildBehandlungenSection(Rezept rezept, ThemeData theme) {
     final colorScheme = theme.colorScheme;
-    
+
     return _buildSection(
       title: 'Behandlungen',
       child: Container(
@@ -165,8 +170,7 @@ class RezeptDetailPage extends ConsumerWidget {
                     ),
                   ],
                 ),
-                for (final position in rezept.positionen)
-                  _buildPositionRow(position, theme),
+                for (final position in rezept.positionen) _buildPositionRow(position, theme),
                 _buildTableFooterRow(rezept, theme),
               ],
             ),
@@ -178,7 +182,7 @@ class RezeptDetailPage extends ConsumerWidget {
 
   TableRow _buildPositionRow(RezeptPos position, ThemeData theme) {
     final colorScheme = theme.colorScheme;
-    
+
     return TableRow(
       decoration: BoxDecoration(
         border: Border(
@@ -215,7 +219,7 @@ class RezeptDetailPage extends ConsumerWidget {
 
   TableRow _buildTableFooterRow(Rezept rezept, ThemeData theme) {
     final colorScheme = theme.colorScheme;
-    
+
     return TableRow(
       children: [
         const SizedBox(),
@@ -251,7 +255,7 @@ class RezeptDetailPage extends ConsumerWidget {
 
   Widget _buildSessionsSection(Rezept rezept, ThemeData theme) {
     final colorScheme = theme.colorScheme;
-    
+
     if (rezept.behandlungen.isEmpty) {
       return _buildSection(
         title: 'Behandlungstermine',
@@ -264,7 +268,7 @@ class RezeptDetailPage extends ConsumerWidget {
         ),
       );
     }
-    
+
     return _buildSection(
       title: 'Behandlungstermine',
       child: Container(
@@ -333,7 +337,7 @@ class RezeptDetailPage extends ConsumerWidget {
     final dateFormat = DateFormat('dd.MM.yyyy HH:mm');
     final duration = behandlung.endZeit.difference(behandlung.startZeit);
     final durationMinutes = duration.inMinutes;
-    
+
     return TableRow(
       decoration: BoxDecoration(
         border: Border(
@@ -365,7 +369,7 @@ class RezeptDetailPage extends ConsumerWidget {
 
 class RezeptDetailContent extends StatelessWidget {
   const RezeptDetailContent({
-    required this.id, 
+    required this.id,
     super.key,
   });
 

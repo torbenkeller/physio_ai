@@ -173,46 +173,50 @@ final _desktopRouterConfig = RoutingConfig(
                   isContextCreate: false,
                 ),
               ),
-            ),
-            GoRoute(
-              path: '/rezepte/create',
-              pageBuilder: (context, state) => const NoTransitionPage(
-                key: ValueKey('rezepteCreatePage'),
-                child: SplittedRezeptePage(
-                  rightPane: CreateRezeptPage(),
-                  isContextCreate: true,
+              routes: [
+                GoRoute(
+                  path: 'create',
+                  pageBuilder: (context, state) => const NoTransitionPage(
+                    key: ValueKey('rezepteCreatePage'),
+                    child: SplittedRezeptePage(
+                      rightPane: CreateRezeptPage(),
+                      isContextCreate: true,
+                    ),
+                  ),
                 ),
-              ),
-            ),
-            GoRoute(
-              path: '/rezepte/upload',
-              pageBuilder: (context, state) => const NoTransitionPage(
-                key: ValueKey('rezepteUploadPage'),
-                child: SplittedRezeptePage(
-                  rightPane: UploadRezeptContent(),
-                  isContextCreate: true,
+                GoRoute(
+                  path: 'upload',
+                  pageBuilder: (context, state) => const NoTransitionPage(
+                    key: ValueKey('rezepteUploadPage'),
+                    child: SplittedRezeptePage(
+                      rightPane: UploadRezeptContent(),
+                      isContextCreate: true,
+                    ),
+                  ),
                 ),
-              ),
-            ),
-            GoRoute(
-              path: '/rezepte/:id',
-              pageBuilder: (context, state) => NoTransitionPage(
-                key: ValueKey('rezepteDetailPage-${state.pathParameters['id']}'),
-                child: SplittedRezeptePage(
-                  rightPane: RezeptDetailPage(id: state.pathParameters['id']!),
-                  isContextCreate: true,
+                GoRoute(
+                  path: ':id',
+                  pageBuilder: (context, state) => NoTransitionPage(
+                    key: ValueKey('rezepteDetailPage-${state.pathParameters['id']}'),
+                    child: SplittedRezeptePage(
+                      rightPane: RezeptDetailPage(id: state.pathParameters['id']!),
+                      isContextCreate: true,
+                    ),
+                  ),
+                  routes: [
+                    GoRoute(
+                      path: 'edit',
+                      pageBuilder: (context, state) => NoTransitionPage(
+                        key: ValueKey('rezepteEditPage-${state.pathParameters['id']}'),
+                        child: SplittedRezeptePage(
+                          rightPane: RezeptEditPage(id: state.pathParameters['id']!),
+                          isContextCreate: true,
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
-              ),
-            ),
-            GoRoute(
-              path: '/rezepte/:id/edit',
-              pageBuilder: (context, state) => NoTransitionPage(
-                key: ValueKey('rezepteEditPage-${state.pathParameters['id']}'),
-                child: SplittedRezeptePage(
-                  rightPane: RezeptEditPage(id: state.pathParameters['id']!),
-                  isContextCreate: true,
-                ),
-              ),
+              ],
             ),
           ],
         ),

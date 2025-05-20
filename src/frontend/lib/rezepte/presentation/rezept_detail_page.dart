@@ -65,6 +65,8 @@ class RezeptDetailPage extends ConsumerWidget {
                 ),
                 const SizedBox(height: 24),
                 _buildBehandlungenSection(rezept, theme),
+                const SizedBox(height: 24),
+                _buildSessionsSection(rezept, theme),
                 const SizedBox(height: 32),
                 Align(
                   child: ElevatedButton.icon(
@@ -240,6 +242,119 @@ class RezeptDetailPage extends ConsumerWidget {
               fontSize: 16,
               color: colorScheme.primary,
             ),
+            textAlign: TextAlign.right,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildSessionsSection(Rezept rezept, ThemeData theme) {
+    final colorScheme = theme.colorScheme;
+    
+    if (rezept.behandlungen.isEmpty) {
+      return _buildSection(
+        title: 'Behandlungstermine',
+        child: Text(
+          'Noch keine Behandlungstermine eingetragen',
+          style: TextStyle(
+            fontStyle: FontStyle.italic,
+            color: colorScheme.onSurface.withOpacity(0.7),
+          ),
+        ),
+      );
+    }
+    
+    return _buildSection(
+      title: 'Behandlungstermine',
+      child: Container(
+        decoration: BoxDecoration(
+          color: colorScheme.tertiaryContainer.withAlpha(51),
+          borderRadius: BorderRadius.circular(8),
+        ),
+        padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
+        child: Column(
+          children: [
+            Table(
+              columnWidths: const {
+                0: FlexColumnWidth(2),
+                1: FlexColumnWidth(2),
+                2: FlexColumnWidth(1),
+              },
+              defaultVerticalAlignment: TableCellVerticalAlignment.middle,
+              children: [
+                TableRow(
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 8),
+                      child: Text(
+                        'Beginn',
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          color: colorScheme.primary,
+                        ),
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 8),
+                      child: Text(
+                        'Ende',
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          color: colorScheme.primary,
+                        ),
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 8),
+                      child: Text(
+                        'Dauer',
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          color: colorScheme.primary,
+                        ),
+                        textAlign: TextAlign.right,
+                      ),
+                    ),
+                  ],
+                ),
+                for (final behandlung in rezept.behandlungen)
+                  _buildBehandlungRow(behandlung, theme),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  TableRow _buildBehandlungRow(Behandlung behandlung, ThemeData theme) {
+    final colorScheme = theme.colorScheme;
+    final dateFormat = DateFormat('dd.MM.yyyy HH:mm');
+    final duration = behandlung.endZeit.difference(behandlung.startZeit);
+    final durationMinutes = duration.inMinutes;
+    
+    return TableRow(
+      decoration: BoxDecoration(
+        border: Border(
+          bottom: BorderSide(
+            color: colorScheme.outline.withAlpha(25),
+          ),
+        ),
+      ),
+      children: [
+        Padding(
+          padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 4),
+          child: Text(dateFormat.format(behandlung.startZeit)),
+        ),
+        Padding(
+          padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 4),
+          child: Text(dateFormat.format(behandlung.endZeit)),
+        ),
+        Padding(
+          padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 4),
+          child: Text(
+            '$durationMinutes min',
             textAlign: TextAlign.right,
           ),
         ),

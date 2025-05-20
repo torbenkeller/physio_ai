@@ -12,6 +12,7 @@ abstract class Rezept with _$Rezept {
     required DateTime ausgestelltAm,
     required double preisGesamt,
     @Default(IListConst([])) IList<RezeptPos> positionen,
+    @Default(IListConst([])) IList<Behandlung> behandlungen,
   }) = _Rezept;
 
   const Rezept._();
@@ -55,4 +56,17 @@ abstract class RezeptPatient with _$RezeptPatient {
   const RezeptPatient._();
 
   factory RezeptPatient.fromJson(Map<String, dynamic> json) => _$RezeptPatientFromJson(json);
+}
+
+@freezed
+abstract class Behandlung with _$Behandlung {
+  const factory Behandlung({
+    required String id,
+    required DateTime startZeit,
+    required DateTime endZeit,
+  }) = _Behandlung;
+
+  const Behandlung._();
+
+  factory Behandlung.fromJson(Map<String, dynamic> json) => _$BehandlungFromJson(json);
 }

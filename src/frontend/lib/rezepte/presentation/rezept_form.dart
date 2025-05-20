@@ -121,7 +121,7 @@ class _RezeptFormState extends ConsumerState<RezeptForm> {
       children: [
         TextButton(
           onPressed: () {
-            context.go('/rezepte');
+            context.pop();
           },
           child: const Text('Abbrechen'),
         ),

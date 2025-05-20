@@ -15,6 +15,10 @@ _Rezept _$RezeptFromJson(Map<String, dynamic> json) => _Rezept(
           ? const IListConst([])
           : IList<RezeptPos>.fromJson(json['positionen'],
               (value) => RezeptPos.fromJson(value as Map<String, dynamic>)),
+      behandlungen: json['behandlungen'] == null
+          ? const IListConst([])
+          : IList<Behandlung>.fromJson(json['behandlungen'],
+              (value) => Behandlung.fromJson(value as Map<String, dynamic>)),
     );
 
 Map<String, dynamic> _$RezeptToJson(_Rezept instance) => <String, dynamic>{
@@ -23,6 +27,9 @@ Map<String, dynamic> _$RezeptToJson(_Rezept instance) => <String, dynamic>{
       'ausgestelltAm': instance.ausgestelltAm.toIso8601String(),
       'preisGesamt': instance.preisGesamt,
       'positionen': instance.positionen.toJson(
+        (value) => value,
+      ),
+      'behandlungen': instance.behandlungen.toJson(
         (value) => value,
       ),
     };
@@ -65,4 +72,17 @@ Map<String, dynamic> _$RezeptPatientToJson(_RezeptPatient instance) =>
       'id': instance.id,
       'vorname': instance.vorname,
       'nachname': instance.nachname,
+    };
+
+_Behandlung _$BehandlungFromJson(Map<String, dynamic> json) => _Behandlung(
+      id: json['id'] as String,
+      startZeit: DateTime.parse(json['startZeit'] as String),
+      endZeit: DateTime.parse(json['endZeit'] as String),
+    );
+
+Map<String, dynamic> _$BehandlungToJson(_Behandlung instance) =>
+    <String, dynamic>{
+      'id': instance.id,
+      'startZeit': instance.startZeit.toIso8601String(),
+      'endZeit': instance.endZeit.toIso8601String(),
     };

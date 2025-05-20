@@ -47,6 +47,7 @@
 - Use Repositories to access API's
 - Create new widgets when the build method gets too long
 - You MUST always format the code before finishing a task
+- Always use the AggregateNotFoundException() when the repository does not find an entry
 
 ### Testing the Frontend
 - There are no unit tests of Repositories because their functionality is highly dependent on the backend responses

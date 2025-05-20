@@ -3,7 +3,7 @@ Content-Type: application/json
 
 ###
 
-PATCH http://localhost:8080/profiles/123e4567-e89b-12d3-a456-426614174000
+PATCH http://localhost:8080/profile/123e4567-e89b-12d3-a456-426614174000
 Content-Type: application/json
 
 {
@@ -11,3 +11,9 @@ Content-Type: application/json
   "inhaberName": "John Doe",
   "profilePictureUrl": "https://example.com/profile.jpg"
 }
+
+###
+
+GET http://localhost:8080/profile/d7e8f9a0-b1c2-3d4e-5f6a-7b8c9d0e1f2a/kalender?
+    accessToken=5a6b7c8d-9e0f-1a2b-3c4d-5e6f7a8b9c0d
+Content-Type: application/json

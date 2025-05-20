@@ -6,6 +6,7 @@ import org.springframework.data.annotation.Version
 import org.springframework.data.relational.core.mapping.MappedCollection
 import org.springframework.data.relational.core.mapping.Table
 import java.time.LocalDate
+import java.time.LocalDateTime
 import java.util.UUID
 
 data class RezeptId(
@@ -29,6 +30,8 @@ data class Rezept(
     val rechnungsnummer: String? = null,
     @MappedCollection(idColumn = "rezept_id", keyColumn = "index")
     val positionen: List<RezeptPos>,
+    @MappedCollection(idColumn = "rezept_id", keyColumn = "index")
+    val behandlungen: List<Behandlung> = emptyList(),
     @Version
     val version: Int = 0,
 ) {
@@ -56,6 +59,35 @@ data class Rezept(
         )
     }
 
+    fun addBehandlung(
+        startZeit: LocalDateTime,
+        endZeit: LocalDateTime,
+    ): Rezept {
+        val newBehandlung = Behandlung.createNew(
+            rezeptId = id,
+            startZeit = startZeit,
+            endZeit = endZeit,
+        )
+
+        // Sort behandlungen by startZeit
+        val sortedBehandlungen = (behandlungen + newBehandlung).sortedBy { it.startZeit }
+
+        return copy(
+            behandlungen = sortedBehandlungen,
+        )
+    }
+
+    fun removeBehandlung(behandlungId: UUID): Rezept {
+        val updatedBehandlungen = behandlungen.filter { it.id != behandlungId }
+        if (updatedBehandlungen.size == behandlungen.size) {
+            return this // No change if not found
+        }
+
+        return copy(
+            behandlungen = updatedBehandlungen,
+        )
+    }
+
     companion object {
         fun createNew(
             patientId: PatientId,
@@ -63,6 +95,10 @@ data class Rezept(
             ausgestelltVonArztId: ArztId?,
             posSources: List<RezeptPosSource>,
         ): Rezept {
+            if (posSources.isEmpty()) {
+                throw IllegalArgumentException("A rezept must have at least one position")
+            }
+
             val positionen = posSources.map(RezeptPosSource::toPosition)
             val preisGesamt = positionen.sumOf { it.preisGesamt }
 
@@ -73,6 +109,7 @@ data class Rezept(
                 ausgestelltVonArztId = ausgestelltVonArztId,
                 preisGesamt = preisGesamt,
                 positionen = positionen,
+                behandlungen = emptyList(),
             )
         }
     }

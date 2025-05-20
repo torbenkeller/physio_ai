@@ -31,6 +31,9 @@ class ProfileControllerTest {
     @MockkBean
     private lateinit var profileRepository: ProfileRepository
 
+    @MockkBean
+    private lateinit var kalenderService: KalenderService
+
     @Test
     fun `getProfile should return null when no profile exists`() {
         // Arrange

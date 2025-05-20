@@ -143,4 +143,53 @@ class RezepteController
                 .findAll()
                 .map { BehandlungsartDto.fromBehandlungsart(it) }
                 .toList()
+
+    @PostMapping("/{id}/behandlungen")
+        fun addBehandlung(
+            @PathVariable id: UUID,
+            @RequestBody behandlungCreateDto: BehandlungCreateDto,
+        ): RezeptDto {
+            val updatedRezept = rezeptService.addBehandlung(
+                rezeptId = RezeptId.fromUUID(id),
+                startZeit = behandlungCreateDto.startZeit,
+                endZeit = behandlungCreateDto.endZeit,
+            )
+
+            val patient = patientenRepository.findById(updatedRezept.patientId)
+                ?: throw IllegalStateException("Patient not found after updating rezept")
+
+            val arzt = updatedRezept.ausgestelltVonArztId?.let { arztId ->
+                aerzteRepository.findById(arztId)
+            }
+
+            return RezeptDto.fromRezept(
+                rezept = updatedRezept,
+                patient = patient,
+                arzt = arzt,
+            )
+        }
+
+        @DeleteMapping("/{rezeptId}/behandlungen/{behandlungId}")
+        fun removeBehandlung(
+            @PathVariable rezeptId: UUID,
+            @PathVariable behandlungId: UUID,
+        ): RezeptDto {
+            val updatedRezept = rezeptService.removeBehandlung(
+                rezeptId = RezeptId.fromUUID(rezeptId),
+                behandlungId = behandlungId,
+            )
+
+            val patient = patientenRepository.findById(updatedRezept.patientId)
+                ?: throw IllegalStateException("Patient not found after updating rezept")
+
+            val arzt = updatedRezept.ausgestelltVonArztId?.let { arztId ->
+                aerzteRepository.findById(arztId)
+            }
+
+            return RezeptDto.fromRezept(
+            rezept = updatedRezept,
+            patient = patient,
+            arzt = arzt,
+        )
+    }
     }

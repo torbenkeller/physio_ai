@@ -17,6 +17,7 @@ import org.springframework.web.multipart.MultipartFile
 import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.StandardCopyOption
+import java.time.LocalDateTime
 import java.util.UUID
 
 @Service
@@ -229,5 +230,68 @@ class RezeptService
             logger.debug("Successfully analyzed prescription image")
 
             return processRezeptImage(file, rezeptData)
+        }
+
+        /**
+         * Adds a Behandlung to a Rezept
+         * @param rezeptId The ID of the Rezept
+         * @param startZeit The start time of the Behandlung
+         * @param endZeit The end time of the Behandlung
+         * @return The updated Rezept
+         */
+        @Transactional
+        @Throws(AggregateNotFoundException::class)
+        fun addBehandlung(
+            rezeptId: RezeptId,
+            startZeit: LocalDateTime,
+            endZeit: LocalDateTime,
+        ): Rezept {
+            logger.debug("Adding Behandlung to Rezept with ID: {}", rezeptId)
+
+            val rezept = rezeptRepository.findById(rezeptId) ?: throw AggregateNotFoundException()
+
+            val updatedRezept = rezept.addBehandlung(startZeit, endZeit)
+
+            val savedRezept = rezeptRepository.save(updatedRezept)
+            logger.debug(
+                "Added Behandlung to Rezept with ID: {}, new behandlungen count: {}",
+                savedRezept.id.id,
+                savedRezept.behandlungen.size,
+            )
+
+            return savedRezept
+        }
+
+        /**
+         * Removes a Behandlung from a Rezept
+         * @param rezeptId The ID of the Rezept
+         * @param behandlungId The ID of the Behandlung to remove
+         * @return The updated Rezept
+         */
+        @Transactional
+        @Throws(AggregateNotFoundException::class)
+        fun removeBehandlung(
+            rezeptId: RezeptId,
+            behandlungId: UUID,
+        ): Rezept {
+            logger.debug("Removing Behandlung with ID: {} from Rezept with ID: {}", behandlungId, rezeptId)
+
+            val rezept = rezeptRepository.findById(rezeptId) ?: throw AggregateNotFoundException()
+
+            val updatedRezept = rezept.removeBehandlung(behandlungId)
+
+            if (updatedRezept == rezept) {
+                logger.debug("No Behandlung with ID: {} found in Rezept with ID: {}", behandlungId, rezeptId)
+                throw AggregateNotFoundException()
+            }
+
+            val savedRezept = rezeptRepository.save(updatedRezept)
+            logger.debug(
+                "Removed Behandlung from Rezept with ID: {}, new behandlungen count: {}",
+                savedRezept.id.id,
+                savedRezept.behandlungen.size,
+            )
+
+            return savedRezept
         }
     }

@@ -15,6 +15,7 @@ data class RezeptDto(
     val preisGesamt: Double,
     val rechnung: RezeptRechnungDto?,
     val positionen: List<RezeptPosDto>,
+    val behandlungen: List<BehandlungDto>,
 ) {
     companion object {
         fun fromRezept(
@@ -42,6 +43,7 @@ data class RezeptDto(
                         }.toList(),
                 rechnung = null,
                 preisGesamt = rezept.preisGesamt,
+                behandlungen = rezept.behandlungen.map { BehandlungDto.fromBehandlung(it) },
             )
     }
 }

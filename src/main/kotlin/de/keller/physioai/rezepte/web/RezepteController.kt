@@ -144,7 +144,7 @@ class RezepteController
                 .map { BehandlungsartDto.fromBehandlungsart(it) }
                 .toList()
 
-    @PostMapping("/{id}/behandlungen")
+        @PostMapping("/{id}/behandlungen")
         fun addBehandlung(
             @PathVariable id: UUID,
             @RequestBody behandlungCreateDto: BehandlungCreateDto,
@@ -187,9 +187,9 @@ class RezepteController
             }
 
             return RezeptDto.fromRezept(
-            rezept = updatedRezept,
-            patient = patient,
-            arzt = arzt,
-        )
-    }
+                rezept = updatedRezept,
+                patient = patient,
+                arzt = arzt,
+            )
+        }
     }

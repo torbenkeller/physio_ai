@@ -25,4 +25,6 @@ data class Profile(
     val accessToken: UUID = UUID.randomUUID(),
     @Version
     val version: Int = 0,
-)
+) {
+    fun getCalenderUrl(): String = "/profile/${id.id}/kalender?accessToken=$accessToken"
+}

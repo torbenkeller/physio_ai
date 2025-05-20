@@ -176,4 +176,34 @@ class ProfileControllerTest {
 
         verify { profileService.updateProfile(profileId, any()) }
     }
+
+    @Test
+    fun `getProfile should include calenderUrl in response`() {
+        // Arrange
+        val profileId = ProfileId(UUID.fromString("d7e8f9a0-b1c2-3d4e-5f6a-7b8c9d0e1f2a"))
+        val accessToken = UUID.fromString("a1b2c3d4-e5f6-7890-1234-567890abcdef")
+        val profile = Profile(
+            id = profileId,
+            praxisName = "Privatpraxis Carsten Huffmeyer",
+            inhaberName = "Carsten Huffmeyer",
+            profilePictureUrl = null,
+            accessToken = accessToken,
+            version = 0,
+        )
+
+        every { profileRepository.findById(profileId) } returns profile
+
+        // Act & Assert
+        mockMvc
+            .perform(get("/profile"))
+            .andExpect(status().isOk)
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+            .andExpect(jsonPath("$.id").value(profileId.id.toString()))
+            .andExpect(jsonPath("$.praxisName").value("Privatpraxis Carsten Huffmeyer"))
+            .andExpect(jsonPath("$.inhaberName").value("Carsten Huffmeyer"))
+            .andExpect(jsonPath("$.profilePictureUrl").doesNotExist())
+            .andExpect(jsonPath("$.calenderUrl").value("/profile/${profileId.id}/kalender?accessToken=$accessToken"))
+
+        verify { profileRepository.findById(profileId) }
+    }
 }

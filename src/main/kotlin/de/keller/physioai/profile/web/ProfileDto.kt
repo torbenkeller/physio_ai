@@ -8,6 +8,7 @@ data class ProfileDto(
     val praxisName: String,
     val inhaberName: String,
     val profilePictureUrl: String?,
+    val calenderUrl: String,
 ) {
     companion object {
         fun fromProfile(profile: Profile): ProfileDto =
@@ -16,6 +17,7 @@ data class ProfileDto(
                 praxisName = profile.praxisName,
                 inhaberName = profile.inhaberName,
                 profilePictureUrl = profile.profilePictureUrl,
+                calenderUrl = profile.getCalenderUrl(),
             )
     }
 }

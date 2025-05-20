@@ -3,7 +3,7 @@ import 'package:physio_ai/patienten/domain/patient.dart';
 import 'package:physio_ai/patienten/infrastructure/patient_form_dto.dart';
 import 'package:physio_ai/shared_kernel/presentation/form_container.dart';
 import 'package:physio_ai/shared_kernel/presentation/form_field_container.dart';
-import 'package:physio_ai/shared_kernel/presentation/validation/validators.dart';
+import 'package:physio_ai/shared_kernel/validation/validators.dart';
 
 class PatientFormContainer extends FormContainer {
   PatientFormContainer({required Patient? patient})

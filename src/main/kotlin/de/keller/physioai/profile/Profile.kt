@@ -26,5 +26,5 @@ data class Profile(
     @Version
     val version: Int = 0,
 ) {
-    fun getCalenderUrl(): String = "/profile/${id.id}/kalender?accessToken=$accessToken"
+    fun getCalenderUrl(host: String): String = "$host/profile/${id.id}/kalender?accessToken=$accessToken"
 }

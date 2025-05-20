@@ -5,7 +5,7 @@ import 'package:physio_ai/main.dart';
 import 'package:physio_ai/rezepte/infrastructure/rezept_form_dto.dart';
 import 'package:physio_ai/rezepte/model/rezept.dart';
 import 'package:physio_ai/rezepte/model/rezept_einlesen_response.dart';
-import 'package:physio_ai/shared_kernel/presentation/infrastructure/error_logger.dart';
+import 'package:physio_ai/shared_kernel/infrastructure/error_logger.dart';
 import 'package:retrofit/error_logger.dart';
 import 'package:retrofit/http.dart';
 

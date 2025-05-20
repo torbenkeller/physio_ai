@@ -37,6 +37,7 @@ class ProfileTest {
         @Test
         fun `getCalenderUrl should return correctly formatted URL`() {
             // Arrange
+            val host = "http://localhost:8080"
             val profileId = ProfileId(UUID.fromString("d7e8f9a0-b1c2-3d4e-5f6a-7b8c9d0e1f2a"))
             val accessToken = UUID.fromString("a1b2c3d4-e5f6-7890-1234-567890abcdef")
             val profile = Profile(
@@ -48,11 +49,11 @@ class ProfileTest {
             )
 
             // Act
-            val calenderUrl = profile.getCalenderUrl()
+            val calenderUrl = profile.getCalenderUrl(host)
 
             // Assert
             assertEquals(
-                "/profile/d7e8f9a0-b1c2-3d4e-5f6a-7b8c9d0e1f2a/kalender?accessToken=a1b2c3d4-e5f6-7890-1234-567890abcdef",
+                "http://localhost:8080/profile/d7e8f9a0-b1c2-3d4e-5f6a-7b8c9d0e1f2a/kalender?accessToken=a1b2c3d4-e5f6-7890-1234-567890abcdef",
                 calenderUrl,
             )
         }
@@ -129,6 +130,7 @@ class ProfileTest {
         @Test
         fun `fromProfile should correctly map all fields`() {
             // Arrange
+            val host = "http://localhost:8080"
             val profileId = ProfileId(UUID.fromString("d7e8f9a0-b1c2-3d4e-5f6a-7b8c9d0e1f2a"))
             val accessToken = UUID.fromString("a1b2c3d4-e5f6-7890-1234-567890abcdef")
             val profile = Profile(
@@ -141,7 +143,7 @@ class ProfileTest {
 
             // Act
             val dto = de.keller.physioai.profile.web.ProfileDto
-                .fromProfile(profile)
+                .fromProfile(profile, host)
 
             // Assert
             assertAll(
@@ -151,7 +153,7 @@ class ProfileTest {
                 { assertEquals("https://example.com/image.jpg", dto.profilePictureUrl) },
                 {
                     assertEquals(
-                        "/profile/d7e8f9a0-b1c2-3d4e-5f6a-7b8c9d0e1f2a/kalender?accessToken=a1b2c3d4-e5f6-7890-1234-567890abcdef",
+                        "http://localhost:8080/profile/d7e8f9a0-b1c2-3d4e-5f6a-7b8c9d0e1f2a/kalender?accessToken=a1b2c3d4-e5f6-7890-1234-567890abcdef",
                         dto.calenderUrl,
                     )
                 },

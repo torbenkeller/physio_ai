@@ -4,6 +4,7 @@ import de.keller.physioai.profile.web.ProfileDto
 import de.keller.physioai.profile.web.ProfileForm
 import de.keller.physioai.shared.web.AggregateNotFoundException
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PatchMapping
 import org.springframework.web.bind.annotation.PathVariable
@@ -22,6 +23,8 @@ class ProfileController
         private val profileService: ProfileService,
         private val profileRepository: ProfileRepository,
         private val kalenderService: KalenderService,
+        @Value("\${server.host:http://localhost:8080}")
+        private val host: String,
     ) {
         @GetMapping
         fun getProfile(): ProfileDto? {
@@ -30,7 +33,7 @@ class ProfileController
             val profile = profileRepository.findById(ProfileId.fromUUID(id))
                 ?: throw AggregateNotFoundException()
 
-            return ProfileDto.fromProfile(profile)
+            return ProfileDto.fromProfile(profile, host)
         }
 
         @PostMapping
@@ -38,7 +41,7 @@ class ProfileController
             @RequestBody profileForm: ProfileForm,
         ): ProfileDto {
             val profile = profileService.createProfile(profileForm)
-            return ProfileDto.fromProfile(profile)
+            return ProfileDto.fromProfile(profile, host)
         }
 
         @PatchMapping
@@ -51,7 +54,7 @@ class ProfileController
                 .updateProfile(
                     id = ProfileId.fromUUID(id),
                     profileForm = profileForm,
-                ).let { ProfileDto.fromProfile(it) }
+                ).let { ProfileDto.fromProfile(it, host) }
         }
 
         @GetMapping("/{id}/kalender", produces = ["text/calendar"])

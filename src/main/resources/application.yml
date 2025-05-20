@@ -6,6 +6,9 @@ spring:
     url: jdbc:postgresql://localhost:5432/physio_ai
     username: postgres
     password: postgres
+    
+server:
+  host: http://localhost:8080
 
   flyway:
     locations: classpath:/db/migration

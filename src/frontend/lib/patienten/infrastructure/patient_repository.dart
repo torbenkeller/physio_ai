@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:physio_ai/main.dart';
 import 'package:physio_ai/patienten/domain/patient.dart';
 import 'package:physio_ai/patienten/infrastructure/patient_form_dto.dart';
-import 'package:physio_ai/shared_kernel/presentation/infrastructure/error_logger.dart';
+import 'package:physio_ai/shared_kernel/infrastructure/error_logger.dart';
 import 'package:retrofit/error_logger.dart';
 import 'package:retrofit/http.dart';
 

@@ -11,13 +11,16 @@ data class ProfileDto(
     val calenderUrl: String,
 ) {
     companion object {
-        fun fromProfile(profile: Profile): ProfileDto =
+        fun fromProfile(
+            profile: Profile,
+            host: String,
+        ): ProfileDto =
             ProfileDto(
                 id = profile.id.id,
                 praxisName = profile.praxisName,
                 inhaberName = profile.inhaberName,
                 profilePictureUrl = profile.profilePictureUrl,
-                calenderUrl = profile.getCalenderUrl(),
+                calenderUrl = profile.getCalenderUrl(host),
             )
     }
 }

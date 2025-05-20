@@ -202,7 +202,7 @@ class ProfileControllerTest {
             .andExpect(jsonPath("$.praxisName").value("Privatpraxis Carsten Huffmeyer"))
             .andExpect(jsonPath("$.inhaberName").value("Carsten Huffmeyer"))
             .andExpect(jsonPath("$.profilePictureUrl").doesNotExist())
-            .andExpect(jsonPath("$.calenderUrl").value("/profile/${profileId.id}/kalender?accessToken=$accessToken"))
+            .andExpect(jsonPath("$.calenderUrl").value("http://localhost:8080/profile/${profileId.id}/kalender?accessToken=$accessToken"))
 
         verify { profileRepository.findById(profileId) }
     }

@@ -5,6 +5,7 @@ import 'package:physio_ai/home_scaffold.dart';
 import 'package:physio_ai/patienten/presentation/create_patient_page.dart';
 import 'package:physio_ai/patienten/presentation/patient_detail_page.dart';
 import 'package:physio_ai/patienten/presentation/patienten_page.dart';
+import 'package:physio_ai/profile/presentation/profile_page.dart';
 import 'package:physio_ai/rezepte/home_page.dart';
 import 'package:physio_ai/rezepte/presentation/create_rezept_page.dart';
 import 'package:physio_ai/rezepte/presentation/rezept_detail_page.dart';
@@ -17,6 +18,7 @@ final _shellKey = GlobalKey<StatefulNavigationShellState>();
 final _shellNavigatorHomeKey = GlobalKey<NavigatorState>(debugLabel: 'shellHome');
 final _shellNavigatorPatientenKey = GlobalKey<NavigatorState>(debugLabel: 'shellPatienten');
 final _shellNavigatorRezepteKey = GlobalKey<NavigatorState>(debugLabel: 'shellRezepte');
+final _shellNavigatorProfileKey = GlobalKey<NavigatorState>(debugLabel: 'shellProfile');
 
 final _mobileRouterConfig = RoutingConfig(
   routes: [
@@ -96,6 +98,14 @@ final _mobileRouterConfig = RoutingConfig(
                   ],
                 ),
               ],
+            ),
+          ],
+        ),
+        StatefulShellBranch(
+          routes: [
+            GoRoute(
+              path: '/profile',
+              builder: (context, state) => const ProfilePage(),
             ),
           ],
         ),
@@ -203,6 +213,14 @@ final _desktopRouterConfig = RoutingConfig(
                   isContextCreate: true,
                 ),
               ),
+            ),
+          ],
+        ),
+        StatefulShellBranch(
+          routes: [
+            GoRoute(
+              path: '/profile',
+              builder: (context, state) => const ProfilePage(),
             ),
           ],
         ),

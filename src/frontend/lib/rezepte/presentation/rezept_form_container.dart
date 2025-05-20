@@ -4,7 +4,7 @@ import 'package:physio_ai/rezepte/infrastructure/rezept_form_dto.dart';
 import 'package:physio_ai/rezepte/model/rezept.dart';
 import 'package:physio_ai/shared_kernel/presentation/form_container.dart';
 import 'package:physio_ai/shared_kernel/presentation/form_field_container.dart';
-import 'package:physio_ai/shared_kernel/presentation/validation/validators.dart';
+import 'package:physio_ai/shared_kernel/validation/validators.dart';
 
 class RezeptFormContainer extends FormContainer {
   RezeptFormContainer._({

@@ -29,7 +29,7 @@ springdoc:
     enabled: true
     path: /api
 
-debug: true
+debug: false
 
 logging:
   level:

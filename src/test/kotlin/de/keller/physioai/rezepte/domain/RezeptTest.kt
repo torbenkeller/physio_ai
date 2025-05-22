@@ -10,21 +10,17 @@ import kotlin.test.assertFailsWith
 import kotlin.test.assertNotEquals
 
 class RezeptTest {
-    private val patientId = PatientId(UUID.randomUUID())
+    private val patientId = PatientId.fromUUID(UUID.randomUUID())
     private val ausgestelltAm = LocalDate.of(2023, 1, 1)
-    private val behandlungsartId = BehandlungsartId(UUID.randomUUID())
+    private val behandlungsartId = BehandlungsartId.generate()
 
     @Test
     fun `createNew should create a valid rezept`() {
         // Arrange
-        val behandlungsart = Behandlungsart(
-            id = behandlungsartId,
-            name = "Manuelle Therapie",
-            preis = 75.2,
-        )
-
-        val posSource = RezeptPosSource(
-            behandlungsart = behandlungsart,
+        val posSource = CreateRezeptPosData(
+            behandlungsartId = behandlungsartId,
+            behandlungsartName = "Manuelle Therapie",
+            behandlungsartPreis = 75.2,
             anzahl = 6,
         )
 
@@ -67,8 +63,10 @@ class RezeptTest {
             preis = 75.2,
         )
 
-        val posSource1 = RezeptPosSource(
-            behandlungsart = behandlungsart1,
+        val posSource1 = CreateRezeptPosData(
+            behandlungsartId = behandlungsartId,
+            behandlungsartName = "Manuelle Therapie",
+            behandlungsartPreis = 75.2,
             anzahl = 6,
         )
 
@@ -79,17 +77,14 @@ class RezeptTest {
             posSources = listOf(posSource1),
         )
 
-        val newPatientId = PatientId(UUID.randomUUID())
+        val newPatientId = PatientId.generate()
         val newAusgestelltAm = LocalDate.of(2023, 2, 1)
-        val newBehandlungsartId = BehandlungsartId(UUID.randomUUID())
-        val newBehandlungsart = Behandlungsart(
-            id = newBehandlungsartId,
-            name = "Klassische Massagetherapie",
-            preis = 22.84,
-        )
+        val newBehandlungsartId = BehandlungsartId.generate()
 
-        val newPosSource = RezeptPosSource(
-            behandlungsart = newBehandlungsart,
+        val newPosSource = CreateRezeptPosData(
+            behandlungsartId = newBehandlungsartId,
+            behandlungsartName = "Klassische Massagetherapie",
+            behandlungsartPreis = 22.84,
             anzahl = 8,
         )
 
@@ -115,16 +110,13 @@ class RezeptTest {
     @Test
     fun `update should throw when no positions are provided`() {
         // Arrange
-        val behandlungsart = Behandlungsart(
-            id = behandlungsartId,
-            name = "Manuelle Therapie",
-            preis = 75.2,
-        )
-
-        val posSource = RezeptPosSource(
-            behandlungsart = behandlungsart,
+        val createRezeptPosData = CreateRezeptPosData(
+            behandlungsartId = behandlungsartId,
+            behandlungsartName = "Manuelle Therapie",
+            behandlungsartPreis = 75.2,
             anzahl = 6,
         )
+        val posSource = createRezeptPosData
 
         val rezept = Rezept.createNew(
             patientId = patientId,
@@ -148,14 +140,10 @@ class RezeptTest {
     @Test
     fun `addBehandlung should add a behandlung to the rezept`() {
         // Arrange
-        val behandlungsart = Behandlungsart(
-            id = behandlungsartId,
-            name = "Manuelle Therapie",
-            preis = 75.2,
-        )
-
-        val posSource = RezeptPosSource(
-            behandlungsart = behandlungsart,
+        val posSource = CreateRezeptPosData(
+            behandlungsartId = behandlungsartId,
+            behandlungsartName = "Manuelle Therapie",
+            behandlungsartPreis = 75.2,
             anzahl = 6,
         )
 
@@ -185,14 +173,10 @@ class RezeptTest {
     @Test
     fun `addBehandlung should sort behandlungen by startZeit`() {
         // Arrange
-        val behandlungsart = Behandlungsart(
-            id = behandlungsartId,
-            name = "Manuelle Therapie",
-            preis = 75.2,
-        )
-
-        val posSource = RezeptPosSource(
-            behandlungsart = behandlungsart,
+        val posSource = CreateRezeptPosData(
+            behandlungsartId = behandlungsartId,
+            behandlungsartName = "Manuelle Therapie",
+            behandlungsartPreis = 75.2,
             anzahl = 6,
         )
 
@@ -232,8 +216,10 @@ class RezeptTest {
             preis = 75.2,
         )
 
-        val posSource = RezeptPosSource(
-            behandlungsart = behandlungsart,
+        val posSource = CreateRezeptPosData(
+            behandlungsartId = behandlungsartId,
+            behandlungsartName = "Manuelle Therapie",
+            behandlungsartPreis = 75.2,
             anzahl = 6,
         )
 
@@ -261,14 +247,10 @@ class RezeptTest {
     @Test
     fun `removeBehandlung should remove the behandlung when found`() {
         // Arrange
-        val behandlungsart = Behandlungsart(
-            id = behandlungsartId,
-            name = "Manuelle Therapie",
-            preis = 75.2,
-        )
-
-        val posSource = RezeptPosSource(
-            behandlungsart = behandlungsart,
+        val posSource = CreateRezeptPosData(
+            behandlungsartId = behandlungsartId,
+            behandlungsartName = "Manuelle Therapie",
+            behandlungsartPreis = 75.2,
             anzahl = 6,
         )
 
@@ -296,14 +278,10 @@ class RezeptTest {
     @Test
     fun `removeBehandlung should maintain order of remaining behandlungen`() {
         // Arrange
-        val behandlungsart = Behandlungsart(
-            id = behandlungsartId,
-            name = "Manuelle Therapie",
-            preis = 75.2,
-        )
-
-        val posSource = RezeptPosSource(
-            behandlungsart = behandlungsart,
+        val posSource = CreateRezeptPosData(
+            behandlungsartId = behandlungsartId,
+            behandlungsartName = "Manuelle Therapie",
+            behandlungsartPreis = 75.2,
             anzahl = 6,
         )
 

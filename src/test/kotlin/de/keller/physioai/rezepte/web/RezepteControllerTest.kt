@@ -1,27 +1,29 @@
 package de.keller.physioai.rezepte.web
 
 import com.ninjasquad.springmockk.MockkBean
-import de.keller.physioai.config.SecurityConfig
-import de.keller.physioai.patienten.Patient
 import de.keller.physioai.patienten.PatientId
-import de.keller.physioai.patienten.PatientenRepository
-import de.keller.physioai.patienten.web.PatientDto
-import de.keller.physioai.rezepte.domain.AerzteRepository
+import de.keller.physioai.patienten.adapters.jdbc.PatientenRepositoryImpl
+import de.keller.physioai.patienten.domain.PatientAggregate
+import de.keller.physioai.patienten.ports.PatientenService
+import de.keller.physioai.rezepte.RezeptId
+import de.keller.physioai.rezepte.RezeptRepository
+import de.keller.physioai.rezepte.adapters.rest.BehandlungsartDto
+import de.keller.physioai.rezepte.adapters.rest.RezepteController
 import de.keller.physioai.rezepte.domain.Arzt
 import de.keller.physioai.rezepte.domain.ArztId
 import de.keller.physioai.rezepte.domain.Behandlungsart
 import de.keller.physioai.rezepte.domain.BehandlungsartId
-import de.keller.physioai.rezepte.domain.BehandlungsartenRepository
-import de.keller.physioai.rezepte.domain.EingelesenerPatientDto
-import de.keller.physioai.rezepte.domain.EingelesenesRezeptDto
-import de.keller.physioai.rezepte.domain.EingelesenesRezeptPosDto
 import de.keller.physioai.rezepte.domain.Rezept
-import de.keller.physioai.rezepte.domain.RezeptAiService
-import de.keller.physioai.rezepte.domain.RezeptEinlesenResponse
-import de.keller.physioai.rezepte.domain.RezeptId
 import de.keller.physioai.rezepte.domain.RezeptPos
-import de.keller.physioai.rezepte.domain.RezeptRepository
-import de.keller.physioai.rezepte.domain.RezeptService
+import de.keller.physioai.rezepte.ports.AerzteRepository
+import de.keller.physioai.rezepte.ports.BehandlungsartenRepository
+import de.keller.physioai.rezepte.ports.EingelesenerPatientDto
+import de.keller.physioai.rezepte.ports.EingelesenesRezeptDto
+import de.keller.physioai.rezepte.ports.EingelesenesRezeptPosDto
+import de.keller.physioai.rezepte.ports.RezeptEinlesenResponse
+import de.keller.physioai.rezepte.ports.RezeptService
+import de.keller.physioai.rezepte.ports.RezepteAiService
+import de.keller.physioai.shared.config.SecurityConfig
 import io.mockk.every
 import io.mockk.just
 import io.mockk.runs
@@ -62,13 +64,16 @@ class RezepteControllerTest {
     private lateinit var aerzteRepository: AerzteRepository
 
     @MockkBean
-    private lateinit var patientenRepository: PatientenRepository
+    private lateinit var patientenRepository: PatientenRepositoryImpl
 
     @MockkBean
-    private lateinit var rezeptAiService: RezeptAiService
+    private lateinit var rezepteAiService: RezepteAiService
 
     @MockkBean
     private lateinit var rezeptService: RezeptService
+
+    @MockkBean
+    private lateinit var patientenService: PatientenService
 
     private val patientId = PatientId.generate()
     private val behandlungsartId1 = BehandlungsartId.generate()
@@ -78,7 +83,7 @@ class RezepteControllerTest {
     private val rezeptId2 = RezeptId.generate()
     private val ausgestelltAm = LocalDate.of(2023, 1, 1)
 
-    private lateinit var patient: Patient
+    private lateinit var patient: PatientAggregate
     private lateinit var behandlungsart1: Behandlungsart
     private lateinit var behandlungsart2: Behandlungsart
     private lateinit var arzt: Arzt
@@ -88,7 +93,7 @@ class RezepteControllerTest {
     @BeforeEach
     fun setUp() {
         // Initialize test data
-        patient = Patient(
+        patient = PatientAggregate(
             id = patientId,
             titel = null,
             vorname = "Max",
@@ -336,7 +341,7 @@ class RezepteControllerTest {
             )
 
             val expectedResponse = RezeptEinlesenResponse(
-                existingPatient = PatientDto.fromPatient(patient),
+                existingPatient = patient,
                 patient = EingelesenerPatientDto(
                     titel = null,
                     vorname = "Max",
@@ -360,7 +365,6 @@ class RezepteControllerTest {
                         ),
                     ),
                 ),
-                path = "/rezepte/tmp/some-file.jpg",
             )
 
             every { rezeptService.rezeptEinlesen(any()) } returns expectedResponse
@@ -375,7 +379,6 @@ class RezepteControllerTest {
                 .andExpect(jsonPath("$.existingPatient.id").value(patientId.id.toString()))
                 .andExpect(jsonPath("$.patient.vorname").value("Max"))
                 .andExpect(jsonPath("$.rezept.ausgestelltAm").value("2023-01-01"))
-                .andExpect(jsonPath("$.path").value("/rezepte/tmp/some-file.jpg"))
 
             verify { rezeptService.rezeptEinlesen(any()) }
         }

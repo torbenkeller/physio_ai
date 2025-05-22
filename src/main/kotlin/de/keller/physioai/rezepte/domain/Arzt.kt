@@ -3,17 +3,6 @@ package de.keller.physioai.rezepte.domain
 import org.springframework.data.annotation.Id
 import org.springframework.data.annotation.Version
 import org.springframework.data.relational.core.mapping.Table
-import java.util.UUID
-
-public data class ArztId(
-    val id: UUID,
-) {
-    companion object {
-        fun fromUUID(id: UUID): ArztId = ArztId(id)
-
-        fun generate(): ArztId = ArztId(UUID.randomUUID())
-    }
-}
 
 @Table("aerzte")
 data class Arzt(

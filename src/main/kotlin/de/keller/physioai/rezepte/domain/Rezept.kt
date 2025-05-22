@@ -1,6 +1,7 @@
 package de.keller.physioai.rezepte.domain
 
 import de.keller.physioai.patienten.PatientId
+import de.keller.physioai.rezepte.RezeptId
 import org.springframework.data.annotation.Id
 import org.springframework.data.annotation.Version
 import org.springframework.data.relational.core.mapping.MappedCollection
@@ -8,16 +9,6 @@ import org.springframework.data.relational.core.mapping.Table
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.util.UUID
-
-data class RezeptId(
-    val id: UUID,
-) {
-    companion object {
-        fun fromUUID(id: UUID): RezeptId = RezeptId(id)
-
-        fun generate(): RezeptId = RezeptId(UUID.randomUUID())
-    }
-}
 
 @Table("rezepte")
 data class Rezept(
@@ -40,13 +31,13 @@ data class Rezept(
         ausgestelltAm: LocalDate,
         ausgestelltVonArztId: ArztId?,
         rechnungsnummer: String?,
-        posSources: List<RezeptPosSource>,
+        posSources: List<CreateRezeptPosData>,
     ): Rezept {
         if (posSources.isEmpty()) {
             throw IllegalArgumentException("A rezept must have at least one position")
         }
 
-        val positionen = posSources.map(RezeptPosSource::toPosition)
+        val positionen = posSources.map(CreateRezeptPosData::toPosition)
         val preisGesamt = positionen.sumOf { it.preisGesamt }
 
         return copy(
@@ -93,13 +84,13 @@ data class Rezept(
             patientId: PatientId,
             ausgestelltAm: LocalDate,
             ausgestelltVonArztId: ArztId?,
-            posSources: List<RezeptPosSource>,
+            posSources: List<CreateRezeptPosData>,
         ): Rezept {
             if (posSources.isEmpty()) {
                 throw IllegalArgumentException("A rezept must have at least one position")
             }
 
-            val positionen = posSources.map(RezeptPosSource::toPosition)
+            val positionen = posSources.map(CreateRezeptPosData::toPosition)
             val preisGesamt = positionen.sumOf { it.preisGesamt }
 
             return Rezept(
@@ -114,29 +105,3 @@ data class Rezept(
         }
     }
 }
-
-data class RezeptPosSource(
-    val behandlungsart: Behandlungsart,
-    val anzahl: Int,
-) {
-    fun toPosition(): RezeptPos =
-        RezeptPos(
-            id = UUID.randomUUID(),
-            behandlungsartId = behandlungsart.id,
-            anzahl = anzahl,
-            einzelpreis = behandlungsart.preis,
-            preisGesamt = behandlungsart.preis * anzahl,
-            behandlungsartName = behandlungsart.name,
-        )
-}
-
-@Table("rezept_pos")
-data class RezeptPos(
-    @Id
-    val id: UUID,
-    val behandlungsartId: BehandlungsartId,
-    val anzahl: Int,
-    val einzelpreis: Double,
-    val preisGesamt: Double,
-    val behandlungsartName: String,
-)

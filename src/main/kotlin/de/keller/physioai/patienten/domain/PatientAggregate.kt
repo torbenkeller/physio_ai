@@ -2,11 +2,13 @@ package de.keller.physioai.patienten.domain
 
 import de.keller.physioai.patienten.Patient
 import de.keller.physioai.patienten.PatientId
+import org.jmolecules.ddd.annotation.AggregateRoot
 import org.springframework.data.annotation.Id
 import org.springframework.data.annotation.Version
 import org.springframework.data.relational.core.mapping.Table
 import java.time.LocalDate
 
+@AggregateRoot
 @ConsistentCopyVisibility
 @Table("patienten")
 data class PatientAggregate internal constructor(

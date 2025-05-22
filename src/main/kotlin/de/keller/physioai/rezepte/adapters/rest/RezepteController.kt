@@ -1,6 +1,6 @@
 package de.keller.physioai.rezepte.adapters.rest
 
-import de.keller.physioai.patienten.adapters.jdbc.PatientenRepositoryImpl
+import de.keller.physioai.patienten.PatientenRepository
 import de.keller.physioai.rezepte.RezeptId
 import de.keller.physioai.rezepte.RezeptRepository
 import de.keller.physioai.rezepte.ports.AerzteRepository
@@ -31,7 +31,7 @@ class RezepteController
         private val rezeptRepository: RezeptRepository,
         private val behandlungsartenRepository: BehandlungsartenRepository,
         private val aerzteRepository: AerzteRepository,
-        private val patientenRepository: PatientenRepositoryImpl,
+        private val patientenRepository: PatientenRepository,
         private val rezeptService: RezeptService,
     ) {
         @GetMapping

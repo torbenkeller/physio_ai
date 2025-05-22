@@ -6,6 +6,6 @@ import org.springframework.modulith.PackageInfo
 /**
  * Patient module for managing patient information.
  */
-@ApplicationModule(type = ApplicationModule.Type.OPEN)
+@ApplicationModule()
 @PackageInfo
 class PatientenModule

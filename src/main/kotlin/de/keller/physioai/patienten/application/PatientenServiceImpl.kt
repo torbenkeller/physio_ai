@@ -5,10 +5,12 @@ import de.keller.physioai.patienten.domain.PatientAggregate
 import de.keller.physioai.patienten.ports.PatientenRepository
 import de.keller.physioai.patienten.ports.PatientenService
 import de.keller.physioai.shared.AggregateNotFoundException
+import org.jmolecules.architecture.hexagonal.Application
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDate
 
+@Application
 @Service
 class PatientenServiceImpl(
     private val patientenRepository: PatientenRepository,

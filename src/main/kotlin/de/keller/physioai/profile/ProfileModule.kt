@@ -1,10 +1,11 @@
 package de.keller.physioai.profile
 
 import org.springframework.modulith.ApplicationModule
-import org.springframework.modulith.NamedInterface
 import org.springframework.modulith.PackageInfo
 
-@ApplicationModule(allowedDependencies = ["shared"])
+/**
+ * Profile module for managing user profiles.
+ */
+@ApplicationModule()
 @PackageInfo
-@NamedInterface("profile")
 class ProfileModule

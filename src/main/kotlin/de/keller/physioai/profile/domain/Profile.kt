@@ -6,7 +6,6 @@ import org.springframework.data.annotation.Version
 import org.springframework.data.relational.core.mapping.Table
 import java.util.UUID
 
-
 @Table("profiles")
 data class Profile(
     @Id

@@ -1,7 +1,10 @@
-package de.keller.physioai.rezepte
+package de.keller.physioai.rezepte.ports
 
+import de.keller.physioai.rezepte.RezeptId
 import de.keller.physioai.rezepte.domain.Rezept
+import org.jmolecules.architecture.hexagonal.SecondaryPort
 
+@SecondaryPort
 interface RezeptRepository {
     fun findAll(): List<Rezept>
 

@@ -4,7 +4,6 @@ import de.keller.physioai.patienten.PatientId
 import de.keller.physioai.patienten.adapters.jdbc.PatientenRepositoryImpl
 import de.keller.physioai.patienten.domain.PatientAggregate
 import de.keller.physioai.rezepte.RezeptId
-import de.keller.physioai.rezepte.RezeptRepository
 import de.keller.physioai.rezepte.adapters.rest.RezeptCreateDto
 import de.keller.physioai.rezepte.adapters.rest.RezeptPosCreateDto
 import de.keller.physioai.rezepte.adapters.rest.RezeptUpdateDto
@@ -16,6 +15,7 @@ import de.keller.physioai.rezepte.domain.RezeptPos
 import de.keller.physioai.rezepte.ports.BehandlungsartenRepository
 import de.keller.physioai.rezepte.ports.EingelesenesRezeptPosRaw
 import de.keller.physioai.rezepte.ports.EingelesenesRezeptRaw
+import de.keller.physioai.rezepte.ports.RezeptRepository
 import de.keller.physioai.rezepte.ports.RezeptService
 import de.keller.physioai.rezepte.ports.RezepteAiService
 import de.keller.physioai.shared.AggregateNotFoundException

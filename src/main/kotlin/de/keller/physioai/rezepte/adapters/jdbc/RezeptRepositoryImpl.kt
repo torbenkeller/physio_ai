@@ -1,8 +1,8 @@
 package de.keller.physioai.rezepte.adapters.jdbc
 
 import de.keller.physioai.rezepte.RezeptId
-import de.keller.physioai.rezepte.RezeptRepository
 import de.keller.physioai.rezepte.domain.Rezept
+import de.keller.physioai.rezepte.ports.RezeptRepository
 import org.springframework.data.jdbc.repository.query.Modifying
 import org.springframework.stereotype.Repository
 import org.springframework.transaction.annotation.Transactional

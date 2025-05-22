@@ -3,18 +3,13 @@ package de.keller.physioai.rezepte.application
 import de.keller.physioai.patienten.PatientId
 import de.keller.physioai.patienten.PatientenRepository
 import de.keller.physioai.rezepte.RezeptId
-import de.keller.physioai.rezepte.RezeptRepository
 import de.keller.physioai.rezepte.adapters.rest.BehandlungsartDto
 import de.keller.physioai.rezepte.adapters.rest.RezeptCreateDto
 import de.keller.physioai.rezepte.adapters.rest.RezeptUpdateDto
 import de.keller.physioai.rezepte.domain.BehandlungsartId
-import de.keller.physioai.rezepte.domain.CreateRezeptPosData
 import de.keller.physioai.rezepte.domain.Rezept
 import de.keller.physioai.rezepte.ports.BehandlungsartenRepository
-import de.keller.physioai.rezepte.ports.EingelesenerPatientDto
-import de.keller.physioai.rezepte.ports.EingelesenesRezeptDto
-import de.keller.physioai.rezepte.ports.EingelesenesRezeptPosDto
-import de.keller.physioai.rezepte.ports.RezeptEinlesenResponse
+import de.keller.physioai.rezepte.ports.RezeptRepository
 import de.keller.physioai.rezepte.ports.RezeptService
 import de.keller.physioai.rezepte.ports.RezepteAiService
 import de.keller.physioai.shared.AggregateNotFoundException
@@ -35,7 +30,7 @@ class RezeptServiceImpl(
 ) : RezeptService {
     val logger: Logger = LoggerFactory.getLogger(RezeptService::class.java)
 
-    override fun rezeptEinlesen(file: MultipartFile): RezeptEinlesenResponse? {
+    override fun rezeptEinlesen(file: MultipartFile): RezeptService.RezeptEinlesenResponse? {
         logger.debug("Processing prescription image: {}", file.originalFilename)
 
         val rezeptData = rezepteAiService.analyzeRezeptImage(file) ?: return null
@@ -55,9 +50,9 @@ class RezeptServiceImpl(
         val behandlungsarten =
             behandlungsartenRepository.findAllByNameIn(rezeptData.rezeptpositionen.map { it.behandlung })
 
-        return RezeptEinlesenResponse(
+        return RezeptService.RezeptEinlesenResponse(
             existingPatient = matchingPatient,
-            patient = EingelesenerPatientDto(
+            patient = RezeptService.EingelesenerPatientDto(
                 titel = rezeptData.titel,
                 vorname = rezeptData.vorname,
                 nachname = rezeptData.nachname,
@@ -67,10 +62,10 @@ class RezeptServiceImpl(
                 stadt = rezeptData.stadt,
                 geburtstag = rezeptData.geburtstag,
             ),
-            rezept = EingelesenesRezeptDto(
+            rezept = RezeptService.EingelesenesRezeptDto(
                 ausgestelltAm = rezeptData.ausgestelltAm,
                 rezeptpositionen = rezeptData.rezeptpositionen.map { pos ->
-                    EingelesenesRezeptPosDto(
+                    RezeptService.EingelesenesRezeptPosDto(
                         anzahl = pos.anzahl,
                         behandlungsart =
                             behandlungsarten
@@ -112,7 +107,7 @@ class RezeptServiceImpl(
                 val behandlungsart =
                     behandlungsarten.find { it.id == BehandlungsartId.fromUUID(pos.behandlungsartId) }!!
 
-                CreateRezeptPosData(
+                Rezept.Companion.CreateRezeptPosData(
                     behandlungsartId = behandlungsart.id,
                     behandlungsartName = behandlungsart.name,
                     behandlungsartPreis = behandlungsart.preis,
@@ -171,7 +166,7 @@ class RezeptServiceImpl(
                 val behandlungsart =
                     behandlungsarten.find { it.id == BehandlungsartId.fromUUID(pos.behandlungsartId) }!!
 
-                CreateRezeptPosData(
+                Rezept.Companion.CreateRezeptPosData(
                     behandlungsartId = behandlungsart.id,
                     behandlungsartName = behandlungsart.name,
                     behandlungsartPreis = behandlungsart.preis,

@@ -6,7 +6,6 @@ import de.keller.physioai.patienten.adapters.jdbc.PatientenRepositoryImpl
 import de.keller.physioai.patienten.domain.PatientAggregate
 import de.keller.physioai.patienten.ports.PatientenService
 import de.keller.physioai.rezepte.RezeptId
-import de.keller.physioai.rezepte.RezeptRepository
 import de.keller.physioai.rezepte.adapters.rest.BehandlungsartDto
 import de.keller.physioai.rezepte.adapters.rest.RezepteController
 import de.keller.physioai.rezepte.domain.Arzt
@@ -21,6 +20,7 @@ import de.keller.physioai.rezepte.ports.EingelesenerPatientDto
 import de.keller.physioai.rezepte.ports.EingelesenesRezeptDto
 import de.keller.physioai.rezepte.ports.EingelesenesRezeptPosDto
 import de.keller.physioai.rezepte.ports.RezeptEinlesenResponse
+import de.keller.physioai.rezepte.ports.RezeptRepository
 import de.keller.physioai.rezepte.ports.RezeptService
 import de.keller.physioai.rezepte.ports.RezepteAiService
 import de.keller.physioai.shared.config.SecurityConfig

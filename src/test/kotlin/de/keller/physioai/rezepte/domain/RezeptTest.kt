@@ -17,7 +17,7 @@ class RezeptTest {
     @Test
     fun `createNew should create a valid rezept`() {
         // Arrange
-        val posSource = CreateRezeptPosData(
+        val posSource = Rezept.Companion.CreateRezeptPosData(
             behandlungsartId = behandlungsartId,
             behandlungsartName = "Manuelle Therapie",
             behandlungsartPreis = 75.2,
@@ -63,7 +63,7 @@ class RezeptTest {
             preis = 75.2,
         )
 
-        val posSource1 = CreateRezeptPosData(
+        val posSource1 = Rezept.Companion.CreateRezeptPosData(
             behandlungsartId = behandlungsartId,
             behandlungsartName = "Manuelle Therapie",
             behandlungsartPreis = 75.2,
@@ -81,7 +81,7 @@ class RezeptTest {
         val newAusgestelltAm = LocalDate.of(2023, 2, 1)
         val newBehandlungsartId = BehandlungsartId.generate()
 
-        val newPosSource = CreateRezeptPosData(
+        val newPosSource = Rezept.Companion.CreateRezeptPosData(
             behandlungsartId = newBehandlungsartId,
             behandlungsartName = "Klassische Massagetherapie",
             behandlungsartPreis = 22.84,
@@ -110,7 +110,7 @@ class RezeptTest {
     @Test
     fun `update should throw when no positions are provided`() {
         // Arrange
-        val createRezeptPosData = CreateRezeptPosData(
+        val createRezeptPosData = Rezept.Companion.CreateRezeptPosData(
             behandlungsartId = behandlungsartId,
             behandlungsartName = "Manuelle Therapie",
             behandlungsartPreis = 75.2,
@@ -140,7 +140,7 @@ class RezeptTest {
     @Test
     fun `addBehandlung should add a behandlung to the rezept`() {
         // Arrange
-        val posSource = CreateRezeptPosData(
+        val posSource = Rezept.Companion.CreateRezeptPosData(
             behandlungsartId = behandlungsartId,
             behandlungsartName = "Manuelle Therapie",
             behandlungsartPreis = 75.2,
@@ -173,7 +173,7 @@ class RezeptTest {
     @Test
     fun `addBehandlung should sort behandlungen by startZeit`() {
         // Arrange
-        val posSource = CreateRezeptPosData(
+        val posSource = Rezept.Companion.CreateRezeptPosData(
             behandlungsartId = behandlungsartId,
             behandlungsartName = "Manuelle Therapie",
             behandlungsartPreis = 75.2,
@@ -216,7 +216,7 @@ class RezeptTest {
             preis = 75.2,
         )
 
-        val posSource = CreateRezeptPosData(
+        val posSource = Rezept.Companion.CreateRezeptPosData(
             behandlungsartId = behandlungsartId,
             behandlungsartName = "Manuelle Therapie",
             behandlungsartPreis = 75.2,
@@ -247,7 +247,7 @@ class RezeptTest {
     @Test
     fun `removeBehandlung should remove the behandlung when found`() {
         // Arrange
-        val posSource = CreateRezeptPosData(
+        val posSource = Rezept.Companion.CreateRezeptPosData(
             behandlungsartId = behandlungsartId,
             behandlungsartName = "Manuelle Therapie",
             behandlungsartPreis = 75.2,
@@ -278,7 +278,7 @@ class RezeptTest {
     @Test
     fun `removeBehandlung should maintain order of remaining behandlungen`() {
         // Arrange
-        val posSource = CreateRezeptPosData(
+        val posSource = Rezept.Companion.CreateRezeptPosData(
             behandlungsartId = behandlungsartId,
             behandlungsartName = "Manuelle Therapie",
             behandlungsartPreis = 75.2,

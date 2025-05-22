@@ -13,8 +13,6 @@ import de.keller.physioai.rezepte.domain.BehandlungsartId
 import de.keller.physioai.rezepte.domain.Rezept
 import de.keller.physioai.rezepte.domain.RezeptPos
 import de.keller.physioai.rezepte.ports.BehandlungsartenRepository
-import de.keller.physioai.rezepte.ports.EingelesenesRezeptPosRaw
-import de.keller.physioai.rezepte.ports.EingelesenesRezeptRaw
 import de.keller.physioai.rezepte.ports.RezeptRepository
 import de.keller.physioai.rezepte.ports.RezeptService
 import de.keller.physioai.rezepte.ports.RezepteAiService
@@ -119,7 +117,7 @@ class RezeptServiceImplTest {
                 "test image content".toByteArray(),
             )
 
-            val rezeptAiResponse = EingelesenesRezeptRaw(
+            val rezeptAiResponse = RezepteAiService.EingelesenesRezeptRaw(
                 ausgestelltAm = LocalDate.of(2023, 1, 1),
                 titel = null,
                 vorname = "Max",
@@ -130,7 +128,7 @@ class RezeptServiceImplTest {
                 stadt = "Musterstadt",
                 geburtstag = LocalDate.of(1980, 1, 1),
                 rezeptpositionen = listOf(
-                    EingelesenesRezeptPosRaw(
+                    RezepteAiService.EingelesenesRezeptPosRaw(
                         anzahl = 6,
                         behandlung = "Manuelle Therapie",
                     ),

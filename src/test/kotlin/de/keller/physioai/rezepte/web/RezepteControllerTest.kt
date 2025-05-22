@@ -10,16 +10,13 @@ import de.keller.physioai.rezepte.adapters.rest.BehandlungsartDto
 import de.keller.physioai.rezepte.adapters.rest.RezepteController
 import de.keller.physioai.rezepte.domain.Arzt
 import de.keller.physioai.rezepte.domain.ArztId
+import de.keller.physioai.rezepte.domain.Behandlung
 import de.keller.physioai.rezepte.domain.Behandlungsart
 import de.keller.physioai.rezepte.domain.BehandlungsartId
 import de.keller.physioai.rezepte.domain.Rezept
 import de.keller.physioai.rezepte.domain.RezeptPos
 import de.keller.physioai.rezepte.ports.AerzteRepository
 import de.keller.physioai.rezepte.ports.BehandlungsartenRepository
-import de.keller.physioai.rezepte.ports.EingelesenerPatientDto
-import de.keller.physioai.rezepte.ports.EingelesenesRezeptDto
-import de.keller.physioai.rezepte.ports.EingelesenesRezeptPosDto
-import de.keller.physioai.rezepte.ports.RezeptEinlesenResponse
 import de.keller.physioai.rezepte.ports.RezeptRepository
 import de.keller.physioai.rezepte.ports.RezeptService
 import de.keller.physioai.rezepte.ports.RezepteAiService
@@ -46,6 +43,7 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers.content
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 import java.time.LocalDate
+import java.time.LocalDateTime
 import java.util.UUID
 
 @Import(SecurityConfig::class)
@@ -208,6 +206,52 @@ class RezepteControllerTest {
             verify { aerzteRepository.findAllByIdIn(listOf(arztId)) }
             verify { patientenRepository.findAllByIdIn(listOf(patientId, patientId)) }
         }
+
+        @Test
+        fun `should return rezepte with behandlungen when they exist`() {
+            // Arrange
+            val behandlung1 = Behandlung(
+                id = UUID.randomUUID(),
+                rezeptId = rezeptId1,
+                startZeit = LocalDateTime.of(2023, 1, 15, 10, 0),
+                endZeit = LocalDateTime.of(2023, 1, 15, 11, 0),
+            )
+            val behandlung2 = Behandlung(
+                id = UUID.randomUUID(),
+                rezeptId = rezeptId1,
+                startZeit = LocalDateTime.of(2023, 1, 16, 10, 0),
+                endZeit = LocalDateTime.of(2023, 1, 16, 11, 0),
+            )
+
+            val rezeptWithBehandlungen = rezept1.copy(
+                behandlungen = listOf(behandlung1, behandlung2),
+            )
+
+            every { rezeptRepository.findAll() } returns listOf(rezeptWithBehandlungen)
+            every { aerzteRepository.findAllByIdIn(listOf(arztId)) } returns listOf(arzt)
+            every { patientenRepository.findAllByIdIn(listOf(patientId)) } returns listOf(patient)
+
+            // Act & Assert
+            mockMvc
+                .perform(get("/rezepte"))
+                .andExpect(status().isOk)
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$").isArray)
+                .andExpect(jsonPath("$.length()").value(1))
+                .andExpect(jsonPath("$[0].id").value(rezeptId1.id.toString()))
+                .andExpect(jsonPath("$[0].behandlungen").isArray)
+                .andExpect(jsonPath("$[0].behandlungen.length()").value(2))
+                .andExpect(jsonPath("$[0].behandlungen[0].id").value(behandlung1.id.toString()))
+                .andExpect(jsonPath("$[0].behandlungen[0].startZeit").value("2023-01-15T10:00:00"))
+                .andExpect(jsonPath("$[0].behandlungen[0].endZeit").value("2023-01-15T11:00:00"))
+                .andExpect(jsonPath("$[0].behandlungen[1].id").value(behandlung2.id.toString()))
+                .andExpect(jsonPath("$[0].behandlungen[1].startZeit").value("2023-01-16T10:00:00"))
+                .andExpect(jsonPath("$[0].behandlungen[1].endZeit").value("2023-01-16T11:00:00"))
+
+            verify { rezeptRepository.findAll() }
+            verify { aerzteRepository.findAllByIdIn(listOf(arztId)) }
+            verify { patientenRepository.findAllByIdIn(listOf(patientId)) }
+        }
     }
 
     @Nested
@@ -340,9 +384,9 @@ class RezepteControllerTest {
                 "test image content".toByteArray(),
             )
 
-            val expectedResponse = RezeptEinlesenResponse(
+            val expectedResponse = RezeptService.RezeptEinlesenResponse(
                 existingPatient = patient,
-                patient = EingelesenerPatientDto(
+                patient = RezeptService.EingelesenerPatientDto(
                     titel = null,
                     vorname = "Max",
                     nachname = "Mustermann",
@@ -352,10 +396,10 @@ class RezepteControllerTest {
                     stadt = "Musterstadt",
                     geburtstag = LocalDate.of(1980, 1, 1),
                 ),
-                rezept = EingelesenesRezeptDto(
+                rezept = RezeptService.EingelesenesRezeptDto(
                     ausgestelltAm = ausgestelltAm,
                     rezeptpositionen = listOf(
-                        EingelesenesRezeptPosDto(
+                        RezeptService.EingelesenesRezeptPosDto(
                             anzahl = 6,
                             behandlungsart = BehandlungsartDto(
                                 id = behandlungsartId1.id,

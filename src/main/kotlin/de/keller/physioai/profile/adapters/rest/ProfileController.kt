@@ -6,6 +6,7 @@ import de.keller.physioai.profile.ports.ProfileRepository
 import de.keller.physioai.profile.ports.ProfileService
 import de.keller.physioai.shared.AggregateNotFoundException
 import jakarta.validation.Valid
+import org.jmolecules.architecture.hexagonal.PrimaryAdapter
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.validation.annotation.Validated
@@ -19,6 +20,7 @@ import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
 import java.util.UUID
 
+@PrimaryAdapter
 @Validated
 @RestController
 @RequestMapping("/profile")

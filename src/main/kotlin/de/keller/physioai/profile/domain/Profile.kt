@@ -1,11 +1,13 @@
 package de.keller.physioai.profile.domain
 
 import de.keller.physioai.profile.ProfileId
+import org.jmolecules.ddd.annotation.AggregateRoot
 import org.springframework.data.annotation.Id
 import org.springframework.data.annotation.Version
 import org.springframework.data.relational.core.mapping.Table
 import java.util.UUID
 
+@AggregateRoot
 @Table("profiles")
 data class Profile(
     @Id

@@ -7,10 +7,12 @@ import de.keller.physioai.shared.AggregateNotFoundException
 import net.fortuna.ical4j.model.Calendar
 import net.fortuna.ical4j.model.TimeZoneRegistryFactory
 import net.fortuna.ical4j.model.property.XProperty
+import org.jmolecules.architecture.hexagonal.Application
 import org.springframework.security.access.AccessDeniedException
 import org.springframework.stereotype.Service
 import java.util.UUID
 
+@Application
 @Service
 class KalenderServiceImpl(
     private val profileRepository: ProfileRepository,

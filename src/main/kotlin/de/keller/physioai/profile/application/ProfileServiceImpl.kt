@@ -6,9 +6,11 @@ import de.keller.physioai.profile.ports.ProfileRepository
 import de.keller.physioai.profile.ports.ProfileService
 import de.keller.physioai.shared.AggregateNotFoundException
 import org.apache.logging.log4j.util.Strings
+import org.jmolecules.architecture.hexagonal.Application
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
+@Application
 @Service
 class ProfileServiceImpl(
     private val repository: ProfileRepository,

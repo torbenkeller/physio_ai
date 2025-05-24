@@ -5,4 +5,4 @@ import java.util.UUID
 @JvmInline
 value class ProfileId(
     val id: UUID,
-) 
+)

@@ -1,4 +1,4 @@
-package de.keller.physioai.behandlung.adapters.api
+package de.keller.physioai.behandlungen.adapters.api
 
 import java.time.LocalDateTime
 import java.util.UUID

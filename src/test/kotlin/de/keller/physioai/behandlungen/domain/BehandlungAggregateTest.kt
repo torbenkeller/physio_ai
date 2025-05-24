@@ -1,4 +1,4 @@
-package de.keller.physioai.behandlung.domain
+package de.keller.physioai.behandlungen.domain
 
 import de.keller.physioai.shared.PatientId
 import de.keller.physioai.shared.RezeptId

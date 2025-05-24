@@ -1,7 +1,7 @@
-package de.keller.physioai.behandlung.adapters.jdbc
+package de.keller.physioai.behandlungen.adapters.jdbc
 
-import de.keller.physioai.behandlung.domain.BehandlungAggregate
-import de.keller.physioai.behandlung.ports.BehandlungRepository
+import de.keller.physioai.behandlungen.domain.BehandlungAggregate
+import de.keller.physioai.behandlungen.ports.BehandlungRepository
 import de.keller.physioai.shared.BehandlungId
 import org.jmolecules.architecture.hexagonal.SecondaryAdapter
 import org.springframework.data.jdbc.repository.query.Modifying

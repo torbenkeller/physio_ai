@@ -1,8 +1,8 @@
-package de.keller.physioai.behandlung.application
+package de.keller.physioai.behandlungen.application
 
-import de.keller.physioai.behandlung.domain.BehandlungAggregate
-import de.keller.physioai.behandlung.ports.BehandlungRepository
-import de.keller.physioai.behandlung.ports.BehandlungService
+import de.keller.physioai.behandlungen.domain.BehandlungAggregate
+import de.keller.physioai.behandlungen.ports.BehandlungRepository
+import de.keller.physioai.behandlungen.ports.BehandlungService
 import de.keller.physioai.shared.AggregateNotFoundException
 import de.keller.physioai.shared.BehandlungId
 import de.keller.physioai.shared.PatientId

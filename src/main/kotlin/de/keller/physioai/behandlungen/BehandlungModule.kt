@@ -1,4 +1,4 @@
-package de.keller.physioai.behandlung
+package de.keller.physioai.behandlungen
 
 import org.springframework.modulith.ApplicationModule
 import org.springframework.modulith.PackageInfo

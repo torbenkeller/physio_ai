@@ -1,6 +1,6 @@
-package de.keller.physioai.behandlung.adapters.api
+package de.keller.physioai.behandlungen.adapters.api
 
-import de.keller.physioai.behandlung.domain.BehandlungAggregate
+import de.keller.physioai.behandlungen.domain.BehandlungAggregate
 import java.time.LocalDateTime
 import java.util.UUID
 

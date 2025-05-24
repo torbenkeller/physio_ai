@@ -1,7 +1,7 @@
-package de.keller.physioai.behandlung.adapters.api
+package de.keller.physioai.behandlungen.adapters.api
 
-import de.keller.physioai.behandlung.ports.BehandlungRepository
-import de.keller.physioai.behandlung.ports.BehandlungService
+import de.keller.physioai.behandlungen.ports.BehandlungRepository
+import de.keller.physioai.behandlungen.ports.BehandlungService
 import de.keller.physioai.shared.AggregateNotFoundException
 import de.keller.physioai.shared.BehandlungId
 import de.keller.physioai.shared.PatientId

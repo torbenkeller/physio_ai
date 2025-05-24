@@ -1,10 +1,10 @@
 package de.keller.physioai.profile.adapters.rest
 
-import de.keller.physioai.profile.ProfileId
 import de.keller.physioai.profile.ports.KalenderService
 import de.keller.physioai.profile.ports.ProfileRepository
 import de.keller.physioai.profile.ports.ProfileService
 import de.keller.physioai.shared.AggregateNotFoundException
+import de.keller.physioai.shared.ProfileId
 import jakarta.validation.Valid
 import org.jmolecules.architecture.hexagonal.PrimaryAdapter
 import org.springframework.beans.factory.annotation.Autowired

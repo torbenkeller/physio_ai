@@ -5,6 +5,7 @@ import 'package:intl/intl.dart';
 import 'package:physio_ai/home_scaffold.dart';
 import 'package:physio_ai/rezepte/model/rezept.dart';
 import 'package:physio_ai/rezepte/rezepte_page.dart';
+import 'package:physio_ai/shared_kernel/presentation/week_calendar_widget.dart';
 
 final rezeptProvider = FutureProvider.family<Rezept?, String>((ref, id) async {
   final rezepte = await ref.watch(rezepteProvider.future);
@@ -37,7 +38,9 @@ class RezeptDetailPage extends ConsumerWidget {
 
         return Scaffold(
           appBar: AppBar(
-            leading: breakpoint.isDesktop() ? const CloseButton() : const BackButton(),
+            leading: breakpoint.isDesktop()
+                ? const CloseButton()
+                : const BackButton(),
             title: const Text('Rezept Details'),
             actions: [
               IconButton(
@@ -53,25 +56,11 @@ class RezeptDetailPage extends ConsumerWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                _buildSection(
-                  title: 'Patient',
-                  child: Text(
-                    '${rezept.patient.vorname} ${rezept.patient.nachname}',
-                    style: theme.textTheme.bodyLarge,
-                  ),
-                ),
-                const SizedBox(height: 24),
-                _buildSection(
-                  title: 'Ausgestellt am',
-                  child: Text(
-                    DateFormat('dd.MM.yyyy').format(rezept.ausgestelltAm),
-                    style: theme.textTheme.bodyLarge,
-                  ),
-                ),
+                _buildPatientAndDateSection(rezept, theme),
                 const SizedBox(height: 24),
                 _buildBehandlungenSection(rezept, theme),
                 const SizedBox(height: 24),
-                _buildSessionsSection(rezept, theme),
+                _buildCalendarSection(rezept, theme),
                 const SizedBox(height: 32),
                 Align(
                   child: ElevatedButton.icon(
@@ -109,6 +98,32 @@ class RezeptDetailPage extends ConsumerWidget {
         ),
         const SizedBox(height: 8),
         child,
+      ],
+    );
+  }
+
+  Widget _buildPatientAndDateSection(Rezept rezept, ThemeData theme) {
+    return Row(
+      children: [
+        Expanded(
+          child: _buildSection(
+            title: 'Patient',
+            child: Text(
+              '${rezept.patient.vorname} ${rezept.patient.nachname}',
+              style: theme.textTheme.bodyLarge,
+            ),
+          ),
+        ),
+        const SizedBox(width: 24),
+        Expanded(
+          child: _buildSection(
+            title: 'Ausgestellt am',
+            child: Text(
+              DateFormat('dd.MM.yyyy').format(rezept.ausgestelltAm),
+              style: theme.textTheme.bodyLarge,
+            ),
+          ),
+        ),
       ],
     );
   }
@@ -170,7 +185,8 @@ class RezeptDetailPage extends ConsumerWidget {
                     ),
                   ],
                 ),
-                for (final position in rezept.positionen) _buildPositionRow(position, theme),
+                for (final position in rezept.positionen)
+                  _buildPositionRow(position, theme),
                 _buildTableFooterRow(rezept, theme),
               ],
             ),
@@ -253,7 +269,7 @@ class RezeptDetailPage extends ConsumerWidget {
     );
   }
 
-  Widget _buildSessionsSection(Rezept rezept, ThemeData theme) {
+  Widget _buildCalendarSection(Rezept rezept, ThemeData theme) {
     final colorScheme = theme.colorScheme;
 
     if (rezept.behandlungen.isEmpty) {
@@ -269,100 +285,28 @@ class RezeptDetailPage extends ConsumerWidget {
       );
     }
 
+    final events = rezept.behandlungen
+        .map(CalendarEvent.fromBehandlung)
+        .toList();
+
     return _buildSection(
       title: 'Behandlungstermine',
       child: Container(
+        height: 500,
         decoration: BoxDecoration(
-          color: colorScheme.tertiaryContainer.withAlpha(51),
-          borderRadius: BorderRadius.circular(8),
-        ),
-        padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
-        child: Column(
-          children: [
-            Table(
-              columnWidths: const {
-                0: FlexColumnWidth(2),
-                1: FlexColumnWidth(2),
-                2: FlexColumnWidth(1),
-              },
-              defaultVerticalAlignment: TableCellVerticalAlignment.middle,
-              children: [
-                TableRow(
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 8),
-                      child: Text(
-                        'Beginn',
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          color: colorScheme.primary,
-                        ),
-                      ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 8),
-                      child: Text(
-                        'Ende',
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          color: colorScheme.primary,
-                        ),
-                      ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 8),
-                      child: Text(
-                        'Dauer',
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          color: colorScheme.primary,
-                        ),
-                        textAlign: TextAlign.right,
-                      ),
-                    ),
-                  ],
-                ),
-                for (final behandlung in rezept.behandlungen)
-                  _buildBehandlungRow(behandlung, theme),
-              ],
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  TableRow _buildBehandlungRow(Behandlung behandlung, ThemeData theme) {
-    final colorScheme = theme.colorScheme;
-    final dateFormat = DateFormat('dd.MM.yyyy HH:mm');
-    final duration = behandlung.endZeit.difference(behandlung.startZeit);
-    final durationMinutes = duration.inMinutes;
-
-    return TableRow(
-      decoration: BoxDecoration(
-        border: Border(
-          bottom: BorderSide(
-            color: colorScheme.outline.withAlpha(25),
+          color: colorScheme.surface,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(
+            color: colorScheme.outline.withOpacity(0.2),
           ),
         ),
+        child: WeekCalendarWidget(
+          events: events,
+          onEventTap: (event) {
+            // Event tap handler - could navigate to edit or show details
+          },
+        ),
       ),
-      children: [
-        Padding(
-          padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 4),
-          child: Text(dateFormat.format(behandlung.startZeit)),
-        ),
-        Padding(
-          padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 4),
-          child: Text(dateFormat.format(behandlung.endZeit)),
-        ),
-        Padding(
-          padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 4),
-          child: Text(
-            '$durationMinutes min',
-            textAlign: TextAlign.right,
-          ),
-        ),
-      ],
     );
   }
 }

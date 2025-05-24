@@ -15,7 +15,6 @@ data class RezeptDto(
     val preisGesamt: Double,
     val rechnung: RechnungDto?,
     val positionen: List<RezeptPosDto>,
-    val behandlungen: List<BehandlungDto>,
 ) {
     companion object {
         fun fromDomain(
@@ -43,7 +42,6 @@ data class RezeptDto(
                         }.toList(),
                 rechnung = null,
                 preisGesamt = rezept.preisGesamt,
-                behandlungen = rezept.behandlungen.map { BehandlungDto.Companion.fromBehandlung(it) },
             )
     }
 }

@@ -1,16 +1,14 @@
 package de.keller.physioai.rezepte.ports
 
 import de.keller.physioai.patienten.Patient
-import de.keller.physioai.rezepte.RezeptId
 import de.keller.physioai.rezepte.adapters.rest.BehandlungsartDto
 import de.keller.physioai.rezepte.adapters.rest.RezeptCreateDto
 import de.keller.physioai.rezepte.adapters.rest.RezeptUpdateDto
 import de.keller.physioai.rezepte.domain.Rezept
+import de.keller.physioai.shared.RezeptId
 import org.jmolecules.architecture.hexagonal.PrimaryPort
 import org.springframework.web.multipart.MultipartFile
 import java.time.LocalDate
-import java.time.LocalDateTime
-import java.util.UUID
 
 @PrimaryPort
 interface RezeptService {
@@ -26,17 +24,6 @@ interface RezeptService {
     fun updateRezept(
         rezeptId: RezeptId,
         rezeptUpdateDto: RezeptUpdateDto,
-    ): Rezept
-
-    fun addBehandlung(
-        rezeptId: RezeptId,
-        startZeit: LocalDateTime,
-        endZeit: LocalDateTime,
-    ): Rezept
-
-    fun removeBehandlung(
-        rezeptId: RezeptId,
-        behandlungId: UUID,
     ): Rezept
 
     data class EingelesenerPatientDto(

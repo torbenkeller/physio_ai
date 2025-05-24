@@ -1,4 +1,4 @@
-package de.keller.physioai.profile
+package de.keller.physioai.shared
 
 import java.util.UUID
 

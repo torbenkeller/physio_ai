@@ -1,8 +1,6 @@
 package de.keller.physioai.rezepte.application
 
-import de.keller.physioai.patienten.PatientId
 import de.keller.physioai.patienten.PatientenRepository
-import de.keller.physioai.rezepte.RezeptId
 import de.keller.physioai.rezepte.adapters.rest.BehandlungsartDto
 import de.keller.physioai.rezepte.adapters.rest.RezeptCreateDto
 import de.keller.physioai.rezepte.adapters.rest.RezeptUpdateDto
@@ -13,13 +11,13 @@ import de.keller.physioai.rezepte.ports.RezeptRepository
 import de.keller.physioai.rezepte.ports.RezeptService
 import de.keller.physioai.rezepte.ports.RezepteAiService
 import de.keller.physioai.shared.AggregateNotFoundException
+import de.keller.physioai.shared.PatientId
+import de.keller.physioai.shared.RezeptId
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.multipart.MultipartFile
-import java.time.LocalDateTime
-import java.util.UUID
 
 @Service
 class RezeptServiceImpl(
@@ -185,69 +183,6 @@ class RezeptServiceImpl(
 
         val savedRezept = rezeptRepository.save(mutatedRezept)
         logger.debug("Updated rezept with ID: {}, positions count: {}", savedRezept.id.id, savedRezept.positionen.size)
-
-        return savedRezept
-    }
-
-    /**
-     * Adds a Behandlung to a Rezept
-     * @param rezeptId The ID of the Rezept
-     * @param startZeit The start time of the Behandlung
-     * @param endZeit The end time of the Behandlung
-     * @return The updated Rezept
-     */
-    @Transactional
-    @Throws(AggregateNotFoundException::class)
-    override fun addBehandlung(
-        rezeptId: RezeptId,
-        startZeit: LocalDateTime,
-        endZeit: LocalDateTime,
-    ): Rezept {
-        logger.debug("Adding Behandlung to Rezept with ID: {}", rezeptId)
-
-        val rezept = rezeptRepository.findById(rezeptId) ?: throw AggregateNotFoundException()
-
-        val updatedRezept = rezept.addBehandlung(startZeit, endZeit)
-
-        val savedRezept = rezeptRepository.save(updatedRezept)
-        logger.debug(
-            "Added Behandlung to Rezept with ID: {}, new behandlungen count: {}",
-            savedRezept.id.id,
-            savedRezept.behandlungen.size,
-        )
-
-        return savedRezept
-    }
-
-    /**
-     * Removes a Behandlung from a Rezept
-     * @param rezeptId The ID of the Rezept
-     * @param behandlungId The ID of the Behandlung to remove
-     * @return The updated Rezept
-     */
-    @Transactional
-    @Throws(AggregateNotFoundException::class)
-    override fun removeBehandlung(
-        rezeptId: RezeptId,
-        behandlungId: UUID,
-    ): Rezept {
-        logger.debug("Removing Behandlung with ID: {} from Rezept with ID: {}", behandlungId, rezeptId)
-
-        val rezept = rezeptRepository.findById(rezeptId) ?: throw AggregateNotFoundException()
-
-        val updatedRezept = rezept.removeBehandlung(behandlungId)
-
-        if (updatedRezept == rezept) {
-            logger.debug("No Behandlung with ID: {} found in Rezept with ID: {}", behandlungId, rezeptId)
-            throw AggregateNotFoundException()
-        }
-
-        val savedRezept = rezeptRepository.save(updatedRezept)
-        logger.debug(
-            "Removed Behandlung from Rezept with ID: {}, new behandlungen count: {}",
-            savedRezept.id.id,
-            savedRezept.behandlungen.size,
-        )
 
         return savedRezept
     }

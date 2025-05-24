@@ -1,7 +1,7 @@
 package de.keller.physioai.patienten.ports
 
-import de.keller.physioai.patienten.PatientId
 import de.keller.physioai.patienten.domain.PatientAggregate
+import de.keller.physioai.shared.PatientId
 import org.jmolecules.architecture.hexagonal.PrimaryPort
 import java.time.LocalDate
 

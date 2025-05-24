@@ -1,10 +1,10 @@
 package de.keller.physioai.patienten.application
 
-import de.keller.physioai.patienten.PatientId
 import de.keller.physioai.patienten.domain.PatientAggregate
 import de.keller.physioai.patienten.ports.PatientenRepository
 import de.keller.physioai.patienten.ports.PatientenService
 import de.keller.physioai.shared.AggregateNotFoundException
+import de.keller.physioai.shared.PatientId
 import org.jmolecules.architecture.hexagonal.Application
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional

@@ -1,13 +1,10 @@
 package de.keller.physioai.rezepte.application
 
-import de.keller.physioai.patienten.PatientId
 import de.keller.physioai.patienten.adapters.jdbc.PatientenRepositoryImpl
 import de.keller.physioai.patienten.domain.PatientAggregate
-import de.keller.physioai.rezepte.RezeptId
 import de.keller.physioai.rezepte.adapters.rest.RezeptCreateDto
 import de.keller.physioai.rezepte.adapters.rest.RezeptPosCreateDto
 import de.keller.physioai.rezepte.adapters.rest.RezeptUpdateDto
-import de.keller.physioai.rezepte.domain.Behandlung
 import de.keller.physioai.rezepte.domain.Behandlungsart
 import de.keller.physioai.rezepte.domain.BehandlungsartId
 import de.keller.physioai.rezepte.domain.Rezept
@@ -17,6 +14,8 @@ import de.keller.physioai.rezepte.ports.RezeptRepository
 import de.keller.physioai.rezepte.ports.RezeptService
 import de.keller.physioai.rezepte.ports.RezepteAiService
 import de.keller.physioai.shared.AggregateNotFoundException
+import de.keller.physioai.shared.PatientId
+import de.keller.physioai.shared.RezeptId
 import io.mockk.clearAllMocks
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
@@ -33,7 +32,6 @@ import java.io.InputStream
 import java.nio.file.Files
 import java.nio.file.Path
 import java.time.LocalDate
-import java.time.LocalDateTime
 import java.util.UUID
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
@@ -308,146 +306,6 @@ class RezeptServiceImplTest {
             // Verify interactions with repositories
             verify { patientenRepository.findById(patientId) }
             verify { behandlungsartenRepository.findAllByIdIn(setOf(nonExistentBehandlungsartId)) }
-            verify(exactly = 0) { rezeptRepository.save(any()) }
-        }
-    }
-
-    @Nested
-    inner class BehandlungManagement {
-        @Test
-        fun `should add behandlung to rezept successfully`() {
-            // Arrange
-            val rezeptId = RezeptId.Companion.generate()
-            val startZeit = LocalDateTime.of(2023, 5, 15, 10, 0)
-            val endZeit = LocalDateTime.of(2023, 5, 15, 11, 0)
-
-            val originalRezept = Rezept(
-                id = rezeptId,
-                patientId = patientId,
-                ausgestelltAm = ausgestelltAm,
-                ausgestelltVonArztId = null,
-                preisGesamt = 752.0,
-                rechnungsnummer = null,
-                positionen = listOf(
-                    RezeptPos(
-                        id = UUID.randomUUID(),
-                        behandlungsartId = behandlungsartId1,
-                        anzahl = 10,
-                        einzelpreis = 75.2,
-                        preisGesamt = 752.0,
-                        behandlungsartName = "Manuelle Therapie",
-                    ),
-                ),
-                behandlungen = emptyList(),
-                version = 1,
-            )
-
-            // Setup mock behavior
-            every { rezeptRepository.findById(rezeptId) } returns originalRezept
-
-            val updatedRezeptSlot = slot<Rezept>()
-            every { rezeptRepository.save(capture(updatedRezeptSlot)) } answers { updatedRezeptSlot.captured }
-
-            // Act
-            val result = rezeptService.addBehandlung(rezeptId, startZeit, endZeit)
-
-            // Assert
-            assertNotNull(result)
-            assertEquals(1, result.behandlungen.size)
-            assertEquals(startZeit, result.behandlungen[0].startZeit)
-            assertEquals(endZeit, result.behandlungen[0].endZeit)
-            assertEquals(rezeptId, result.behandlungen[0].rezeptId)
-
-            // Verify interactions with repositories
-            verify { rezeptRepository.findById(rezeptId) }
-            verify { rezeptRepository.save(any()) }
-        }
-
-        @Test
-        fun `should throw exception when rezept not found for adding behandlung`() {
-            // Arrange
-            val nonExistentRezeptId = RezeptId.Companion.generate()
-            val startZeit = LocalDateTime.of(2023, 5, 15, 10, 0)
-            val endZeit = LocalDateTime.of(2023, 5, 15, 11, 0)
-
-            // Setup mock behavior
-            every { rezeptRepository.findById(nonExistentRezeptId) } returns null
-
-            // Act & Assert
-            assertFailsWith<AggregateNotFoundException> {
-                rezeptService.addBehandlung(nonExistentRezeptId, startZeit, endZeit)
-            }
-
-            // Verify interactions with repositories
-            verify { rezeptRepository.findById(nonExistentRezeptId) }
-            verify(exactly = 0) { rezeptRepository.save(any()) }
-        }
-
-        @Test
-        fun `should throw exception when rezept not found for removing behandlung`() {
-            // Arrange
-            val nonExistentRezeptId = RezeptId.Companion.generate()
-            val behandlungId = UUID.randomUUID()
-
-            // Setup mock behavior
-            every { rezeptRepository.findById(nonExistentRezeptId) } returns null
-
-            // Act & Assert
-            assertFailsWith<AggregateNotFoundException> {
-                rezeptService.removeBehandlung(nonExistentRezeptId, behandlungId)
-            }
-
-            // Verify interactions with repositories
-            verify { rezeptRepository.findById(nonExistentRezeptId) }
-            verify(exactly = 0) { rezeptRepository.save(any()) }
-        }
-
-        @Test
-        fun `should throw exception when behandlung not found for removal`() {
-            // Arrange
-            val rezeptId = RezeptId.Companion.generate()
-            val existingBehandlungId = UUID.randomUUID()
-            val nonExistentBehandlungId = UUID.randomUUID()
-
-            val behandlung = Behandlung(
-                id = existingBehandlungId,
-                rezeptId = rezeptId,
-                startZeit = LocalDateTime.of(2023, 5, 15, 10, 0),
-                endZeit = LocalDateTime.of(2023, 5, 15, 11, 0),
-                version = 0,
-            )
-
-            val originalRezept = Rezept(
-                id = rezeptId,
-                patientId = patientId,
-                ausgestelltAm = ausgestelltAm,
-                ausgestelltVonArztId = null,
-                preisGesamt = 752.0,
-                rechnungsnummer = null,
-                positionen = listOf(
-                    RezeptPos(
-                        id = UUID.randomUUID(),
-                        behandlungsartId = behandlungsartId1,
-                        anzahl = 10,
-                        einzelpreis = 75.2,
-                        preisGesamt = 752.0,
-                        behandlungsartName = "Manuelle Therapie",
-                    ),
-                ),
-                behandlungen = listOf(behandlung),
-                version = 1,
-            )
-
-            // Setup mock behavior
-            every { rezeptRepository.findById(rezeptId) } returns originalRezept
-
-            // Act & Assert
-            assertFailsWith<AggregateNotFoundException> {
-                rezeptService.removeBehandlung(rezeptId, nonExistentBehandlungId)
-            }
-
-            // Verify interactions with repositories
-            verify { rezeptRepository.findById(rezeptId) }
             verify(exactly = 0) { rezeptRepository.save(any()) }
         }
     }

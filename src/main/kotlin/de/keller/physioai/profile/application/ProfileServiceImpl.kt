@@ -1,10 +1,10 @@
 package de.keller.physioai.profile.application
 
-import de.keller.physioai.profile.ProfileId
 import de.keller.physioai.profile.domain.Profile
 import de.keller.physioai.profile.ports.ProfileRepository
 import de.keller.physioai.profile.ports.ProfileService
 import de.keller.physioai.shared.AggregateNotFoundException
+import de.keller.physioai.shared.ProfileId
 import org.apache.logging.log4j.util.Strings
 import org.jmolecules.architecture.hexagonal.Application
 import org.springframework.stereotype.Service

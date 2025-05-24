@@ -38,3 +38,19 @@ VALUES ('c9d0e1f2-a3b4-5c6d-7e8f-9a0b1c2d3e4f', 'e5f6a7b8-c9d0-1e2f-3a4b-5c6d7e8
        ('f8a9b0c1-d2e3-4f5a-6b7c-8d9e0f1a2b3c', 'b8c9d0e1-f2a3-4b5c-6d7e-8f9a0b1c2d3e', 1, 1, 17.07, 17.07, 'Wärmepackung', '43c27a35-612b-4297-98da-2bb93c24f723'),
        ('a9b0c1d2-e3f4-5a6b-7c8d-9e0f1a2b3c4d', 'b8c9d0e1-f2a3-4b5c-6d7e-8f9a0b1c2d3e', 2, 1, 22.84, 22.84, 'Klassische Massagetherapie', 'cfdc701b-c5f9-4000-8d4b-85ed7aa7a141')
 ON CONFLICT DO NOTHING;
+
+-- Insert test behandlungen
+INSERT INTO behandlungen (id, rezept_id, index, start_zeit, end_zeit, version)
+VALUES ('11a2b3c4-d5e6-7f8a-9b0c-1d2e3f4a5b6c', 'e5f6a7b8-c9d0-1e2f-3a4b-5c6d7e8f9a0b', 0, '2024-03-18 09:00:00', '2024-03-18 10:00:00', 0),
+       ('22b3c4d5-e6f7-8a9b-0c1d-2e3f4a5b6c7d', 'e5f6a7b8-c9d0-1e2f-3a4b-5c6d7e8f9a0b', 1, '2024-03-20 14:30:00', '2024-03-20 15:30:00', 0),
+       ('33c4d5e6-f7a8-9b0c-1d2e-3f4a5b6c7d8e', 'e5f6a7b8-c9d0-1e2f-3a4b-5c6d7e8f9a0b', 2, '2024-03-22 11:15:00', '2024-03-22 12:15:00', 0),
+       
+       ('44d5e6f7-a8b9-0c1d-2e3f-4a5b6c7d8e9f', 'f6a7b8c9-d0e1-2f3a-4b5c-6d7e8f9a0b1c', 0, '2024-03-25 08:00:00', '2024-03-25 09:00:00', 0),
+       ('55e6f7a8-b9c0-1d2e-3f4a-5b6c7d8e9f0a', 'f6a7b8c9-d0e1-2f3a-4b5c-6d7e8f9a0b1c', 1, '2024-03-27 13:45:00', '2024-03-27 14:45:00', 0),
+       
+       ('66f7a8b9-c0d1-2e3f-4a5b-6c7d8e9f0a1b', 'a7b8c9d0-e1f2-3a4b-5c6d-7e8f9a0b1c2d', 0, '2024-03-28 10:30:00', '2024-03-28 11:30:00', 0),
+       ('77a8b9c0-d1e2-3f4a-5b6c-7d8e9f0a1b2c', 'a7b8c9d0-e1f2-3a4b-5c6d-7e8f9a0b1c2d', 1, '2024-03-30 16:00:00', '2024-03-30 17:00:00', 0),
+       
+       ('88b9c0d1-e2f3-4a5b-6c7d-8e9f0a1b2c3d', 'b8c9d0e1-f2a3-4b5c-6d7e-8f9a0b1c2d3e', 0, '2024-04-02 12:00:00', '2024-04-02 13:00:00', 0),
+       ('99c0d1e2-f3a4-5b6c-7d8e-9f0a1b2c3d4e', 'b8c9d0e1-f2a3-4b5c-6d7e-8f9a0b1c2d3e', 1, '2024-04-04 15:30:00', '2024-04-04 16:30:00', 0)
+ON CONFLICT DO NOTHING;

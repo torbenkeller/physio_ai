@@ -1,10 +1,10 @@
 package de.keller.physioai.profile.application
 
-import de.keller.physioai.profile.ProfileId
 import de.keller.physioai.profile.domain.Profile
 import de.keller.physioai.profile.ports.KalenderService
 import de.keller.physioai.profile.ports.ProfileRepository
 import de.keller.physioai.shared.AggregateNotFoundException
+import de.keller.physioai.shared.ProfileId
 import io.mockk.clearAllMocks
 import io.mockk.every
 import io.mockk.impl.annotations.MockK

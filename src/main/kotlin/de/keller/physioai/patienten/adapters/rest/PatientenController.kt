@@ -1,8 +1,8 @@
 package de.keller.physioai.patienten.adapters.rest
 
-import de.keller.physioai.patienten.PatientId
 import de.keller.physioai.patienten.ports.PatientenRepository
 import de.keller.physioai.patienten.ports.PatientenService
+import de.keller.physioai.shared.PatientId
 import org.jmolecules.architecture.hexagonal.PrimaryAdapter
 import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping

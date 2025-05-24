@@ -1,9 +1,9 @@
 package de.keller.physioai.profile.application
 
-import de.keller.physioai.profile.ProfileId
 import de.keller.physioai.profile.ports.KalenderService
 import de.keller.physioai.profile.ports.ProfileRepository
 import de.keller.physioai.shared.AggregateNotFoundException
+import de.keller.physioai.shared.ProfileId
 import net.fortuna.ical4j.model.Calendar
 import net.fortuna.ical4j.model.TimeZoneRegistryFactory
 import net.fortuna.ical4j.model.property.XProperty

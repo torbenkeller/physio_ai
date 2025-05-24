@@ -1,16 +1,13 @@
 package de.keller.physioai.rezepte.web
 
 import com.ninjasquad.springmockk.MockkBean
-import de.keller.physioai.patienten.PatientId
 import de.keller.physioai.patienten.adapters.jdbc.PatientenRepositoryImpl
 import de.keller.physioai.patienten.domain.PatientAggregate
 import de.keller.physioai.patienten.ports.PatientenService
-import de.keller.physioai.rezepte.RezeptId
 import de.keller.physioai.rezepte.adapters.rest.BehandlungsartDto
 import de.keller.physioai.rezepte.adapters.rest.RezepteController
 import de.keller.physioai.rezepte.domain.Arzt
 import de.keller.physioai.rezepte.domain.ArztId
-import de.keller.physioai.rezepte.domain.Behandlung
 import de.keller.physioai.rezepte.domain.Behandlungsart
 import de.keller.physioai.rezepte.domain.BehandlungsartId
 import de.keller.physioai.rezepte.domain.Rezept
@@ -20,6 +17,8 @@ import de.keller.physioai.rezepte.ports.BehandlungsartenRepository
 import de.keller.physioai.rezepte.ports.RezeptRepository
 import de.keller.physioai.rezepte.ports.RezeptService
 import de.keller.physioai.rezepte.ports.RezepteAiService
+import de.keller.physioai.shared.PatientId
+import de.keller.physioai.shared.RezeptId
 import de.keller.physioai.shared.config.SecurityConfig
 import io.mockk.every
 import io.mockk.just
@@ -43,7 +42,6 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers.content
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 import java.time.LocalDate
-import java.time.LocalDateTime
 import java.util.UUID
 
 @Import(SecurityConfig::class)
@@ -208,26 +206,9 @@ class RezepteControllerTest {
         }
 
         @Test
-        fun `should return rezepte with behandlungen when they exist`() {
+        fun `should return rezepte without behandlungen since they are managed separately`() {
             // Arrange
-            val behandlung1 = Behandlung(
-                id = UUID.randomUUID(),
-                rezeptId = rezeptId1,
-                startZeit = LocalDateTime.of(2023, 1, 15, 10, 0),
-                endZeit = LocalDateTime.of(2023, 1, 15, 11, 0),
-            )
-            val behandlung2 = Behandlung(
-                id = UUID.randomUUID(),
-                rezeptId = rezeptId1,
-                startZeit = LocalDateTime.of(2023, 1, 16, 10, 0),
-                endZeit = LocalDateTime.of(2023, 1, 16, 11, 0),
-            )
-
-            val rezeptWithBehandlungen = rezept1.copy(
-                behandlungen = listOf(behandlung1, behandlung2),
-            )
-
-            every { rezeptRepository.findAll() } returns listOf(rezeptWithBehandlungen)
+            every { rezeptRepository.findAll() } returns listOf(rezept1)
             every { aerzteRepository.findAllByIdIn(listOf(arztId)) } returns listOf(arzt)
             every { patientenRepository.findAllByIdIn(listOf(patientId)) } returns listOf(patient)
 
@@ -239,14 +220,7 @@ class RezepteControllerTest {
                 .andExpect(jsonPath("$").isArray)
                 .andExpect(jsonPath("$.length()").value(1))
                 .andExpect(jsonPath("$[0].id").value(rezeptId1.id.toString()))
-                .andExpect(jsonPath("$[0].behandlungen").isArray)
-                .andExpect(jsonPath("$[0].behandlungen.length()").value(2))
-                .andExpect(jsonPath("$[0].behandlungen[0].id").value(behandlung1.id.toString()))
-                .andExpect(jsonPath("$[0].behandlungen[0].startZeit").value("2023-01-15T10:00:00"))
-                .andExpect(jsonPath("$[0].behandlungen[0].endZeit").value("2023-01-15T11:00:00"))
-                .andExpect(jsonPath("$[0].behandlungen[1].id").value(behandlung2.id.toString()))
-                .andExpect(jsonPath("$[0].behandlungen[1].startZeit").value("2023-01-16T10:00:00"))
-                .andExpect(jsonPath("$[0].behandlungen[1].endZeit").value("2023-01-16T11:00:00"))
+                .andExpect(jsonPath("$[0].behandlungen").doesNotExist())
 
             verify { rezeptRepository.findAll() }
             verify { aerzteRepository.findAllByIdIn(listOf(arztId)) }

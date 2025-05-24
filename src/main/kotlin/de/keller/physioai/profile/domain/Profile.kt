@@ -1,6 +1,6 @@
 package de.keller.physioai.profile.domain
 
-import de.keller.physioai.profile.ProfileId
+import de.keller.physioai.shared.ProfileId
 import org.jmolecules.ddd.annotation.AggregateRoot
 import org.springframework.data.annotation.Id
 import org.springframework.data.annotation.Version

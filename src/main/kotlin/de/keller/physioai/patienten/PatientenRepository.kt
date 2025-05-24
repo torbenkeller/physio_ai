@@ -1,5 +1,6 @@
 package de.keller.physioai.patienten
 
+import de.keller.physioai.shared.PatientId
 import java.time.LocalDate
 
 interface PatientenRepository {

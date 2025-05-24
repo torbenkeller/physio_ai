@@ -1,7 +1,7 @@
 package de.keller.physioai.profile.domain
 
-import de.keller.physioai.profile.ProfileId
 import de.keller.physioai.profile.adapters.rest.ProfileDto
+import de.keller.physioai.shared.ProfileId
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertAll

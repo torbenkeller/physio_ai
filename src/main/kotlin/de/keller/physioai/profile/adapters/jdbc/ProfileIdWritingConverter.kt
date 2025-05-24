@@ -1,6 +1,6 @@
 package de.keller.physioai.profile.adapters.jdbc
 
-import de.keller.physioai.profile.ProfileId
+import de.keller.physioai.shared.ProfileId
 import de.keller.physioai.shared.SpringDataJdbcConverter
 import org.springframework.core.convert.converter.Converter
 import org.springframework.data.convert.WritingConverter

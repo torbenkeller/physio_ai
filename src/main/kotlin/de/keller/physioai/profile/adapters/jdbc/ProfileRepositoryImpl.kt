@@ -1,8 +1,8 @@
 package de.keller.physioai.profile.adapters.jdbc
 
-import de.keller.physioai.profile.ProfileId
 import de.keller.physioai.profile.domain.Profile
 import de.keller.physioai.profile.ports.ProfileRepository
+import de.keller.physioai.shared.ProfileId
 import org.jmolecules.architecture.hexagonal.SecondaryAdapter
 import org.springframework.data.jdbc.repository.query.Modifying
 import org.springframework.stereotype.Repository

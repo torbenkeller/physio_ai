@@ -1,8 +1,8 @@
 package de.keller.physioai.patienten.adapters.jdbc
 
-import de.keller.physioai.patienten.PatientId
 import de.keller.physioai.patienten.domain.PatientAggregate
 import de.keller.physioai.patienten.ports.PatientenRepository
+import de.keller.physioai.shared.PatientId
 import org.jmolecules.architecture.hexagonal.SecondaryAdapter
 import org.springframework.data.jdbc.repository.query.Modifying
 import org.springframework.stereotype.Repository

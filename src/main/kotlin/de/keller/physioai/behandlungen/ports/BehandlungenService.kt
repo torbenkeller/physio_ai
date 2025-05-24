@@ -8,7 +8,7 @@ import org.jmolecules.architecture.hexagonal.PrimaryPort
 import java.time.LocalDateTime
 
 @PrimaryPort
-interface BehandlungService {
+interface BehandlungenService {
     fun createBehandlung(
         patientId: PatientId,
         startZeit: LocalDateTime,

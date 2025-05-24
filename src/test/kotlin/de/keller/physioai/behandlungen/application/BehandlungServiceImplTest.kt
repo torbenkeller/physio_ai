@@ -1,8 +1,8 @@
 package de.keller.physioai.behandlungen.application
 
 import de.keller.physioai.behandlungen.domain.BehandlungAggregate
-import de.keller.physioai.behandlungen.ports.BehandlungRepository
-import de.keller.physioai.behandlungen.ports.BehandlungService
+import de.keller.physioai.behandlungen.ports.BehandlungenRepository
+import de.keller.physioai.behandlungen.ports.BehandlungenService
 import de.keller.physioai.shared.AggregateNotFoundException
 import de.keller.physioai.shared.BehandlungId
 import de.keller.physioai.shared.PatientId
@@ -27,14 +27,14 @@ import kotlin.test.assertNull
 @ExtendWith(MockKExtension::class)
 class BehandlungServiceImplTest {
     @MockK
-    private lateinit var behandlungRepository: BehandlungRepository
+    private lateinit var behandlungenRepository: BehandlungenRepository
 
-    private lateinit var behandlungService: BehandlungService
+    private lateinit var behandlungenService: BehandlungenService
 
     @BeforeEach
     fun setUp() {
         clearAllMocks()
-        behandlungService = BehandlungServiceImpl(behandlungRepository)
+        behandlungenService = BehandlungenServiceImpl(behandlungenRepository)
     }
 
     @Nested
@@ -48,10 +48,10 @@ class BehandlungServiceImplTest {
             val endZeit = LocalDateTime.of(2024, 1, 15, 11, 0)
 
             val savedBehandlungSlot = slot<BehandlungAggregate>()
-            every { behandlungRepository.save(capture(savedBehandlungSlot)) } answers { savedBehandlungSlot.captured }
+            every { behandlungenRepository.save(capture(savedBehandlungSlot)) } answers { savedBehandlungSlot.captured }
 
             // Act
-            val result = behandlungService.createBehandlung(
+            val result = behandlungenService.createBehandlung(
                 patientId = patientId,
                 startZeit = startZeit,
                 endZeit = endZeit,
@@ -64,7 +64,7 @@ class BehandlungServiceImplTest {
             assertEquals(startZeit, result.startZeit)
             assertEquals(endZeit, result.endZeit)
             assertEquals(rezeptId, result.rezeptId)
-            verify { behandlungRepository.save(any()) }
+            verify { behandlungenRepository.save(any()) }
         }
 
         @Test
@@ -75,10 +75,10 @@ class BehandlungServiceImplTest {
             val endZeit = LocalDateTime.of(2024, 1, 15, 11, 0)
 
             val savedBehandlungSlot = slot<BehandlungAggregate>()
-            every { behandlungRepository.save(capture(savedBehandlungSlot)) } answers { savedBehandlungSlot.captured }
+            every { behandlungenRepository.save(capture(savedBehandlungSlot)) } answers { savedBehandlungSlot.captured }
 
             // Act
-            val result = behandlungService.createBehandlung(
+            val result = behandlungenService.createBehandlung(
                 patientId = patientId,
                 startZeit = startZeit,
                 endZeit = endZeit,
@@ -91,7 +91,7 @@ class BehandlungServiceImplTest {
             assertEquals(startZeit, result.startZeit)
             assertEquals(endZeit, result.endZeit)
             assertNull(result.rezeptId)
-            verify { behandlungRepository.save(any()) }
+            verify { behandlungenRepository.save(any()) }
         }
     }
 
@@ -117,13 +117,13 @@ class BehandlungServiceImplTest {
                 version = 0,
             )
 
-            every { behandlungRepository.findById(behandlungId) } returns existingBehandlung
+            every { behandlungenRepository.findById(behandlungId) } returns existingBehandlung
 
             val savedBehandlungSlot = slot<BehandlungAggregate>()
-            every { behandlungRepository.save(capture(savedBehandlungSlot)) } answers { savedBehandlungSlot.captured }
+            every { behandlungenRepository.save(capture(savedBehandlungSlot)) } answers { savedBehandlungSlot.captured }
 
             // Act
-            val result = behandlungService.updateBehandlung(
+            val result = behandlungenService.updateBehandlung(
                 id = behandlungId,
                 startZeit = newStartZeit,
                 endZeit = newEndZeit,
@@ -138,8 +138,8 @@ class BehandlungServiceImplTest {
             assertEquals(newEndZeit, result.endZeit)
             assertEquals(newRezeptId, result.rezeptId)
 
-            verify { behandlungRepository.findById(behandlungId) }
-            verify { behandlungRepository.save(any()) }
+            verify { behandlungenRepository.findById(behandlungId) }
+            verify { behandlungenRepository.save(any()) }
         }
 
         @Test
@@ -149,11 +149,11 @@ class BehandlungServiceImplTest {
             val startZeit = LocalDateTime.of(2024, 1, 15, 14, 0)
             val endZeit = LocalDateTime.of(2024, 1, 15, 15, 0)
 
-            every { behandlungRepository.findById(behandlungId) } returns null
+            every { behandlungenRepository.findById(behandlungId) } returns null
 
             // Act & Assert
             assertFailsWith<AggregateNotFoundException> {
-                behandlungService.updateBehandlung(
+                behandlungenService.updateBehandlung(
                     id = behandlungId,
                     startZeit = startZeit,
                     endZeit = endZeit,
@@ -161,8 +161,8 @@ class BehandlungServiceImplTest {
                 )
             }
 
-            verify { behandlungRepository.findById(behandlungId) }
-            verify(exactly = 0) { behandlungRepository.save(any()) }
+            verify { behandlungenRepository.findById(behandlungId) }
+            verify(exactly = 0) { behandlungenRepository.save(any()) }
         }
 
         @Test
@@ -184,13 +184,13 @@ class BehandlungServiceImplTest {
                 version = 0,
             )
 
-            every { behandlungRepository.findById(behandlungId) } returns existingBehandlung
+            every { behandlungenRepository.findById(behandlungId) } returns existingBehandlung
 
             val savedBehandlungSlot = slot<BehandlungAggregate>()
-            every { behandlungRepository.save(capture(savedBehandlungSlot)) } answers { savedBehandlungSlot.captured }
+            every { behandlungenRepository.save(capture(savedBehandlungSlot)) } answers { savedBehandlungSlot.captured }
 
             // Act
-            val result = behandlungService.updateBehandlung(
+            val result = behandlungenService.updateBehandlung(
                 id = behandlungId,
                 startZeit = newStartZeit,
                 endZeit = newEndZeit,
@@ -205,8 +205,8 @@ class BehandlungServiceImplTest {
             assertEquals(newEndZeit, result.endZeit)
             assertNull(result.rezeptId)
 
-            verify { behandlungRepository.findById(behandlungId) }
-            verify { behandlungRepository.save(any()) }
+            verify { behandlungenRepository.findById(behandlungId) }
+            verify { behandlungenRepository.save(any()) }
         }
     }
 
@@ -225,15 +225,15 @@ class BehandlungServiceImplTest {
                 version = 0,
             )
 
-            every { behandlungRepository.findById(behandlungId) } returns behandlung
-            every { behandlungRepository.delete(behandlung) } returns Unit
+            every { behandlungenRepository.findById(behandlungId) } returns behandlung
+            every { behandlungenRepository.delete(behandlung) } returns Unit
 
             // Act
-            behandlungService.deleteBehandlung(behandlungId)
+            behandlungenService.deleteBehandlung(behandlungId)
 
             // Assert
-            verify { behandlungRepository.findById(behandlungId) }
-            verify { behandlungRepository.delete(behandlung) }
+            verify { behandlungenRepository.findById(behandlungId) }
+            verify { behandlungenRepository.delete(behandlung) }
         }
 
         @Test
@@ -241,15 +241,15 @@ class BehandlungServiceImplTest {
             // Arrange
             val behandlungId = BehandlungId(UUID.randomUUID())
 
-            every { behandlungRepository.findById(behandlungId) } returns null
+            every { behandlungenRepository.findById(behandlungId) } returns null
 
             // Act & Assert
             assertFailsWith<AggregateNotFoundException> {
-                behandlungService.deleteBehandlung(behandlungId)
+                behandlungenService.deleteBehandlung(behandlungId)
             }
 
-            verify { behandlungRepository.findById(behandlungId) }
-            verify(exactly = 0) { behandlungRepository.delete(any()) }
+            verify { behandlungenRepository.findById(behandlungId) }
+            verify(exactly = 0) { behandlungenRepository.delete(any()) }
         }
     }
 }

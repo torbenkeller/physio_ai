@@ -6,7 +6,7 @@ import de.keller.physioai.shared.PatientId
 import org.jmolecules.architecture.hexagonal.SecondaryPort
 
 @SecondaryPort
-interface BehandlungRepository {
+interface BehandlungenRepository {
     fun save(behandlung: BehandlungAggregate): BehandlungAggregate
 
     fun findById(id: BehandlungId): BehandlungAggregate?

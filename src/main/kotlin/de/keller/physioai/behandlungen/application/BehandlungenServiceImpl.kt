@@ -1,8 +1,8 @@
 package de.keller.physioai.behandlungen.application
 
 import de.keller.physioai.behandlungen.domain.BehandlungAggregate
-import de.keller.physioai.behandlungen.ports.BehandlungRepository
-import de.keller.physioai.behandlungen.ports.BehandlungService
+import de.keller.physioai.behandlungen.ports.BehandlungenRepository
+import de.keller.physioai.behandlungen.ports.BehandlungenService
 import de.keller.physioai.shared.AggregateNotFoundException
 import de.keller.physioai.shared.BehandlungId
 import de.keller.physioai.shared.PatientId
@@ -15,9 +15,9 @@ import java.time.LocalDateTime
 @Application
 @Service
 @Transactional
-class BehandlungServiceImpl(
-    private val behandlungRepository: BehandlungRepository,
-) : BehandlungService {
+class BehandlungenServiceImpl(
+    private val behandlungenRepository: BehandlungenRepository,
+) : BehandlungenService {
     override fun createBehandlung(
         patientId: PatientId,
         startZeit: LocalDateTime,
@@ -30,7 +30,7 @@ class BehandlungServiceImpl(
             endZeit = endZeit,
             rezeptId = rezeptId,
         )
-        return behandlungRepository.save(behandlung)
+        return behandlungenRepository.save(behandlung)
     }
 
     override fun updateBehandlung(
@@ -39,7 +39,7 @@ class BehandlungServiceImpl(
         endZeit: LocalDateTime,
         rezeptId: RezeptId?,
     ): BehandlungAggregate {
-        val behandlung = behandlungRepository.findById(id)
+        val behandlung = behandlungenRepository.findById(id)
             ?: throw AggregateNotFoundException()
 
         val updatedBehandlung = behandlung.update(
@@ -47,13 +47,13 @@ class BehandlungServiceImpl(
             endZeit = endZeit,
             rezeptId = rezeptId,
         )
-        return behandlungRepository.save(updatedBehandlung)
+        return behandlungenRepository.save(updatedBehandlung)
     }
 
     override fun deleteBehandlung(id: BehandlungId) {
-        val behandlung = behandlungRepository.findById(id)
+        val behandlung = behandlungenRepository.findById(id)
             ?: throw AggregateNotFoundException()
 
-        return behandlungRepository.delete(behandlung)
+        return behandlungenRepository.delete(behandlung)
     }
 }

@@ -2,8 +2,8 @@ package de.keller.physioai.behandlungen.adapters.api
 
 import com.ninjasquad.springmockk.MockkBean
 import de.keller.physioai.behandlungen.domain.BehandlungAggregate
-import de.keller.physioai.behandlungen.ports.BehandlungRepository
-import de.keller.physioai.behandlungen.ports.BehandlungService
+import de.keller.physioai.behandlungen.ports.BehandlungenRepository
+import de.keller.physioai.behandlungen.ports.BehandlungenService
 import de.keller.physioai.shared.AggregateNotFoundException
 import de.keller.physioai.shared.BehandlungId
 import de.keller.physioai.shared.PatientId
@@ -24,16 +24,16 @@ import java.time.LocalDateTime
 import java.util.UUID
 
 @Import(SecurityConfig::class)
-@WebMvcTest(BehandlungController::class)
-class BehandlungControllerTest {
+@WebMvcTest(BehandlungenController::class)
+class BehandlungenControllerTest {
     @Autowired
     private lateinit var mockMvc: MockMvc
 
     @MockkBean
-    private lateinit var behandlungService: BehandlungService
+    private lateinit var behandlungenService: BehandlungenService
 
     @MockkBean
-    private lateinit var behandlungRepository: BehandlungRepository
+    private lateinit var behandlungenRepository: BehandlungenRepository
 
     @Nested
     inner class CreateBehandlung {
@@ -56,7 +56,7 @@ class BehandlungControllerTest {
             )
 
             every {
-                behandlungService.createBehandlung(
+                behandlungenService.createBehandlung(
                     patientId,
                     startZeit,
                     endZeit,
@@ -88,7 +88,7 @@ class BehandlungControllerTest {
                 .andExpect(MockMvcResultMatchers.jsonPath("$.endZeit").value("2024-01-15T11:00:00"))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.rezeptId").value(rezeptId.id.toString()))
 
-            verify { behandlungService.createBehandlung(patientId, startZeit, endZeit, rezeptId) }
+            verify { behandlungenService.createBehandlung(patientId, startZeit, endZeit, rezeptId) }
         }
 
         @Test
@@ -109,7 +109,7 @@ class BehandlungControllerTest {
             )
 
             every {
-                behandlungService.createBehandlung(
+                behandlungenService.createBehandlung(
                     patientId,
                     startZeit,
                     endZeit,
@@ -141,7 +141,7 @@ class BehandlungControllerTest {
                 .andExpect(MockMvcResultMatchers.jsonPath("$.endZeit").value("2024-01-15T11:00:00"))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.rezeptId").doesNotExist())
 
-            verify { behandlungService.createBehandlung(patientId, startZeit, endZeit, null) }
+            verify { behandlungenService.createBehandlung(patientId, startZeit, endZeit, null) }
         }
     }
 
@@ -165,7 +165,7 @@ class BehandlungControllerTest {
                 version = 0,
             )
 
-            every { behandlungRepository.findById(behandlungId) } returns behandlung
+            every { behandlungenRepository.findById(behandlungId) } returns behandlung
 
             // Act & Assert
             mockMvc
@@ -178,7 +178,7 @@ class BehandlungControllerTest {
                 .andExpect(MockMvcResultMatchers.jsonPath("$.endZeit").value("2024-01-15T11:00:00"))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.rezeptId").value(rezeptId.id.toString()))
 
-            verify { behandlungRepository.findById(behandlungId) }
+            verify { behandlungenRepository.findById(behandlungId) }
         }
 
         @Test
@@ -186,14 +186,14 @@ class BehandlungControllerTest {
             // Arrange
             val behandlungId = BehandlungId(UUID.fromString("f1e2d3c4-b5a6-9870-1234-567890fedcba"))
 
-            every { behandlungRepository.findById(behandlungId) } returns null
+            every { behandlungenRepository.findById(behandlungId) } returns null
 
             // Act & Assert
             mockMvc
                 .perform(MockMvcRequestBuilders.get("/behandlungen/${behandlungId.id}"))
                 .andExpect(MockMvcResultMatchers.status().isNotFound)
 
-            verify { behandlungRepository.findById(behandlungId) }
+            verify { behandlungenRepository.findById(behandlungId) }
         }
     }
 
@@ -220,7 +220,7 @@ class BehandlungControllerTest {
                 version = 0,
             )
 
-            every { behandlungRepository.findAll() } returns listOf(behandlung1, behandlung2)
+            every { behandlungenRepository.findAll() } returns listOf(behandlung1, behandlung2)
 
             // Act & Assert
             mockMvc
@@ -231,7 +231,7 @@ class BehandlungControllerTest {
                 .andExpect(MockMvcResultMatchers.jsonPath("$[0].id").value("f1e2d3c4-b5a6-9870-1234-567890fedcba"))
                 .andExpect(MockMvcResultMatchers.jsonPath("$[1].id").value("a1a1a1a1-b2b2-c3c3-d4d4-e5e5e5e5e5e5"))
 
-            verify { behandlungRepository.findAll() }
+            verify { behandlungenRepository.findAll() }
         }
     }
 
@@ -250,7 +250,7 @@ class BehandlungControllerTest {
                 version = 0,
             )
 
-            every { behandlungRepository.findAllByPatientId(patientId) } returns listOf(behandlung)
+            every { behandlungenRepository.findAllByPatientId(patientId) } returns listOf(behandlung)
 
             // Act & Assert
             mockMvc
@@ -261,7 +261,7 @@ class BehandlungControllerTest {
                 .andExpect(MockMvcResultMatchers.jsonPath("$[0].id").value("f1e2d3c4-b5a6-9870-1234-567890fedcba"))
                 .andExpect(MockMvcResultMatchers.jsonPath("$[0].patientId").value(patientId.id.toString()))
 
-            verify { behandlungRepository.findAllByPatientId(patientId) }
+            verify { behandlungenRepository.findAllByPatientId(patientId) }
         }
     }
 
@@ -286,7 +286,7 @@ class BehandlungControllerTest {
             )
 
             every {
-                behandlungService.updateBehandlung(
+                behandlungenService.updateBehandlung(
                     behandlungId,
                     startZeit,
                     endZeit,
@@ -317,7 +317,7 @@ class BehandlungControllerTest {
                 .andExpect(MockMvcResultMatchers.jsonPath("$.endZeit").value("2024-01-15T15:00:00"))
 
             verify {
-                behandlungService.updateBehandlung(
+                behandlungenService.updateBehandlung(
                     behandlungId,
                     startZeit,
                     endZeit,
@@ -335,7 +335,7 @@ class BehandlungControllerTest {
             val rezeptId = RezeptId(UUID.fromString("a1b2c3d4-e5f6-7890-1234-567890abcdef"))
 
             every {
-                behandlungService.updateBehandlung(behandlungId, startZeit, endZeit, rezeptId)
+                behandlungenService.updateBehandlung(behandlungId, startZeit, endZeit, rezeptId)
             } throws AggregateNotFoundException()
 
             // Act & Assert
@@ -356,7 +356,7 @@ class BehandlungControllerTest {
                         ),
                 ).andExpect(MockMvcResultMatchers.status().isNotFound)
 
-            verify { behandlungService.updateBehandlung(behandlungId, startZeit, endZeit, rezeptId) }
+            verify { behandlungenService.updateBehandlung(behandlungId, startZeit, endZeit, rezeptId) }
         }
     }
 
@@ -367,14 +367,14 @@ class BehandlungControllerTest {
             // Arrange
             val behandlungId = BehandlungId(UUID.fromString("f1e2d3c4-b5a6-9870-1234-567890fedcba"))
 
-            every { behandlungService.deleteBehandlung(behandlungId) } returns Unit
+            every { behandlungenService.deleteBehandlung(behandlungId) } returns Unit
 
             // Act & Assert
             mockMvc
                 .perform(MockMvcRequestBuilders.delete("/behandlungen/${behandlungId.id}"))
                 .andExpect(MockMvcResultMatchers.status().isOk)
 
-            verify { behandlungService.deleteBehandlung(behandlungId) }
+            verify { behandlungenService.deleteBehandlung(behandlungId) }
         }
 
         @Test
@@ -382,14 +382,14 @@ class BehandlungControllerTest {
             // Arrange
             val behandlungId = BehandlungId(UUID.fromString("f1e2d3c4-b5a6-9870-1234-567890fedcba"))
 
-            every { behandlungService.deleteBehandlung(behandlungId) } throws AggregateNotFoundException()
+            every { behandlungenService.deleteBehandlung(behandlungId) } throws AggregateNotFoundException()
 
             // Act & Assert
             mockMvc
                 .perform(MockMvcRequestBuilders.delete("/behandlungen/${behandlungId.id}"))
                 .andExpect(MockMvcResultMatchers.status().isNotFound)
 
-            verify { behandlungService.deleteBehandlung(behandlungId) }
+            verify { behandlungenService.deleteBehandlung(behandlungId) }
         }
     }
 }

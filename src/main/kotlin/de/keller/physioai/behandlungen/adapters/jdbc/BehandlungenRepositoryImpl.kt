@@ -1,7 +1,7 @@
 package de.keller.physioai.behandlungen.adapters.jdbc
 
 import de.keller.physioai.behandlungen.domain.BehandlungAggregate
-import de.keller.physioai.behandlungen.ports.BehandlungRepository
+import de.keller.physioai.behandlungen.ports.BehandlungenRepository
 import de.keller.physioai.shared.BehandlungId
 import org.jmolecules.architecture.hexagonal.SecondaryAdapter
 import org.springframework.data.jdbc.repository.query.Modifying
@@ -12,8 +12,8 @@ import org.springframework.transaction.annotation.Transactional
 @org.springframework.stereotype.Repository
 @org.jmolecules.ddd.annotation.Repository
 @Transactional(readOnly = true)
-interface BehandlungRepositoryImpl :
-    BehandlungRepository,
+interface BehandlungenRepositoryImpl :
+    BehandlungenRepository,
     Repository<BehandlungAggregate, BehandlungId> {
     @Modifying
     @Transactional

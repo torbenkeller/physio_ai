@@ -1,7 +1,7 @@
 package de.keller.physioai.behandlungen.adapters.api
 
-import de.keller.physioai.behandlungen.ports.BehandlungRepository
-import de.keller.physioai.behandlungen.ports.BehandlungService
+import de.keller.physioai.behandlungen.ports.BehandlungenRepository
+import de.keller.physioai.behandlungen.ports.BehandlungenService
 import de.keller.physioai.shared.AggregateNotFoundException
 import de.keller.physioai.shared.BehandlungId
 import de.keller.physioai.shared.PatientId
@@ -22,16 +22,16 @@ import java.util.UUID
 @PrimaryAdapter
 @RestController
 @RequestMapping("/behandlungen")
-class BehandlungController(
-    private val behandlungService: BehandlungService,
-    private val behandlungRepository: BehandlungRepository,
+class BehandlungenController(
+    private val behandlungenService: BehandlungenService,
+    private val behandlungenRepository: BehandlungenRepository,
 ) {
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     fun createBehandlung(
         @RequestBody formDto: BehandlungFormDto,
     ): BehandlungDto {
-        val behandlung = behandlungService.createBehandlung(
+        val behandlung = behandlungenService.createBehandlung(
             patientId = PatientId(formDto.patientId),
             startZeit = formDto.startZeit,
             endZeit = formDto.endZeit,
@@ -45,7 +45,7 @@ class BehandlungController(
     fun getBehandlung(
         @PathVariable id: UUID,
     ): BehandlungDto {
-        val behandlung = behandlungRepository.findById(BehandlungId(id))
+        val behandlung = behandlungenRepository.findById(BehandlungId(id))
             ?: throw AggregateNotFoundException()
 
         return BehandlungDto.fromDomain(behandlung)
@@ -53,7 +53,7 @@ class BehandlungController(
 
     @GetMapping
     fun getAllBehandlungen(): List<BehandlungDto> {
-        val behandlungen = behandlungRepository.findAll()
+        val behandlungen = behandlungenRepository.findAll()
         return behandlungen.map { BehandlungDto.fromDomain(it) }
     }
 
@@ -61,7 +61,7 @@ class BehandlungController(
     fun getBehandlungenByPatient(
         @PathVariable patientId: UUID,
     ): List<BehandlungDto> {
-        val behandlungen = behandlungRepository.findAllByPatientId(PatientId(patientId))
+        val behandlungen = behandlungenRepository.findAllByPatientId(PatientId(patientId))
         return behandlungen.map { BehandlungDto.fromDomain(it) }
     }
 
@@ -70,7 +70,7 @@ class BehandlungController(
         @PathVariable id: UUID,
         @RequestBody formDto: BehandlungFormDto,
     ): BehandlungDto {
-        val behandlung = behandlungService.updateBehandlung(
+        val behandlung = behandlungenService.updateBehandlung(
             id = BehandlungId(id),
             startZeit = formDto.startZeit,
             endZeit = formDto.endZeit,
@@ -82,5 +82,5 @@ class BehandlungController(
     @DeleteMapping("/{id}")
     fun deleteBehandlung(
         @PathVariable id: UUID,
-    ) = behandlungService.deleteBehandlung(BehandlungId(id))
+    ) = behandlungenService.deleteBehandlung(BehandlungId(id))
 }

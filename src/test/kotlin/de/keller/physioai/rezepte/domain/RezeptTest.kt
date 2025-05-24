@@ -8,9 +8,9 @@ import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
 
 class RezeptTest {
-    private val patientId = PatientId.fromUUID(UUID.randomUUID())
+    private val patientId = PatientId(UUID.randomUUID())
     private val ausgestelltAm = LocalDate.of(2023, 1, 1)
-    private val behandlungsartId = BehandlungsartId.generate()
+    private val behandlungsartId = BehandlungsartId(UUID.randomUUID())
 
     @Test
     fun `createNew should create a valid rezept`() {
@@ -74,9 +74,9 @@ class RezeptTest {
             posSources = listOf(posSource1),
         )
 
-        val newPatientId = PatientId.generate()
+        val newPatientId = PatientId(UUID.randomUUID())
         val newAusgestelltAm = LocalDate.of(2023, 2, 1)
-        val newBehandlungsartId = BehandlungsartId.generate()
+        val newBehandlungsartId = BehandlungsartId(UUID.randomUUID())
 
         val newPosSource = Rezept.Companion.CreateRezeptPosData(
             behandlungsartId = newBehandlungsartId,

@@ -1,6 +1,6 @@
 package de.keller.physioai.profile.domain
 
-import de.keller.physioai.profile.adapters.rest.ProfileDto
+import de.keller.physioai.profile.adapters.api.ProfileDto
 import de.keller.physioai.shared.ProfileId
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
@@ -11,36 +11,12 @@ import kotlin.test.assertNotNull
 
 class ProfileTest {
     @Nested
-    inner class ProfileIdTests {
-        @Test
-        fun `fromUUID should create ProfileId with given UUID`() {
-            // Arrange
-            val uuid = UUID.randomUUID()
-
-            // Act
-            val profileId = ProfileId.fromUUID(uuid)
-
-            // Assert
-            assertEquals(uuid, profileId.id)
-        }
-
-        @Test
-        fun `generate should create ProfileId with random UUID`() {
-            // Act
-            val profileId = ProfileId.generate()
-
-            // Assert
-            assertNotNull(profileId.id)
-        }
-    }
-
-    @Nested
     inner class ProfileMethodTests {
         @Test
         fun `getCalenderUrl should return correctly formatted URL`() {
             // Arrange
             val host = "http://localhost:8080"
-            val profileId = ProfileId.fromUUID(UUID.fromString("d7e8f9a0-b1c2-3d4e-5f6a-7b8c9d0e1f2a"))
+            val profileId = ProfileId(UUID.fromString("d7e8f9a0-b1c2-3d4e-5f6a-7b8c9d0e1f2a"))
             val accessToken = UUID.fromString("a1b2c3d4-e5f6-7890-1234-567890abcdef")
             val profile = Profile(
                 id = profileId,
@@ -66,7 +42,7 @@ class ProfileTest {
         @Test
         fun `profile should be created with given values`() {
             // Arrange
-            val profileId = ProfileId.generate()
+            val profileId = ProfileId(UUID.randomUUID())
             val praxisName = "Test Praxis"
             val inhaberName = "Test Owner"
             val profilePictureUrl = "https://example.com/image.jpg"
@@ -95,7 +71,7 @@ class ProfileTest {
         @Test
         fun `profile should be created with default version`() {
             // Arrange
-            val profileId = ProfileId.generate()
+            val profileId = ProfileId(UUID.randomUUID())
 
             // Act
             val profile = Profile(
@@ -112,7 +88,7 @@ class ProfileTest {
         @Test
         fun `profile should be created with default random access token`() {
             // Arrange
-            val profileId = ProfileId.generate()
+            val profileId = ProfileId(UUID.randomUUID())
 
             // Act
             val profile = Profile(
@@ -133,7 +109,7 @@ class ProfileTest {
         fun `fromProfile should correctly map all fields`() {
             // Arrange
             val host = "http://localhost:8080"
-            val profileId = ProfileId.fromUUID(UUID.fromString("d7e8f9a0-b1c2-3d4e-5f6a-7b8c9d0e1f2a"))
+            val profileId = ProfileId(UUID.fromString("d7e8f9a0-b1c2-3d4e-5f6a-7b8c9d0e1f2a"))
             val accessToken = UUID.fromString("a1b2c3d4-e5f6-7890-1234-567890abcdef")
             val profile = Profile(
                 id = profileId,

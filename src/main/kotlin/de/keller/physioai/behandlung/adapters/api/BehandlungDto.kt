@@ -1,0 +1,24 @@
+package de.keller.physioai.behandlung.adapters.api
+
+import de.keller.physioai.behandlung.domain.BehandlungAggregate
+import java.time.LocalDateTime
+import java.util.UUID
+
+data class BehandlungDto(
+    val id: UUID,
+    val patientId: UUID,
+    val startZeit: LocalDateTime,
+    val endZeit: LocalDateTime,
+    val rezeptId: UUID?,
+) {
+    companion object {
+        fun fromDomain(aggregate: BehandlungAggregate): BehandlungDto =
+            BehandlungDto(
+                id = aggregate.id.id,
+                patientId = aggregate.patientId.id,
+                startZeit = aggregate.startZeit,
+                endZeit = aggregate.endZeit,
+                rezeptId = aggregate.rezeptId?.id,
+            )
+    }
+}

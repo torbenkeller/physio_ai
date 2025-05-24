@@ -62,7 +62,7 @@ data class Rezept(
             val preisGesamt = positionen.sumOf { it.preisGesamt }
 
             return Rezept(
-                id = RezeptId.generate(),
+                id = RezeptId(UUID.randomUUID()),
                 patientId = patientId,
                 ausgestelltAm = ausgestelltAm,
                 ausgestelltVonArztId = ausgestelltVonArztId,

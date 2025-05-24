@@ -5,6 +5,7 @@ import de.keller.physioai.profile.ports.ProfileRepository
 import de.keller.physioai.profile.ports.ProfileService
 import de.keller.physioai.shared.AggregateNotFoundException
 import de.keller.physioai.shared.ProfileId
+import de.keller.physioai.shared.anyValue
 import io.mockk.clearAllMocks
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
@@ -66,10 +67,10 @@ class ProfileServiceImplTest {
         fun `should throw exception when no profile exists to update`() {
             // Arrange
 
-            every { profileRepository.findById(any()) } returns null
+            every { profileRepository.findById(anyValue()) } returns null
 
             // Act & Assert
-            val profileId = ProfileId.fromUUID(UUID.fromString("d7e8f9a0-b1c2-3d4e-5f6a-7b8c9d0e1f2a"))
+            val profileId = ProfileId(UUID.fromString("d7e8f9a0-b1c2-3d4e-5f6a-7b8c9d0e1f2a"))
             assertFailsWith<AggregateNotFoundException> {
                 profileService.updateProfile(
                     profileId,
@@ -86,7 +87,7 @@ class ProfileServiceImplTest {
         @Test
         fun `should update existing profile successfully`() {
             // Arrange
-            val profileId = ProfileId.fromUUID(UUID.fromString("d7e8f9a0-b1c2-3d4e-5f6a-7b8c9d0e1f2a"))
+            val profileId = ProfileId(UUID.fromString("d7e8f9a0-b1c2-3d4e-5f6a-7b8c9d0e1f2a"))
             val existingProfile = Profile(
                 id = profileId,
                 praxisName = "Old Practice Name",
@@ -95,7 +96,7 @@ class ProfileServiceImplTest {
                 version = 0,
             )
 
-            every { profileRepository.findById(any()) } returns existingProfile
+            every { profileRepository.findById(anyValue()) } returns existingProfile
 
             val savedProfileSlot = slot<Profile>()
             every { profileRepository.save(capture(savedProfileSlot)) } answers { savedProfileSlot.captured }
@@ -122,7 +123,7 @@ class ProfileServiceImplTest {
         @Test
         fun `should only update provided fields`() {
             // Arrange
-            val profileId = ProfileId.fromUUID(UUID.fromString("d7e8f9a0-b1c2-3d4e-5f6a-7b8c9d0e1f2a"))
+            val profileId = ProfileId(UUID.fromString("d7e8f9a0-b1c2-3d4e-5f6a-7b8c9d0e1f2a"))
             val existingProfile = Profile(
                 id = profileId,
                 praxisName = "Privatpraxis Carsten Huffmeyer",
@@ -131,7 +132,7 @@ class ProfileServiceImplTest {
                 version = 0,
             )
 
-            every { profileRepository.findById(any()) } returns existingProfile
+            every { profileRepository.findById(anyValue()) } returns existingProfile
 
             val savedProfileSlot = slot<Profile>()
             every { profileRepository.save(capture(savedProfileSlot)) } answers { savedProfileSlot.captured }

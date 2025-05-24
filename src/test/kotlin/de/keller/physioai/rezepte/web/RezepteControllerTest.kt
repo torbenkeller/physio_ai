@@ -4,8 +4,8 @@ import com.ninjasquad.springmockk.MockkBean
 import de.keller.physioai.patienten.adapters.jdbc.PatientenRepositoryImpl
 import de.keller.physioai.patienten.domain.PatientAggregate
 import de.keller.physioai.patienten.ports.PatientenService
-import de.keller.physioai.rezepte.adapters.rest.BehandlungsartDto
-import de.keller.physioai.rezepte.adapters.rest.RezepteController
+import de.keller.physioai.rezepte.adapters.api.BehandlungsartDto
+import de.keller.physioai.rezepte.adapters.api.RezepteController
 import de.keller.physioai.rezepte.domain.Arzt
 import de.keller.physioai.rezepte.domain.ArztId
 import de.keller.physioai.rezepte.domain.Behandlungsart
@@ -19,6 +19,7 @@ import de.keller.physioai.rezepte.ports.RezeptService
 import de.keller.physioai.rezepte.ports.RezepteAiService
 import de.keller.physioai.shared.PatientId
 import de.keller.physioai.shared.RezeptId
+import de.keller.physioai.shared.anyValue
 import de.keller.physioai.shared.config.SecurityConfig
 import io.mockk.every
 import io.mockk.just
@@ -71,12 +72,12 @@ class RezepteControllerTest {
     @MockkBean
     private lateinit var patientenService: PatientenService
 
-    private val patientId = PatientId.generate()
-    private val behandlungsartId1 = BehandlungsartId.generate()
-    private val behandlungsartId2 = BehandlungsartId.generate()
+    private val patientId = PatientId(UUID.randomUUID())
+    private val behandlungsartId1 = BehandlungsartId(UUID.randomUUID())
+    private val behandlungsartId2 = BehandlungsartId(UUID.randomUUID())
     private val arztId = ArztId.generate()
-    private val rezeptId1 = RezeptId.generate()
-    private val rezeptId2 = RezeptId.generate()
+    private val rezeptId1 = RezeptId(UUID.randomUUID())
+    private val rezeptId2 = RezeptId(UUID.randomUUID())
     private val ausgestelltAm = LocalDate.of(2023, 1, 1)
 
     private lateinit var patient: PatientAggregate
@@ -233,7 +234,7 @@ class RezepteControllerTest {
         @Test
         fun `should delete rezept successfully`() {
             // Arrange
-            every { rezeptRepository.deleteById(any()) } just runs
+            every { rezeptRepository.deleteById(anyValue()) } just runs
 
             // Act & Assert
             mockMvc
@@ -308,7 +309,7 @@ class RezepteControllerTest {
             )
 
             // Mock the service and repository calls
-            every { rezeptService.updateRezept(any(), any()) } returns updatedRezept
+            every { rezeptService.updateRezept(anyValue(), any()) } returns updatedRezept
             every { patientenRepository.findById(patientId) } returns patient
             every { aerzteRepository.findById(arztId) } returns arzt
 

@@ -39,7 +39,7 @@ class KalenderServiceImplTest {
         @Test
         fun `should throw AggregateNotFoundException when profile not found`() {
             // Arrange
-            val profileId = ProfileId.generate()
+            val profileId = ProfileId(UUID.randomUUID())
             val accessToken = UUID.randomUUID()
 
             every { profileRepository.findById(profileId) } returns null
@@ -55,7 +55,7 @@ class KalenderServiceImplTest {
         @Test
         fun `should throw AccessDeniedException when access token does not match`() {
             // Arrange
-            val profileId = ProfileId.generate()
+            val profileId = ProfileId(UUID.randomUUID())
             val correctAccessToken = UUID.randomUUID()
             val wrongAccessToken = UUID.randomUUID()
 
@@ -80,7 +80,7 @@ class KalenderServiceImplTest {
         @Test
         fun `should return correctly formatted iCalendar data when successful`() {
             // Arrange
-            val profileId = ProfileId.generate()
+            val profileId = ProfileId(UUID.randomUUID())
             val accessToken = UUID.randomUUID()
 
             val profile = Profile(

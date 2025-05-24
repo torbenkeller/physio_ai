@@ -9,6 +9,7 @@ import de.keller.physioai.rezepte.ports.RezepteAiService
 import de.keller.physioai.shared.PatientId
 import io.mockk.impl.annotations.MockK
 import java.time.LocalDate
+import java.util.UUID
 
 class RezepteAiServiceImplTest {
     @MockK
@@ -20,9 +21,9 @@ class RezepteAiServiceImplTest {
     @MockK
     private lateinit var behandlungsartenRepository: BehandlungsartenRepository
 
-    private val patientId = PatientId.Companion.generate()
-    private val behandlungsartId1 = BehandlungsartId.Companion.generate()
-    private val behandlungsartId2 = BehandlungsartId.Companion.generate()
+    private val patientId = PatientId(UUID.randomUUID())
+    private val behandlungsartId1 = BehandlungsartId(UUID.randomUUID())
+    private val behandlungsartId2 = BehandlungsartId(UUID.randomUUID())
     private val ausgestelltAm = LocalDate.of(2023, 1, 1)
 
     private lateinit var patient: Patient

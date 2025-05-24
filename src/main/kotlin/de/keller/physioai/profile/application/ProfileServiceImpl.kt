@@ -9,6 +9,7 @@ import org.apache.logging.log4j.util.Strings
 import org.jmolecules.architecture.hexagonal.Application
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import java.util.UUID
 
 @Application
 @Service
@@ -23,7 +24,7 @@ class ProfileServiceImpl(
     ): Profile {
         val profile =
             Profile(
-                id = ProfileId.Companion.generate(),
+                id = ProfileId(UUID.randomUUID()),
                 praxisName = praxisName,
                 inhaberName = inhaberName,
                 profilePictureUrl = Strings.trimToNull(profilePictureUrl),

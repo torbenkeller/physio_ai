@@ -2,9 +2,9 @@ package de.keller.physioai.rezepte.application
 
 import de.keller.physioai.patienten.adapters.jdbc.PatientenRepositoryImpl
 import de.keller.physioai.patienten.domain.PatientAggregate
-import de.keller.physioai.rezepte.adapters.rest.RezeptCreateDto
-import de.keller.physioai.rezepte.adapters.rest.RezeptPosCreateDto
-import de.keller.physioai.rezepte.adapters.rest.RezeptUpdateDto
+import de.keller.physioai.rezepte.adapters.api.RezeptCreateDto
+import de.keller.physioai.rezepte.adapters.api.RezeptPosCreateDto
+import de.keller.physioai.rezepte.adapters.api.RezeptUpdateDto
 import de.keller.physioai.rezepte.domain.Behandlungsart
 import de.keller.physioai.rezepte.domain.BehandlungsartId
 import de.keller.physioai.rezepte.domain.Rezept
@@ -16,6 +16,7 @@ import de.keller.physioai.rezepte.ports.RezepteAiService
 import de.keller.physioai.shared.AggregateNotFoundException
 import de.keller.physioai.shared.PatientId
 import de.keller.physioai.shared.RezeptId
+import de.keller.physioai.shared.anyValue
 import io.mockk.clearAllMocks
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
@@ -54,9 +55,9 @@ class RezeptServiceImplTest {
 
     private lateinit var rezeptService: RezeptService
 
-    private val patientId = PatientId.Companion.generate()
-    private val behandlungsartId1 = BehandlungsartId.Companion.generate()
-    private val behandlungsartId2 = BehandlungsartId.Companion.generate()
+    private val patientId = PatientId(UUID.randomUUID())
+    private val behandlungsartId1 = BehandlungsartId(UUID.randomUUID())
+    private val behandlungsartId2 = BehandlungsartId(UUID.randomUUID())
     private val ausgestelltAm = LocalDate.of(2023, 1, 1)
 
     private lateinit var patient: PatientAggregate
@@ -258,7 +259,7 @@ class RezeptServiceImplTest {
         @Test
         fun `should throw exception when patient not found`() {
             // Arrange
-            val nonExistentPatientId = PatientId.Companion.generate()
+            val nonExistentPatientId = PatientId(UUID.randomUUID())
             val createDto = RezeptCreateDto(
                 patientId = nonExistentPatientId.id,
                 ausgestelltAm = ausgestelltAm,
@@ -282,7 +283,7 @@ class RezeptServiceImplTest {
         @Test
         fun `should throw exception when behandlungsart not found`() {
             // Arrange
-            val nonExistentBehandlungsartId = BehandlungsartId.Companion.generate()
+            val nonExistentBehandlungsartId = BehandlungsartId(UUID.randomUUID())
             val posCreateDto = RezeptPosCreateDto(
                 behandlungsartId = nonExistentBehandlungsartId.id,
                 anzahl = 5,
@@ -315,7 +316,7 @@ class RezeptServiceImplTest {
         @Test
         fun `should update an existing rezept successfully`() {
             // Arrange
-            val rezeptId = RezeptId.Companion.generate()
+            val rezeptId = RezeptId(UUID.randomUUID())
 
             val originalPos1 = RezeptPos(
                 id = UUID.randomUUID(),
@@ -383,7 +384,7 @@ class RezeptServiceImplTest {
         @Test
         fun `should update with multiple positions successfully`() {
             // Arrange
-            val rezeptId = RezeptId.Companion.generate()
+            val rezeptId = RezeptId(UUID.randomUUID())
 
             val originalPos1 = RezeptPos(
                 id = UUID.randomUUID(),
@@ -456,7 +457,7 @@ class RezeptServiceImplTest {
         @Test
         fun `should throw exception when rezept not found`() {
             // Arrange
-            val nonExistentRezeptId = RezeptId.Companion.generate()
+            val nonExistentRezeptId = RezeptId(UUID.randomUUID())
             val updateDto = RezeptUpdateDto(
                 patientId = patientId.id,
                 ausgestelltAm = LocalDate.of(2024, 1, 1),
@@ -473,16 +474,16 @@ class RezeptServiceImplTest {
 
             // Verify interactions with repositories
             verify { rezeptRepository.findById(nonExistentRezeptId) }
-            verify(exactly = 0) { patientenRepository.findById(any()) }
-            verify(exactly = 0) { behandlungsartenRepository.findAllByIdIn(any()) }
+            verify(exactly = 0) { patientenRepository.findById(anyValue()) }
+            verify(exactly = 0) { behandlungsartenRepository.findAllByIdIn(anyValue()) }
             verify(exactly = 0) { rezeptRepository.save(any()) }
         }
 
         @Test
         fun `should throw exception when patient not found`() {
             // Arrange
-            val rezeptId = RezeptId.Companion.generate()
-            val nonExistentPatientId = PatientId.Companion.generate()
+            val rezeptId = RezeptId(UUID.randomUUID())
+            val nonExistentPatientId = PatientId(UUID.randomUUID())
 
             val originalRezept = Rezept(
                 id = rezeptId,
@@ -525,7 +526,7 @@ class RezeptServiceImplTest {
         @Test
         fun `should throw exception when no positions provided`() {
             // Arrange
-            val rezeptId = RezeptId.Companion.generate()
+            val rezeptId = RezeptId(UUID.randomUUID())
 
             val originalPos1 = RezeptPos(
                 id = UUID.randomUUID(),
@@ -573,8 +574,8 @@ class RezeptServiceImplTest {
         @Test
         fun `should throw exception when behandlungsart not found`() {
             // Arrange
-            val rezeptId = RezeptId.Companion.generate()
-            val nonExistentBehandlungsartId = BehandlungsartId.Companion.generate()
+            val rezeptId = RezeptId(UUID.randomUUID())
+            val nonExistentBehandlungsartId = BehandlungsartId(UUID.randomUUID())
 
             val originalRezept = Rezept(
                 id = rezeptId,

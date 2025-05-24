@@ -2,13 +2,11 @@ package de.keller.physioai.patienten.domain
 
 import de.keller.physioai.patienten.Patient
 import de.keller.physioai.shared.PatientId
-import de.keller.physioai.shared.RezeptId
 import org.jmolecules.ddd.annotation.AggregateRoot
 import org.springframework.data.annotation.Id
 import org.springframework.data.annotation.Version
 import org.springframework.data.relational.core.mapping.Table
 import java.time.LocalDate
-import java.time.LocalDateTime
 import java.util.UUID
 
 @AggregateRoot
@@ -28,7 +26,6 @@ data class PatientAggregate internal constructor(
     override val telFestnetz: String?,
     override val email: String?,
     override val geburtstag: LocalDate?,
-    val behandlungen: List<Behandlung> = emptyList(),
     @Version
     val version: Int = 0,
 ) : Patient {
@@ -59,45 +56,6 @@ data class PatientAggregate internal constructor(
             geburtstag = geburtstag,
         )
 
-    fun addBehandlung(
-        startZeit: LocalDateTime,
-        endZeit: LocalDateTime,
-        rezeptId: RezeptId?,
-    ): PatientAggregate {
-        val neueBehandlung = Behandlung.createNew(
-            patientId = this.id,
-            startZeit = startZeit,
-            endZeit = endZeit,
-            rezeptId = rezeptId,
-        )
-        return copy(behandlungen = behandlungen + neueBehandlung)
-    }
-
-    fun updateBehandlung(
-        behandlungId: UUID,
-        startZeit: LocalDateTime,
-        endZeit: LocalDateTime,
-        rezeptId: RezeptId?,
-    ): PatientAggregate {
-        val updatedBehandlungen = behandlungen.map { behandlung ->
-            if (behandlung.id == behandlungId) {
-                behandlung.copy(
-                    startZeit = startZeit,
-                    endZeit = endZeit,
-                    rezeptId = rezeptId,
-                )
-            } else {
-                behandlung
-            }
-        }
-        return copy(behandlungen = updatedBehandlungen)
-    }
-
-    fun removeBehandlung(behandlungId: UUID): PatientAggregate {
-        val filteredBehandlungen = behandlungen.filter { it.id != behandlungId }
-        return copy(behandlungen = filteredBehandlungen)
-    }
-
     companion object {
         fun create(
             titel: String?,
@@ -113,7 +71,7 @@ data class PatientAggregate internal constructor(
             geburtstag: LocalDate?,
         ): PatientAggregate =
             PatientAggregate(
-                id = PatientId.generate(),
+                id = PatientId(UUID.randomUUID()),
                 titel = titel,
                 vorname = vorname,
                 nachname = nachname,

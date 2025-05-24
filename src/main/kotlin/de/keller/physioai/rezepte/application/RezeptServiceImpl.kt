@@ -1,9 +1,9 @@
 package de.keller.physioai.rezepte.application
 
 import de.keller.physioai.patienten.PatientenRepository
-import de.keller.physioai.rezepte.adapters.rest.BehandlungsartDto
-import de.keller.physioai.rezepte.adapters.rest.RezeptCreateDto
-import de.keller.physioai.rezepte.adapters.rest.RezeptUpdateDto
+import de.keller.physioai.rezepte.adapters.api.BehandlungsartDto
+import de.keller.physioai.rezepte.adapters.api.RezeptCreateDto
+import de.keller.physioai.rezepte.adapters.api.RezeptUpdateDto
 import de.keller.physioai.rezepte.domain.BehandlungsartId
 import de.keller.physioai.rezepte.domain.Rezept
 import de.keller.physioai.rezepte.ports.BehandlungsartenRepository
@@ -80,7 +80,7 @@ class RezeptServiceImpl(
         // Log the received data
         logger.debug("Received rezeptCreateDto: {}", rezeptCreateDto)
 
-        val patientId = PatientId.Companion.fromUUID(rezeptCreateDto.patientId)
+        val patientId = PatientId(rezeptCreateDto.patientId)
         val patient =
             patientenRepository.findById(patientId)
                 ?: throw IllegalArgumentException("Patient with ID ${rezeptCreateDto.patientId} not found")
@@ -93,7 +93,7 @@ class RezeptServiceImpl(
 
         // Validate all behandlungsarten exist
         val behandlungsartIds =
-            rezeptCreateDto.positionen.map { BehandlungsartId.Companion.fromUUID(it.behandlungsartId) }.toSet()
+            rezeptCreateDto.positionen.map { BehandlungsartId(it.behandlungsartId) }.toSet()
         val behandlungsarten = behandlungsartenRepository.findAllByIdIn(behandlungsartIds).toList()
         if (behandlungsarten.size != behandlungsartIds.size) {
             throw IllegalArgumentException("One or more BehandlungsartId not found")
@@ -103,7 +103,7 @@ class RezeptServiceImpl(
         val posSources =
             rezeptCreateDto.positionen.map { pos ->
                 val behandlungsart =
-                    behandlungsarten.find { it.id == BehandlungsartId.fromUUID(pos.behandlungsartId) }!!
+                    behandlungsarten.find { it.id == BehandlungsartId(pos.behandlungsartId) }!!
 
                 Rezept.Companion.CreateRezeptPosData(
                     behandlungsartId = behandlungsart.id,
@@ -142,14 +142,14 @@ class RezeptServiceImpl(
         logger.debug("Found existing rezept: {}", rezept)
 
         // Validate patient exists
-        val patientId = PatientId.Companion.fromUUID(rezeptUpdateDto.patientId)
+        val patientId = PatientId(rezeptUpdateDto.patientId)
         val patient = patientenRepository.findById(patientId) ?: throw AggregateNotFoundException()
 
         logger.debug("Found patient: {}", patient)
 
         // Validate all behandlungsarten exist
         val behandlungsartIds = rezeptUpdateDto.positionen
-            .map { BehandlungsartId.Companion.fromUUID(it.behandlungsartId) }
+            .map { BehandlungsartId(it.behandlungsartId) }
             .toSet()
 
         val behandlungsarten = behandlungsartenRepository.findAllByIdIn(behandlungsartIds).toList()
@@ -162,7 +162,7 @@ class RezeptServiceImpl(
         val posSources =
             rezeptUpdateDto.positionen.map { pos ->
                 val behandlungsart =
-                    behandlungsarten.find { it.id == BehandlungsartId.fromUUID(pos.behandlungsartId) }!!
+                    behandlungsarten.find { it.id == BehandlungsartId(pos.behandlungsartId) }!!
 
                 Rezept.Companion.CreateRezeptPosData(
                     behandlungsartId = behandlungsart.id,

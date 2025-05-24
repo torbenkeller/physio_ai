@@ -1,9 +1,9 @@
 package de.keller.physioai.rezepte.ports
 
 import de.keller.physioai.patienten.Patient
-import de.keller.physioai.rezepte.adapters.rest.BehandlungsartDto
-import de.keller.physioai.rezepte.adapters.rest.RezeptCreateDto
-import de.keller.physioai.rezepte.adapters.rest.RezeptUpdateDto
+import de.keller.physioai.rezepte.adapters.api.BehandlungsartDto
+import de.keller.physioai.rezepte.adapters.api.RezeptCreateDto
+import de.keller.physioai.rezepte.adapters.api.RezeptUpdateDto
 import de.keller.physioai.rezepte.domain.Rezept
 import de.keller.physioai.shared.RezeptId
 import org.jmolecules.architecture.hexagonal.PrimaryPort

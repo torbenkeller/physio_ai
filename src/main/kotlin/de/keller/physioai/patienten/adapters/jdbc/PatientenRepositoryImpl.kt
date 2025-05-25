@@ -4,30 +4,26 @@ import de.keller.physioai.patienten.domain.PatientAggregate
 import de.keller.physioai.patienten.ports.PatientenRepository
 import de.keller.physioai.shared.PatientId
 import org.jmolecules.architecture.hexagonal.SecondaryAdapter
-import org.springframework.data.jdbc.repository.query.Modifying
 import org.springframework.stereotype.Repository
-import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDate
 
+/***
+ * This indirection is needed because spring data can not use kotlin value classes within collections as arguments.
+ */
 @SecondaryAdapter
-@Transactional(readOnly = true)
 @Repository
-interface PatientenRepositoryImpl :
-    org.springframework.data.repository.Repository<PatientAggregate, PatientId>,
-    PatientenRepository {
-    override fun findAll(): List<PatientAggregate>
+class PatientenRepositoryImpl(
+    val patientenDAO: PatientenDAO,
+) : PatientenRepository {
+    override fun findAll(): List<PatientAggregate> = patientenDAO.findAll()
 
-    override fun findById(id: PatientId): PatientAggregate?
+    override fun findById(id: PatientId): PatientAggregate? = patientenDAO.findById(id.id)
 
-    override fun findAllByIdIn(ids: Collection<PatientId>): List<PatientAggregate>
+    override fun findAllByIdIn(ids: Collection<PatientId>): List<PatientAggregate> = patientenDAO.findAllByIdIn(ids = ids.map { it.id })
 
-    override fun findPatientByGeburtstag(geburtstag: LocalDate): List<PatientAggregate>
+    override fun findPatientByGeburtstag(geburtstag: LocalDate): List<PatientAggregate> = patientenDAO.findPatientByGeburtstag(geburtstag)
 
-    @Transactional(readOnly = false)
-    @Modifying
-    override fun save(patient: PatientAggregate): PatientAggregate
+    override fun save(patient: PatientAggregate): PatientAggregate = patientenDAO.save(patient)
 
-    @Transactional(readOnly = false)
-    @Modifying
-    override fun deleteById(id: PatientId)
+    override fun deleteById(id: PatientId) = patientenDAO.deleteById(id.id)
 }

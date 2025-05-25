@@ -89,12 +89,12 @@ class BehandlungenController(
     @GetMapping("/calender/week")
     fun getWeeklyCalendar(
         @RequestParam date: String,
-    ): Map<LocalDate, List<BehandlungDto>> {
+    ): Map<LocalDate, List<BehandlungKalenderDto>> {
         val parsedDate = LocalDate.parse(date)
         val weeklyCalendar = behandlungenService.getWeeklyCalendar(parsedDate)
         return weeklyCalendar
             .mapValues { (_, behandlungen) ->
-                behandlungen.map { BehandlungDto.fromDomain(it) }
+                behandlungen.map { BehandlungKalenderDto.fromDomain(it) }
             }
     }
 }

@@ -1,6 +1,7 @@
 package de.keller.physioai.behandlungen.ports
 
 import de.keller.physioai.behandlungen.domain.BehandlungAggregate
+import de.keller.physioai.patienten.Patient
 import de.keller.physioai.shared.BehandlungId
 import de.keller.physioai.shared.PatientId
 import de.keller.physioai.shared.RezeptId
@@ -26,5 +27,10 @@ interface BehandlungenService {
 
     fun deleteBehandlung(id: BehandlungId)
 
-    fun getWeeklyCalendar(date: LocalDate): Map<LocalDate, List<BehandlungAggregate>>
+    fun getWeeklyCalendar(date: LocalDate): Map<LocalDate, List<GetWeeklyCalendarBehandlungResponse>>
 }
+
+data class GetWeeklyCalendarBehandlungResponse(
+    val behandlungAggregate: BehandlungAggregate,
+    val patient: Patient,
+)

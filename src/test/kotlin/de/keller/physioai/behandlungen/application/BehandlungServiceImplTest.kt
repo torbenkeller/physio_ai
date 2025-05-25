@@ -3,6 +3,7 @@ package de.keller.physioai.behandlungen.application
 import de.keller.physioai.behandlungen.domain.BehandlungAggregate
 import de.keller.physioai.behandlungen.ports.BehandlungenRepository
 import de.keller.physioai.behandlungen.ports.BehandlungenService
+import de.keller.physioai.patienten.PatientenRepository
 import de.keller.physioai.shared.AggregateNotFoundException
 import de.keller.physioai.shared.BehandlungId
 import de.keller.physioai.shared.PatientId
@@ -29,12 +30,15 @@ class BehandlungServiceImplTest {
     @MockK
     private lateinit var behandlungenRepository: BehandlungenRepository
 
+    @MockK
+    private lateinit var patientenRepository: PatientenRepository
+
     private lateinit var behandlungenService: BehandlungenService
 
     @BeforeEach
     fun setUp() {
         clearAllMocks()
-        behandlungenService = BehandlungenServiceImpl(behandlungenRepository)
+        behandlungenService = BehandlungenServiceImpl(behandlungenRepository, patientenRepository)
     }
 
     @Nested

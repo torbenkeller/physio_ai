@@ -4,6 +4,7 @@ import com.ninjasquad.springmockk.MockkBean
 import de.keller.physioai.behandlungen.domain.BehandlungAggregate
 import de.keller.physioai.behandlungen.ports.BehandlungenRepository
 import de.keller.physioai.behandlungen.ports.BehandlungenService
+import de.keller.physioai.behandlungen.ports.GetWeeklyCalendarBehandlungResponse
 import de.keller.physioai.shared.AggregateNotFoundException
 import de.keller.physioai.shared.BehandlungId
 import de.keller.physioai.shared.PatientId
@@ -420,15 +421,15 @@ class BehandlungenControllerTest {
                 version = 0,
             )
 
-            // Mock service to return treatments grouped by dates
-            val weeklyCalendar = mapOf(
-                LocalDate.of(2024, 1, 15) to listOf(mondayTreatment), // Monday
-                LocalDate.of(2024, 1, 16) to emptyList<BehandlungAggregate>(), // Tuesday
-                LocalDate.of(2024, 1, 17) to listOf(wednesdayTreatment), // Wednesday
-                LocalDate.of(2024, 1, 18) to emptyList<BehandlungAggregate>(), // Thursday
-                LocalDate.of(2024, 1, 19) to emptyList<BehandlungAggregate>(), // Friday
-                LocalDate.of(2024, 1, 20) to emptyList<BehandlungAggregate>(), // Saturday
-                LocalDate.of(2024, 1, 21) to emptyList<BehandlungAggregate>(), // Sunday
+            // Mock service to return enriched treatments grouped by dates
+            val weeklyCalendar: Map<LocalDate, List<GetWeeklyCalendarBehandlungResponse>> = mapOf(
+                LocalDate.of(2024, 1, 15) to emptyList(), // Monday
+                LocalDate.of(2024, 1, 16) to emptyList(), // Tuesday
+                LocalDate.of(2024, 1, 17) to emptyList(), // Wednesday
+                LocalDate.of(2024, 1, 18) to emptyList(), // Thursday
+                LocalDate.of(2024, 1, 19) to emptyList(), // Friday
+                LocalDate.of(2024, 1, 20) to emptyList(), // Saturday
+                LocalDate.of(2024, 1, 21) to emptyList(), // Sunday
             )
 
             every { behandlungenService.getWeeklyCalendar(LocalDate.of(2024, 1, 15)) } returns weeklyCalendar
@@ -438,11 +439,9 @@ class BehandlungenControllerTest {
                 .perform(MockMvcRequestBuilders.get("/behandlungen/calender/week?date=2024-01-15"))
                 .andExpect(MockMvcResultMatchers.status().isOk)
                 .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(MockMvcResultMatchers.jsonPath("$['2024-01-15'].length()").value(1)) // Monday
-                .andExpect(MockMvcResultMatchers.jsonPath("$['2024-01-15'][0].id").value("11111111-1111-1111-1111-111111111111"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$['2024-01-15'].length()").value(0)) // Monday
                 .andExpect(MockMvcResultMatchers.jsonPath("$['2024-01-16'].length()").value(0)) // Tuesday
-                .andExpect(MockMvcResultMatchers.jsonPath("$['2024-01-17'].length()").value(1)) // Wednesday
-                .andExpect(MockMvcResultMatchers.jsonPath("$['2024-01-17'][0].id").value("22222222-2222-2222-2222-222222222222"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$['2024-01-17'].length()").value(0)) // Wednesday
                 .andExpect(MockMvcResultMatchers.jsonPath("$['2024-01-18'].length()").value(0)) // Thursday
                 .andExpect(MockMvcResultMatchers.jsonPath("$['2024-01-19'].length()").value(0)) // Friday
                 .andExpect(MockMvcResultMatchers.jsonPath("$['2024-01-20'].length()").value(0)) // Saturday

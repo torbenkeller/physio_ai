@@ -3,6 +3,8 @@ package de.keller.physioai.behandlungen.application
 import de.keller.physioai.behandlungen.domain.BehandlungAggregate
 import de.keller.physioai.behandlungen.ports.BehandlungenRepository
 import de.keller.physioai.behandlungen.ports.BehandlungenService
+import de.keller.physioai.behandlungen.ports.GetWeeklyCalendarBehandlungResponse
+import de.keller.physioai.patienten.PatientenRepository
 import de.keller.physioai.shared.AggregateNotFoundException
 import de.keller.physioai.shared.BehandlungId
 import de.keller.physioai.shared.PatientId
@@ -20,6 +22,7 @@ import java.time.temporal.TemporalAdjusters
 @Transactional
 class BehandlungenServiceImpl(
     private val behandlungenRepository: BehandlungenRepository,
+    private val patientenRepository: PatientenRepository,
 ) : BehandlungenService {
     override fun createBehandlung(
         patientId: PatientId,
@@ -60,7 +63,7 @@ class BehandlungenServiceImpl(
         return behandlungenRepository.delete(behandlung)
     }
 
-    override fun getWeeklyCalendar(date: LocalDate): Map<LocalDate, List<BehandlungAggregate>> {
+    override fun getWeeklyCalendar(date: LocalDate): Map<LocalDate, List<GetWeeklyCalendarBehandlungResponse>> {
         // Calculate week boundaries (Monday to Sunday)
         val weekStart = date.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY))
         val weekEnd = date.with(TemporalAdjusters.nextOrSame(DayOfWeek.SUNDAY))
@@ -70,22 +73,34 @@ class BehandlungenServiceImpl(
         val endDateTime = weekEnd.atTime(23, 59, 59)
 
         // Fetch treatments from repository
-        val treatments = behandlungenRepository.findAllByDateRange(startDateTime, endDateTime)
+        val behandlungen = behandlungenRepository.findAllByDateRange(startDateTime, endDateTime)
 
-        // Group treatments by actual date
-        val treatmentsByDate = treatments.groupBy { behandlung ->
-            behandlung.startZeit.toLocalDate()
+        // Fetch patient data for all treatments
+        val patientIds = behandlungen.map { it.patientId }.toSet()
+        val patients = patientenRepository.findAllByIdIn(patientIds)
+
+        // Enrich treatments with patient data
+        val enrichedBehandlungen = behandlungen.map { behandlung ->
+            GetWeeklyCalendarBehandlungResponse(
+                behandlungAggregate = behandlung,
+                patient = patients.find { it.id == behandlung.patientId } ?: throw AggregateNotFoundException(),
+            )
+        }
+
+        // Group enriched treatments by actual date
+        val behandlungByDate = enrichedBehandlungen.groupBy { response ->
+            response.behandlungAggregate.startZeit.toLocalDate()
         }
 
         // Return map with all dates in the week, using empty lists for dates without treatments
         return mapOf(
-            weekStart to treatmentsByDate[weekStart].orEmpty(),
-            weekStart.plusDays(1) to treatmentsByDate[weekStart.plusDays(1)].orEmpty(),
-            weekStart.plusDays(2) to treatmentsByDate[weekStart.plusDays(2)].orEmpty(),
-            weekStart.plusDays(3) to treatmentsByDate[weekStart.plusDays(3)].orEmpty(),
-            weekStart.plusDays(4) to treatmentsByDate[weekStart.plusDays(4)].orEmpty(),
-            weekStart.plusDays(5) to treatmentsByDate[weekStart.plusDays(5)].orEmpty(),
-            weekStart.plusDays(6) to treatmentsByDate[weekStart.plusDays(6)].orEmpty(),
+            weekStart to behandlungByDate[weekStart].orEmpty(),
+            weekStart.plusDays(1) to behandlungByDate[weekStart.plusDays(1)].orEmpty(),
+            weekStart.plusDays(2) to behandlungByDate[weekStart.plusDays(2)].orEmpty(),
+            weekStart.plusDays(3) to behandlungByDate[weekStart.plusDays(3)].orEmpty(),
+            weekStart.plusDays(4) to behandlungByDate[weekStart.plusDays(4)].orEmpty(),
+            weekStart.plusDays(5) to behandlungByDate[weekStart.plusDays(5)].orEmpty(),
+            weekStart.plusDays(6) to behandlungByDate[weekStart.plusDays(6)].orEmpty(),
         )
     }
 }

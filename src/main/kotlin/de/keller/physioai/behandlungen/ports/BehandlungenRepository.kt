@@ -4,6 +4,7 @@ import de.keller.physioai.behandlungen.domain.BehandlungAggregate
 import de.keller.physioai.shared.BehandlungId
 import de.keller.physioai.shared.PatientId
 import org.jmolecules.architecture.hexagonal.SecondaryPort
+import java.time.LocalDateTime
 
 @SecondaryPort
 interface BehandlungenRepository {
@@ -16,4 +17,9 @@ interface BehandlungenRepository {
     fun findAll(): List<BehandlungAggregate>
 
     fun delete(behandlung: BehandlungAggregate)
+
+    fun findAllByDateRange(
+        startDateTime: LocalDateTime,
+        endDateTime: LocalDateTime,
+    ): List<BehandlungAggregate>
 }

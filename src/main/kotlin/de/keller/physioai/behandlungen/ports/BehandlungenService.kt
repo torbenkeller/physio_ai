@@ -5,6 +5,7 @@ import de.keller.physioai.shared.BehandlungId
 import de.keller.physioai.shared.PatientId
 import de.keller.physioai.shared.RezeptId
 import org.jmolecules.architecture.hexagonal.PrimaryPort
+import java.time.LocalDate
 import java.time.LocalDateTime
 
 @PrimaryPort
@@ -24,4 +25,6 @@ interface BehandlungenService {
     ): BehandlungAggregate
 
     fun deleteBehandlung(id: BehandlungId)
+
+    fun getWeeklyCalendar(date: LocalDate): Map<LocalDate, List<BehandlungAggregate>>
 }

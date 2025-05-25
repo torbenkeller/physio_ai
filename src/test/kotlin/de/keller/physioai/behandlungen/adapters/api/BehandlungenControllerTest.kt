@@ -20,6 +20,7 @@ import org.springframework.http.MediaType
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers
+import java.time.LocalDate
 import java.time.LocalDateTime
 import java.util.UUID
 
@@ -390,6 +391,64 @@ class BehandlungenControllerTest {
                 .andExpect(MockMvcResultMatchers.status().isNotFound)
 
             verify { behandlungenService.deleteBehandlung(behandlungId) }
+        }
+    }
+
+    @Nested
+    inner class GetWeeklyCalendar {
+        @Test
+        fun `should return treatments grouped by weekdays for given week`() {
+            // Arrange
+            val queryDate = "2024-01-15" // Monday
+
+            // Create test treatments for that week (Monday 15th to Sunday 21st)
+            val mondayTreatment = BehandlungAggregate(
+                id = BehandlungId(UUID.fromString("11111111-1111-1111-1111-111111111111")),
+                patientId = PatientId(UUID.fromString("d7e8f9a0-b1c2-3d4e-5f6a-7b8c9d0e1f2a")),
+                startZeit = LocalDateTime.of(2024, 1, 15, 10, 0), // Monday
+                endZeit = LocalDateTime.of(2024, 1, 15, 11, 0),
+                rezeptId = null,
+                version = 0,
+            )
+
+            val wednesdayTreatment = BehandlungAggregate(
+                id = BehandlungId(UUID.fromString("22222222-2222-2222-2222-222222222222")),
+                patientId = PatientId(UUID.fromString("a1b2c3d4-e5f6-7890-1234-567890abcdef")),
+                startZeit = LocalDateTime.of(2024, 1, 17, 14, 0), // Wednesday
+                endZeit = LocalDateTime.of(2024, 1, 17, 15, 0),
+                rezeptId = null,
+                version = 0,
+            )
+
+            // Mock service to return treatments grouped by dates
+            val weeklyCalendar = mapOf(
+                LocalDate.of(2024, 1, 15) to listOf(mondayTreatment), // Monday
+                LocalDate.of(2024, 1, 16) to emptyList<BehandlungAggregate>(), // Tuesday
+                LocalDate.of(2024, 1, 17) to listOf(wednesdayTreatment), // Wednesday
+                LocalDate.of(2024, 1, 18) to emptyList<BehandlungAggregate>(), // Thursday
+                LocalDate.of(2024, 1, 19) to emptyList<BehandlungAggregate>(), // Friday
+                LocalDate.of(2024, 1, 20) to emptyList<BehandlungAggregate>(), // Saturday
+                LocalDate.of(2024, 1, 21) to emptyList<BehandlungAggregate>(), // Sunday
+            )
+
+            every { behandlungenService.getWeeklyCalendar(LocalDate.of(2024, 1, 15)) } returns weeklyCalendar
+
+            // Act & Assert
+            mockMvc
+                .perform(MockMvcRequestBuilders.get("/behandlungen/calender/week?date=2024-01-15"))
+                .andExpect(MockMvcResultMatchers.status().isOk)
+                .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(MockMvcResultMatchers.jsonPath("$['2024-01-15'].length()").value(1)) // Monday
+                .andExpect(MockMvcResultMatchers.jsonPath("$['2024-01-15'][0].id").value("11111111-1111-1111-1111-111111111111"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$['2024-01-16'].length()").value(0)) // Tuesday
+                .andExpect(MockMvcResultMatchers.jsonPath("$['2024-01-17'].length()").value(1)) // Wednesday
+                .andExpect(MockMvcResultMatchers.jsonPath("$['2024-01-17'][0].id").value("22222222-2222-2222-2222-222222222222"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$['2024-01-18'].length()").value(0)) // Thursday
+                .andExpect(MockMvcResultMatchers.jsonPath("$['2024-01-19'].length()").value(0)) // Friday
+                .andExpect(MockMvcResultMatchers.jsonPath("$['2024-01-20'].length()").value(0)) // Saturday
+                .andExpect(MockMvcResultMatchers.jsonPath("$['2024-01-21'].length()").value(0)) // Sunday
+
+            verify { behandlungenService.getWeeklyCalendar(LocalDate.of(2024, 1, 15)) }
         }
     }
 }

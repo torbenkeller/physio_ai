@@ -10,7 +10,10 @@ import de.keller.physioai.shared.RezeptId
 import org.jmolecules.architecture.hexagonal.Application
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import java.time.DayOfWeek
+import java.time.LocalDate
 import java.time.LocalDateTime
+import java.time.temporal.TemporalAdjusters
 
 @Application
 @Service
@@ -55,5 +58,34 @@ class BehandlungenServiceImpl(
             ?: throw AggregateNotFoundException()
 
         return behandlungenRepository.delete(behandlung)
+    }
+
+    override fun getWeeklyCalendar(date: LocalDate): Map<LocalDate, List<BehandlungAggregate>> {
+        // Calculate week boundaries (Monday to Sunday)
+        val weekStart = date.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY))
+        val weekEnd = date.with(TemporalAdjusters.nextOrSame(DayOfWeek.SUNDAY))
+
+        // Get all treatments for the week
+        val startDateTime = weekStart.atStartOfDay()
+        val endDateTime = weekEnd.atTime(23, 59, 59)
+
+        // Fetch treatments from repository
+        val treatments = behandlungenRepository.findAllByDateRange(startDateTime, endDateTime)
+
+        // Group treatments by actual date
+        val treatmentsByDate = treatments.groupBy { behandlung ->
+            behandlung.startZeit.toLocalDate()
+        }
+
+        // Return map with all dates in the week, using empty lists for dates without treatments
+        return mapOf(
+            weekStart to treatmentsByDate[weekStart].orEmpty(),
+            weekStart.plusDays(1) to treatmentsByDate[weekStart.plusDays(1)].orEmpty(),
+            weekStart.plusDays(2) to treatmentsByDate[weekStart.plusDays(2)].orEmpty(),
+            weekStart.plusDays(3) to treatmentsByDate[weekStart.plusDays(3)].orEmpty(),
+            weekStart.plusDays(4) to treatmentsByDate[weekStart.plusDays(4)].orEmpty(),
+            weekStart.plusDays(5) to treatmentsByDate[weekStart.plusDays(5)].orEmpty(),
+            weekStart.plusDays(6) to treatmentsByDate[weekStart.plusDays(6)].orEmpty(),
+        )
     }
 }

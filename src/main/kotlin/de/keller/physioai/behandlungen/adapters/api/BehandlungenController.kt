@@ -15,8 +15,10 @@ import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.PutMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
+import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.ResponseStatus
 import org.springframework.web.bind.annotation.RestController
+import java.time.LocalDate
 import java.util.UUID
 
 @PrimaryAdapter
@@ -83,4 +85,16 @@ class BehandlungenController(
     fun deleteBehandlung(
         @PathVariable id: UUID,
     ) = behandlungenService.deleteBehandlung(BehandlungId(id))
+
+    @GetMapping("/calender/week")
+    fun getWeeklyCalendar(
+        @RequestParam date: String,
+    ): Map<LocalDate, List<BehandlungDto>> {
+        val parsedDate = LocalDate.parse(date)
+        val weeklyCalendar = behandlungenService.getWeeklyCalendar(parsedDate)
+        return weeklyCalendar
+            .mapValues { (_, behandlungen) ->
+                behandlungen.map { BehandlungDto.fromDomain(it) }
+            }
+    }
 }

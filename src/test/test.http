@@ -24,3 +24,9 @@ Content-Type: application/json
 GET http://localhost:8080/behandlungen
 Content-Type: application/json
 
+
+###
+
+GET http://localhost:8080/behandlungen/calender/week?date=2024-04-02
+Content-Type: application/json
+

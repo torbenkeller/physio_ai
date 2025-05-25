@@ -75,7 +75,7 @@ class RezepteControllerTest {
     private val patientId = PatientId(UUID.randomUUID())
     private val behandlungsartId1 = BehandlungsartId(UUID.randomUUID())
     private val behandlungsartId2 = BehandlungsartId(UUID.randomUUID())
-    private val arztId = ArztId.generate()
+    private val arztId = ArztId(UUID.randomUUID())
     private val rezeptId1 = RezeptId(UUID.randomUUID())
     private val rezeptId2 = RezeptId(UUID.randomUUID())
     private val ausgestelltAm = LocalDate.of(2023, 1, 1)

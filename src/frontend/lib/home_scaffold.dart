@@ -1,4 +1,5 @@
-import 'package:flutter/material.dart' hide NavigationDrawer, NavigationDrawerDestination;
+import 'package:flutter/material.dart'
+    hide NavigationDrawer, NavigationDrawerDestination;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:physio_ai/profile/infrastructure/profile_repository.dart';
@@ -29,10 +30,12 @@ enum Breakpoint {
 }
 
 final profilePictureUrlProvider = FutureProvider((ref) {
-  return ref.watch(profileProvider.selectAsync((value) => value.profilePictureUrl));
+  return ref
+      .watch(profileProvider.selectAsync((value) => value.profilePictureUrl));
 });
 
-final profileButtonTextProvider = FutureProvider<({String inhaberName, String praxisName})>((ref) {
+final profileButtonTextProvider =
+    FutureProvider<({String inhaberName, String praxisName})>((ref) {
   return ref.watch(
     profileProvider.selectAsync(
       (value) => (inhaberName: value.inhaberName, praxisName: value.praxisName),
@@ -60,6 +63,10 @@ class HomeScaffold extends StatelessWidget {
     (
       icon: Icons.people,
       label: 'Patienten',
+    ),
+    (
+      icon: Icons.medical_services,
+      label: 'Behandlungen',
     ),
     (
       icon: Icons.document_scanner,
@@ -122,7 +129,8 @@ class HomeScaffold extends StatelessWidget {
                 padding: const EdgeInsets.all(12),
                 header: Padding(
                   padding: const EdgeInsets.fromLTRB(16, 16, 16, 10),
-                  child: Text('Physio.ai', style: Theme.of(context).textTheme.titleSmall),
+                  child: Text('Physio.ai',
+                      style: Theme.of(context).textTheme.titleSmall),
                 ),
                 footer: const NavigationDrawerDestination(
                   label: _ProfileLabel(),

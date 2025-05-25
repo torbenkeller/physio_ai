@@ -7,19 +7,12 @@
       ],
       "env": {
         "PORT": "3334",
-        "LOG_LEVEL": "critical"
+        "LOG_LEVEL": "critical",
+        "RESOURCES_SUPPORTED": "true",
+        "IMAGES_SUPPORTED": "true"
       },
       "disabled": false,
       "autoApprove": []
-    },
-
-    "pubdev": {
-      "command": "dart",
-      "args": [
-        "run"
-      ],
-      "workingDirectory": "/Users/torben/Desktop/Projects/pubdev_mcp",
-      "disabled": true
     }
   }
 }

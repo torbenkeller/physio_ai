@@ -4,7 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:physio_ai/home_scaffold.dart';
 import 'package:physio_ai/rezepte/model/rezept.dart';
-import 'package:physio_ai/rezepte/rezepte_page.dart';
+import 'package:physio_ai/rezepte/presentation/rezepte_page.dart';
 import 'package:physio_ai/shared_kernel/presentation/week_calendar_widget.dart';
 
 final rezeptProvider = FutureProvider.family<Rezept?, String>((ref, id) async {
@@ -38,9 +38,7 @@ class RezeptDetailPage extends ConsumerWidget {
 
         return Scaffold(
           appBar: AppBar(
-            leading: breakpoint.isDesktop()
-                ? const CloseButton()
-                : const BackButton(),
+            leading: breakpoint.isDesktop() ? const CloseButton() : const BackButton(),
             title: const Text('Rezept Details'),
             actions: [
               IconButton(
@@ -59,8 +57,8 @@ class RezeptDetailPage extends ConsumerWidget {
                 _buildPatientAndDateSection(rezept, theme),
                 const SizedBox(height: 24),
                 _buildBehandlungenSection(rezept, theme),
-                const SizedBox(height: 24),
-                _buildCalendarSection(rezept, theme),
+                // const SizedBox(height: 24),
+                // _buildCalendarSection(rezept, theme),
                 const SizedBox(height: 32),
                 Align(
                   child: ElevatedButton.icon(
@@ -185,8 +183,7 @@ class RezeptDetailPage extends ConsumerWidget {
                     ),
                   ],
                 ),
-                for (final position in rezept.positionen)
-                  _buildPositionRow(position, theme),
+                for (final position in rezept.positionen) _buildPositionRow(position, theme),
                 _buildTableFooterRow(rezept, theme),
               ],
             ),
@@ -285,9 +282,7 @@ class RezeptDetailPage extends ConsumerWidget {
       );
     }
 
-    final events = rezept.behandlungen
-        .map(CalendarEvent.fromBehandlung)
-        .toList();
+    final events = rezept.behandlungen.map(CalendarEvent.fromBehandlung).toList();
 
     return _buildSection(
       title: 'Behandlungstermine',
@@ -300,12 +295,12 @@ class RezeptDetailPage extends ConsumerWidget {
             color: colorScheme.outline.withOpacity(0.2),
           ),
         ),
-        child: WeekCalendarWidget(
-          events: events,
-          onEventTap: (event) {
-            // Event tap handler - could navigate to edit or show details
-          },
-        ),
+        // child: WeekCalendarWidget(
+        //   events: events.lock,
+        //   onEventTap: (event) {
+        //     // Event tap handler - could navigate to edit or show details
+        //   },
+        // ),
       ),
     );
   }

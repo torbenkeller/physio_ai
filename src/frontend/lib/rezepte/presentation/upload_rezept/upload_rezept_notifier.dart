@@ -11,7 +11,7 @@ import 'package:physio_ai/rezepte/infrastructure/rezept_form_dto.dart';
 import 'package:physio_ai/rezepte/infrastructure/rezept_repository.dart';
 import 'package:physio_ai/rezepte/model/rezept.dart';
 import 'package:physio_ai/rezepte/model/rezept_einlesen_response.dart';
-import 'package:physio_ai/rezepte/rezepte_page.dart';
+import 'package:physio_ai/rezepte/presentation/rezepte_page.dart';
 
 part 'generated/upload_rezept_notifier.freezed.dart';
 

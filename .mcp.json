@@ -1,18 +1,15 @@
 {
   "mcpServers": {
-    "flutter-inspector": {
+    "flutterInspector": {
       "command": "node",
       "args": [
         "/Users/torben/Desktop/Projects/mcp_flutter/mcp_server/build/index.js"
       ],
       "env": {
         "PORT": "3334",
-        "LOG_LEVEL": "critical",
-        "RESOURCES_SUPPORTED": "true",
-        "IMAGES_SUPPORTED": "true"
+        "LOG_LEVEL": "critical"
       },
-      "disabled": false,
-      "autoApprove": []
+      "disabled": false
     }
   }
 }

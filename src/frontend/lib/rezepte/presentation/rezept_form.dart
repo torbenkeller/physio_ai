@@ -9,7 +9,7 @@ import 'package:physio_ai/patienten/presentation/patienten_page.dart';
 import 'package:physio_ai/rezepte/infrastructure/rezept_repository.dart';
 import 'package:physio_ai/rezepte/model/rezept.dart';
 import 'package:physio_ai/rezepte/presentation/rezept_form_container.dart';
-import 'package:physio_ai/rezepte/rezepte_page.dart';
+import 'package:physio_ai/rezepte/presentation/rezepte_page.dart';
 
 final rezeptFormContainerProvider =
     Provider.family.autoDispose<RezeptFormContainer, Rezept?>((ref, rezept) {

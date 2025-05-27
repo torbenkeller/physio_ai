@@ -1,3 +1,4 @@
+import 'package:fast_immutable_collections/fast_immutable_collections.dart';
 import 'package:flutter/material.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:intl/intl.dart';
@@ -27,45 +28,46 @@ abstract class CalendarEvent with _$CalendarEvent {
   }
 }
 
+typedef WorkingHours = ({int startHour, int endHour});
+
 /// Week calendar widget that displays events for a single week
 class WeekCalendarWidget extends StatefulWidget {
   const WeekCalendarWidget({
     required this.events,
-    this.selectedDate,
-    this.onDateSelected,
+    required this.selectedWeek,
+    this.onWeekSelected,
     this.onEventTap,
     this.eventHeight = 32.0,
     this.hourHeight = 60.0,
-    this.startHour = 8,
-    this.endHour = 20,
+    this.workingHours = (startHour: 9, endHour: 18),
     super.key,
   });
 
-  final List<CalendarEvent> events;
-  final DateTime? selectedDate;
-  final ValueChanged<DateTime>? onDateSelected;
+  final IList<CalendarEvent> events;
+  final ValueChanged<DateTime>? onWeekSelected;
   final ValueChanged<CalendarEvent>? onEventTap;
   final double eventHeight;
   final double hourHeight;
-  final int startHour;
-  final int endHour;
+  final WorkingHours workingHours;
+  final DateTime selectedWeek;
 
   @override
   State<WeekCalendarWidget> createState() => _WeekCalendarWidgetState();
 }
 
 class _WeekCalendarWidgetState extends State<WeekCalendarWidget> {
-  late DateTime _currentWeek;
+  late ScrollController _scrollController;
 
   @override
   void initState() {
     super.initState();
-    _currentWeek = widget.selectedDate ?? DateTime.now();
+    _scrollController = ScrollController(
+        initialScrollOffset: (widget.workingHours.startHour - 1) * widget.hourHeight);
   }
 
   DateTime get _weekStart {
-    final weekday = _currentWeek.weekday;
-    return _currentWeek.subtract(Duration(days: weekday - 1));
+    final weekday = widget.selectedWeek.weekday;
+    return widget.selectedWeek.subtract(Duration(days: weekday - 1));
   }
 
   List<DateTime> get _weekDays {
@@ -76,28 +78,20 @@ class _WeekCalendarWidgetState extends State<WeekCalendarWidget> {
   List<CalendarEvent> _getEventsForDay(DateTime day) {
     return widget.events.where((event) {
       final eventDate = event.startTime;
-      return eventDate.year == day.year &&
-          eventDate.month == day.month &&
-          eventDate.day == day.day;
+      return eventDate.year == day.year && eventDate.month == day.month && eventDate.day == day.day;
     }).toList();
   }
 
   void _previousWeek() {
-    setState(() {
-      _currentWeek = _currentWeek.subtract(const Duration(days: 7));
-    });
+    widget.onWeekSelected?.call(widget.selectedWeek.subtract(const Duration(days: 7)));
   }
 
   void _nextWeek() {
-    setState(() {
-      _currentWeek = _currentWeek.add(const Duration(days: 7));
-    });
+    widget.onWeekSelected?.call(widget.selectedWeek.add(const Duration(days: 7)));
   }
 
   void _goToToday() {
-    setState(() {
-      _currentWeek = DateTime.now();
-    });
+    widget.onWeekSelected?.call(DateTime.now());
   }
 
   @override
@@ -108,12 +102,8 @@ class _WeekCalendarWidgetState extends State<WeekCalendarWidget> {
     return Column(
       children: [
         // Header with navigation
-        Container(
-          padding: const EdgeInsets.all(16),
-          decoration: BoxDecoration(
-            color: colorScheme.surfaceContainerHighest,
-            borderRadius: const BorderRadius.vertical(top: Radius.circular(12)),
-          ),
+        Padding(
+          padding: const EdgeInsets.only(bottom: 8),
           child: Row(
             children: [
               IconButton(
@@ -125,13 +115,13 @@ class _WeekCalendarWidgetState extends State<WeekCalendarWidget> {
                   child: Column(
                     children: [
                       Text(
-                        DateFormat('MMMM yyyy', 'de').format(_currentWeek),
+                        DateFormat('MMMM yyyy', 'de').format(widget.selectedWeek),
                         style: theme.textTheme.titleMedium?.copyWith(
                           fontWeight: FontWeight.bold,
                         ),
                       ),
                       Text(
-                        'KW ${_getWeekNumber(_currentWeek)}',
+                        'KW ${_getWeekNumber(widget.selectedWeek)}',
                         style: theme.textTheme.bodySmall?.copyWith(
                           color: colorScheme.onSurface.withOpacity(0.7),
                         ),
@@ -154,87 +144,76 @@ class _WeekCalendarWidgetState extends State<WeekCalendarWidget> {
 
         // Calendar grid
         Expanded(
-          child: Container(
-            decoration: BoxDecoration(
-              border: Border.all(color: colorScheme.outline.withOpacity(0.2)),
-              borderRadius:
-                  const BorderRadius.vertical(bottom: Radius.circular(12)),
-            ),
-            child: Column(
-              children: [
-                // Day headers
-                Container(
-                  height: 48,
-                  decoration: BoxDecoration(
-                    color: colorScheme.surfaceContainerHigh,
-                    border: Border(
-                      bottom: BorderSide(
-                        color: colorScheme.outline.withOpacity(0.2),
-                      ),
+          child: Column(
+            children: [
+              // Day headers
+              Container(
+                height: 48,
+                decoration: BoxDecoration(
+                  border: Border(
+                    bottom: BorderSide(
+                      color: colorScheme.outline.withOpacity(0.2),
                     ),
                   ),
-                  child: Row(
-                    children: [
-                      // Time column header
-                      Container(
-                        width: 60,
-                        decoration: BoxDecoration(
-                          border: Border(
-                            right: BorderSide(
-                              color: colorScheme.outline.withOpacity(0.2),
-                            ),
+                ),
+                child: Row(
+                  children: [
+                    // Time column header
+                    Container(
+                      width: 60,
+                      decoration: BoxDecoration(
+                        border: Border(
+                          right: BorderSide(
+                            color: colorScheme.outline.withOpacity(0.2),
                           ),
                         ),
                       ),
-                      // Day headers
-                      for (final day in _weekDays)
-                        Expanded(
-                          child: _buildDayHeader(day, theme),
-                        ),
-                    ],
-                  ),
+                    ),
+                    // Day headers
+                    for (final day in _weekDays)
+                      Expanded(
+                        child: _buildDayHeader(day, theme),
+                      ),
+                  ],
                 ),
+              ),
 
-                // Calendar body
-                Expanded(
-                  child: SingleChildScrollView(
-                    child: SizedBox(
-                      height: (widget.endHour - widget.startHour) *
-                          widget.hourHeight,
-                      child: Row(
-                        children: [
-                          // Time column
-                          Container(
-                            width: 60,
-                            decoration: BoxDecoration(
-                              border: Border(
-                                right: BorderSide(
-                                  color: colorScheme.outline.withOpacity(0.2),
-                                ),
+              // Calendar body
+              Expanded(
+                child: SingleChildScrollView(
+                  controller: _scrollController,
+                  child: SizedBox(
+                    height: 24 * widget.hourHeight,
+                    child: Row(
+                      children: [
+                        // Time column
+                        Container(
+                          width: 60,
+                          decoration: BoxDecoration(
+                            border: Border(
+                              right: BorderSide(
+                                color: colorScheme.outline.withOpacity(0.2),
                               ),
                             ),
-                            child: Column(
-                              children: [
-                                for (int hour = widget.startHour;
-                                    hour < widget.endHour;
-                                    hour++)
-                                  _buildHourLabel(hour, theme),
-                              ],
-                            ),
                           ),
+                          child: Column(
+                            children: [
+                              for (int hour = 0; hour < 24; hour++) _buildHourLabel(hour, theme),
+                            ],
+                          ),
+                        ),
 
-                          // Day columns
-                          for (final day in _weekDays)
-                            Expanded(
-                              child: _buildDayColumn(day, theme),
-                            ),
-                        ],
-                      ),
+                        // Day columns
+                        for (final (index, day) in _weekDays.indexed)
+                          Expanded(
+                            child: _buildDayColumn(day, theme, _weekDays.length - 1 == index),
+                          ),
+                      ],
                     ),
                   ),
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
         ),
       ],
@@ -244,11 +223,9 @@ class _WeekCalendarWidgetState extends State<WeekCalendarWidget> {
   Widget _buildDayHeader(DateTime day, ThemeData theme) {
     final colorScheme = theme.colorScheme;
     final isToday = _isToday(day);
-    final isSelected =
-        widget.selectedDate != null && _isSameDay(day, widget.selectedDate!);
 
     return GestureDetector(
-      onTap: () => widget.onDateSelected?.call(day),
+      onTap: () => widget.onWeekSelected?.call(day),
       child: Container(
         decoration: BoxDecoration(
           border: Border(
@@ -256,7 +233,6 @@ class _WeekCalendarWidgetState extends State<WeekCalendarWidget> {
               color: colorScheme.outline.withOpacity(0.2),
             ),
           ),
-          color: isSelected ? colorScheme.primary.withOpacity(0.1) : null,
         ),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -296,32 +272,44 @@ class _WeekCalendarWidgetState extends State<WeekCalendarWidget> {
     );
   }
 
-  Widget _buildDayColumn(DateTime day, ThemeData theme) {
+  Widget _buildDayColumn(DateTime day, ThemeData theme, bool isLastColumn) {
     final colorScheme = theme.colorScheme;
     final events = _getEventsForDay(day);
 
+    final boxDecoration = isLastColumn
+        ? null
+        : BoxDecoration(
+            border: Border(
+              right: BorderSide(
+                color: colorScheme.outline.withOpacity(0.2),
+              ),
+            ),
+          );
+
     return Container(
-      decoration: BoxDecoration(
-        border: Border(
-          right: BorderSide(
-            color: colorScheme.outline.withOpacity(0.2),
-          ),
-        ),
-      ),
+      decoration: boxDecoration,
       child: Stack(
         children: [
           // Hour dividers
-          for (int hour = widget.startHour; hour < widget.endHour; hour++)
-            Positioned(
-              top: (hour - widget.startHour) * widget.hourHeight,
-              left: 0,
-              right: 0,
-              child: Container(
-                height: 1,
-                color: colorScheme.outline.withOpacity(0.1),
-              ),
-            ),
-
+          Column(
+            children: [
+              for (int hour = 0; hour < 24; hour++)
+                Container(
+                  height: widget.hourHeight,
+                  decoration: BoxDecoration(
+                    color:
+                        hour < widget.workingHours.startHour || hour > widget.workingHours.endHour
+                            ? colorScheme.surfaceContainer
+                            : null,
+                    border: Border(
+                      bottom: BorderSide(
+                        color: colorScheme.outline.withOpacity(0.2),
+                      ),
+                    ),
+                  ),
+                )
+            ],
+          ),
           // Events
           for (final event in events) _buildEventWidget(event, day, theme),
         ],
@@ -337,8 +325,7 @@ class _WeekCalendarWidgetState extends State<WeekCalendarWidget> {
     final endMinutes = event.endTime.hour * 60 + event.endTime.minute;
     final durationMinutes = endMinutes - startMinutes;
 
-    final startOffset =
-        (startMinutes - widget.startHour * 60) / 60 * widget.hourHeight;
+    final startOffset = startMinutes / 60 * widget.hourHeight;
     final height = durationMinutes / 60 * widget.hourHeight;
 
     return Positioned(
@@ -385,19 +372,15 @@ class _WeekCalendarWidgetState extends State<WeekCalendarWidget> {
 
   bool _isToday(DateTime date) {
     final today = DateTime.now();
-    return date.year == today.year &&
-        date.month == today.month &&
-        date.day == today.day;
+    return _isSameDay(today, date);
   }
 
   bool _isSameDay(DateTime date1, DateTime date2) {
-    return date1.year == date2.year &&
-        date1.month == date2.month &&
-        date1.day == date2.day;
+    return DateUtils.dateOnly(date1) == DateUtils.dateOnly(date2);
   }
 
   int _getWeekNumber(DateTime date) {
-    final firstDayOfYear = DateTime(date.year, 1, 1);
+    final firstDayOfYear = DateTime(date.year);
     final daysSinceFirstDay = date.difference(firstDayOfYear).inDays;
     return ((daysSinceFirstDay + firstDayOfYear.weekday - 1) / 7).ceil();
   }

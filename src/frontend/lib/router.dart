@@ -1,29 +1,25 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:physio_ai/behandlungen/behandlungen_page.dart';
+import 'package:physio_ai/behandlungen/presentation/behandlungen_page.dart';
 import 'package:physio_ai/home_scaffold.dart';
 import 'package:physio_ai/patienten/presentation/create_patient_page.dart';
 import 'package:physio_ai/patienten/presentation/patient_detail_page.dart';
 import 'package:physio_ai/patienten/presentation/patienten_page.dart';
 import 'package:physio_ai/profile/presentation/profile_page.dart';
-import 'package:physio_ai/rezepte/home_page.dart';
 import 'package:physio_ai/rezepte/presentation/create_rezept_page.dart';
 import 'package:physio_ai/rezepte/presentation/rezept_detail_page.dart';
 import 'package:physio_ai/rezepte/presentation/rezept_edit_page.dart';
+import 'package:physio_ai/rezepte/presentation/rezepte_page.dart';
 import 'package:physio_ai/rezepte/presentation/upload_rezept/upload_rezept_page.dart';
-import 'package:physio_ai/rezepte/rezepte_page.dart';
+import 'package:physio_ai/shared_kernel/presentation/home_page.dart';
 
 final _rootNavigatorKey = GlobalKey<NavigatorState>();
 final _shellKey = GlobalKey<StatefulNavigationShellState>();
-final _shellNavigatorHomeKey =
-    GlobalKey<NavigatorState>(debugLabel: 'shellHome');
-final _shellNavigatorPatientenKey =
-    GlobalKey<NavigatorState>(debugLabel: 'shellPatienten');
-final _shellNavigatorRezepteKey =
-    GlobalKey<NavigatorState>(debugLabel: 'shellRezepte');
-final _shellNavigatorProfileKey =
-    GlobalKey<NavigatorState>(debugLabel: 'shellProfile');
+final _shellNavigatorHomeKey = GlobalKey<NavigatorState>(debugLabel: 'shellHome');
+final _shellNavigatorPatientenKey = GlobalKey<NavigatorState>(debugLabel: 'shellPatienten');
+final _shellNavigatorRezepteKey = GlobalKey<NavigatorState>(debugLabel: 'shellRezepte');
+final _shellNavigatorProfileKey = GlobalKey<NavigatorState>(debugLabel: 'shellProfile');
 
 final _mobileRouterConfig = RoutingConfig(
   routes: [
@@ -218,11 +214,9 @@ final _desktopRouterConfig = RoutingConfig(
                 GoRoute(
                   path: ':id',
                   pageBuilder: (context, state) => NoTransitionPage(
-                    key: ValueKey(
-                        'rezepteDetailPage-${state.pathParameters['id']}'),
+                    key: ValueKey('rezepteDetailPage-${state.pathParameters['id']}'),
                     child: SplittedRezeptePage(
-                      rightPane:
-                          RezeptDetailPage(id: state.pathParameters['id']!),
+                      rightPane: RezeptDetailPage(id: state.pathParameters['id']!),
                       isContextCreate: true,
                     ),
                   ),
@@ -230,11 +224,9 @@ final _desktopRouterConfig = RoutingConfig(
                     GoRoute(
                       path: 'edit',
                       pageBuilder: (context, state) => NoTransitionPage(
-                        key: ValueKey(
-                            'rezepteEditPage-${state.pathParameters['id']}'),
+                        key: ValueKey('rezepteEditPage-${state.pathParameters['id']}'),
                         child: SplittedRezeptePage(
-                          rightPane:
-                              RezeptEditPage(id: state.pathParameters['id']!),
+                          rightPane: RezeptEditPage(id: state.pathParameters['id']!),
                           isContextCreate: true,
                         ),
                       ),

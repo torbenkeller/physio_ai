@@ -2,7 +2,7 @@ import 'package:fast_immutable_collections/fast_immutable_collections.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:physio_ai/behandlungen/presentation/behandlungen_calendar_provider.dart';
-import 'package:physio_ai/shared_kernel/presentation/week_calendar_widget.dart';
+import 'package:physio_ai/behandlungen/presentation/behandlungen_week_calendar_widget.dart';
 
 class BehandlungenPage extends ConsumerStatefulWidget {
   const BehandlungenPage({super.key});
@@ -17,17 +17,7 @@ class _BehandlungenPageState extends ConsumerState<BehandlungenPage> {
   @override
   Widget build(BuildContext context) {
     final events = ref.watch(weeklyCalendarProvider(_selectedWeek));
-    final calenderEvents = (events.value ?? IList())
-        .map(
-          (b) => CalendarEvent(
-            startTime: b.startZeit,
-            endTime: b.endZeit,
-            title: b.patient.name,
-            color: Colors.blueAccent,
-            id: b.id,
-          ),
-        )
-        .toIList();
+    final calenderEvents = events.value ?? IList();
 
     return Scaffold(
       body: Padding(
@@ -40,24 +30,9 @@ class _BehandlungenPageState extends ConsumerState<BehandlungenPage> {
               child: Card(
                 child: Padding(
                   padding: const EdgeInsets.all(16),
-                  child: WeekCalendarWidget(
+                  child: BehandlungenWeekCalendarWidget(
                     events: calenderEvents,
                     selectedWeek: _selectedWeek,
-                    onEventDialogRequested: (eventId) =>
-                        events.value!.firstWhere((b) => b.id == eventId).let(
-                              (event) => EventDialogInfo(
-                                title: event.patient.name,
-                                timeRange: '${event.startZeit} - ${event.endZeit}',
-                              ),
-                            ),
-                    onEventTap: (event) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text('Behandlung: ${event.title}'),
-                          duration: const Duration(seconds: 2),
-                        ),
-                      );
-                    },
                     onWeekSelected: (date) {
                       setState(() {
                         _selectedWeek = date;

@@ -4,7 +4,7 @@
 // ignore_for_file: type=lint
 // ignore_for_file: unused_element, deprecated_member_use, deprecated_member_use_from_same_package, use_function_type_syntax_for_parameters, unnecessary_const, avoid_init_to_null, invalid_override_different_default_values_named, prefer_expression_function_bodies, annotate_overrides, invalid_annotation_target, unnecessary_question_mark
 
-part of '../week_calendar_widget.dart';
+part of '../behandlungen_week_calendar_widget.dart';
 
 // **************************************************************************
 // FreezedGenerator
@@ -26,8 +26,7 @@ mixin _$CalendarEvent {
   @JsonKey(includeFromJson: false, includeToJson: false)
   @pragma('vm:prefer-inline')
   $CalendarEventCopyWith<CalendarEvent> get copyWith =>
-      _$CalendarEventCopyWithImpl<CalendarEvent>(
-          this as CalendarEvent, _$identity);
+      _$CalendarEventCopyWithImpl<CalendarEvent>(this as CalendarEvent, _$identity);
 
   @override
   bool operator ==(Object other) {
@@ -35,16 +34,14 @@ mixin _$CalendarEvent {
         (other.runtimeType == runtimeType &&
             other is CalendarEvent &&
             (identical(other.id, id) || other.id == id) &&
-            (identical(other.startTime, startTime) ||
-                other.startTime == startTime) &&
+            (identical(other.startTime, startTime) || other.startTime == startTime) &&
             (identical(other.endTime, endTime) || other.endTime == endTime) &&
             (identical(other.title, title) || other.title == title) &&
             (identical(other.color, color) || other.color == color));
   }
 
   @override
-  int get hashCode =>
-      Object.hash(runtimeType, id, startTime, endTime, title, color);
+  int get hashCode => Object.hash(runtimeType, id, startTime, endTime, title, color);
 
   @override
   String toString() {
@@ -54,21 +51,14 @@ mixin _$CalendarEvent {
 
 /// @nodoc
 abstract mixin class $CalendarEventCopyWith<$Res> {
-  factory $CalendarEventCopyWith(
-          CalendarEvent value, $Res Function(CalendarEvent) _then) =
+  factory $CalendarEventCopyWith(CalendarEvent value, $Res Function(CalendarEvent) _then) =
       _$CalendarEventCopyWithImpl;
   @useResult
-  $Res call(
-      {String id,
-      DateTime startTime,
-      DateTime endTime,
-      String title,
-      Color? color});
+  $Res call({String id, DateTime startTime, DateTime endTime, String title, Color? color});
 }
 
 /// @nodoc
-class _$CalendarEventCopyWithImpl<$Res>
-    implements $CalendarEventCopyWith<$Res> {
+class _$CalendarEventCopyWithImpl<$Res> implements $CalendarEventCopyWith<$Res> {
   _$CalendarEventCopyWithImpl(this._self, this._then);
 
   final CalendarEvent _self;
@@ -146,16 +136,14 @@ class _CalendarEvent extends CalendarEvent {
         (other.runtimeType == runtimeType &&
             other is _CalendarEvent &&
             (identical(other.id, id) || other.id == id) &&
-            (identical(other.startTime, startTime) ||
-                other.startTime == startTime) &&
+            (identical(other.startTime, startTime) || other.startTime == startTime) &&
             (identical(other.endTime, endTime) || other.endTime == endTime) &&
             (identical(other.title, title) || other.title == title) &&
             (identical(other.color, color) || other.color == color));
   }
 
   @override
-  int get hashCode =>
-      Object.hash(runtimeType, id, startTime, endTime, title, color);
+  int get hashCode => Object.hash(runtimeType, id, startTime, endTime, title, color);
 
   @override
   String toString() {
@@ -164,24 +152,16 @@ class _CalendarEvent extends CalendarEvent {
 }
 
 /// @nodoc
-abstract mixin class _$CalendarEventCopyWith<$Res>
-    implements $CalendarEventCopyWith<$Res> {
-  factory _$CalendarEventCopyWith(
-          _CalendarEvent value, $Res Function(_CalendarEvent) _then) =
+abstract mixin class _$CalendarEventCopyWith<$Res> implements $CalendarEventCopyWith<$Res> {
+  factory _$CalendarEventCopyWith(_CalendarEvent value, $Res Function(_CalendarEvent) _then) =
       __$CalendarEventCopyWithImpl;
   @override
   @useResult
-  $Res call(
-      {String id,
-      DateTime startTime,
-      DateTime endTime,
-      String title,
-      Color? color});
+  $Res call({String id, DateTime startTime, DateTime endTime, String title, Color? color});
 }
 
 /// @nodoc
-class __$CalendarEventCopyWithImpl<$Res>
-    implements _$CalendarEventCopyWith<$Res> {
+class __$CalendarEventCopyWithImpl<$Res> implements _$CalendarEventCopyWith<$Res> {
   __$CalendarEventCopyWithImpl(this._self, this._then);
 
   final _CalendarEvent _self;
@@ -236,8 +216,7 @@ mixin _$EventDialogInfo {
   @JsonKey(includeFromJson: false, includeToJson: false)
   @pragma('vm:prefer-inline')
   $EventDialogInfoCopyWith<EventDialogInfo> get copyWith =>
-      _$EventDialogInfoCopyWithImpl<EventDialogInfo>(
-          this as EventDialogInfo, _$identity);
+      _$EventDialogInfoCopyWithImpl<EventDialogInfo>(this as EventDialogInfo, _$identity);
 
   @override
   bool operator ==(Object other) {
@@ -245,18 +224,15 @@ mixin _$EventDialogInfo {
         (other.runtimeType == runtimeType &&
             other is EventDialogInfo &&
             (identical(other.title, title) || other.title == title) &&
-            (identical(other.timeRange, timeRange) ||
-                other.timeRange == timeRange) &&
-            (identical(other.subtitle, subtitle) ||
-                other.subtitle == subtitle) &&
-            (identical(other.description, description) ||
-                other.description == description) &&
+            (identical(other.timeRange, timeRange) || other.timeRange == timeRange) &&
+            (identical(other.subtitle, subtitle) || other.subtitle == subtitle) &&
+            (identical(other.description, description) || other.description == description) &&
             const DeepCollectionEquality().equals(other.details, details));
   }
 
   @override
-  int get hashCode => Object.hash(runtimeType, title, timeRange, subtitle,
-      description, const DeepCollectionEquality().hash(details));
+  int get hashCode => Object.hash(runtimeType, title, timeRange, subtitle, description,
+      const DeepCollectionEquality().hash(details));
 
   @override
   String toString() {
@@ -266,8 +242,7 @@ mixin _$EventDialogInfo {
 
 /// @nodoc
 abstract mixin class $EventDialogInfoCopyWith<$Res> {
-  factory $EventDialogInfoCopyWith(
-          EventDialogInfo value, $Res Function(EventDialogInfo) _then) =
+  factory $EventDialogInfoCopyWith(EventDialogInfo value, $Res Function(EventDialogInfo) _then) =
       _$EventDialogInfoCopyWithImpl;
   @useResult
   $Res call(
@@ -279,8 +254,7 @@ abstract mixin class $EventDialogInfoCopyWith<$Res> {
 }
 
 /// @nodoc
-class _$EventDialogInfoCopyWithImpl<$Res>
-    implements $EventDialogInfoCopyWith<$Res> {
+class _$EventDialogInfoCopyWithImpl<$Res> implements $EventDialogInfoCopyWith<$Res> {
   _$EventDialogInfoCopyWithImpl(this._self, this._then);
 
   final EventDialogInfo _self;
@@ -365,18 +339,15 @@ class _EventDialogInfo implements EventDialogInfo {
         (other.runtimeType == runtimeType &&
             other is _EventDialogInfo &&
             (identical(other.title, title) || other.title == title) &&
-            (identical(other.timeRange, timeRange) ||
-                other.timeRange == timeRange) &&
-            (identical(other.subtitle, subtitle) ||
-                other.subtitle == subtitle) &&
-            (identical(other.description, description) ||
-                other.description == description) &&
+            (identical(other.timeRange, timeRange) || other.timeRange == timeRange) &&
+            (identical(other.subtitle, subtitle) || other.subtitle == subtitle) &&
+            (identical(other.description, description) || other.description == description) &&
             const DeepCollectionEquality().equals(other._details, _details));
   }
 
   @override
-  int get hashCode => Object.hash(runtimeType, title, timeRange, subtitle,
-      description, const DeepCollectionEquality().hash(_details));
+  int get hashCode => Object.hash(runtimeType, title, timeRange, subtitle, description,
+      const DeepCollectionEquality().hash(_details));
 
   @override
   String toString() {
@@ -385,10 +356,8 @@ class _EventDialogInfo implements EventDialogInfo {
 }
 
 /// @nodoc
-abstract mixin class _$EventDialogInfoCopyWith<$Res>
-    implements $EventDialogInfoCopyWith<$Res> {
-  factory _$EventDialogInfoCopyWith(
-          _EventDialogInfo value, $Res Function(_EventDialogInfo) _then) =
+abstract mixin class _$EventDialogInfoCopyWith<$Res> implements $EventDialogInfoCopyWith<$Res> {
+  factory _$EventDialogInfoCopyWith(_EventDialogInfo value, $Res Function(_EventDialogInfo) _then) =
       __$EventDialogInfoCopyWithImpl;
   @override
   @useResult
@@ -401,8 +370,7 @@ abstract mixin class _$EventDialogInfoCopyWith<$Res>
 }
 
 /// @nodoc
-class __$EventDialogInfoCopyWithImpl<$Res>
-    implements _$EventDialogInfoCopyWith<$Res> {
+class __$EventDialogInfoCopyWithImpl<$Res> implements _$EventDialogInfoCopyWith<$Res> {
   __$EventDialogInfoCopyWithImpl(this._self, this._then);
 
   final _EventDialogInfo _self;

@@ -5,11 +5,10 @@ import 'package:intl/intl.dart';
 import 'package:physio_ai/home_scaffold.dart';
 import 'package:physio_ai/rezepte/model/rezept.dart';
 import 'package:physio_ai/rezepte/presentation/rezepte_page.dart';
-import 'package:physio_ai/shared_kernel/presentation/week_calendar_widget.dart';
 
-final rezeptProvider = FutureProvider.family<Rezept?, String>((ref, id) async {
+final rezeptProvider = FutureProvider.family<Rezept, String>((ref, id) async {
   final rezepte = await ref.watch(rezepteProvider.future);
-  return rezepte.where((r) => r.id == id).firstOrNull;
+  return rezepte.where((r) => r.id == id).first;
 });
 
 class RezeptDetailPage extends ConsumerWidget {
@@ -263,45 +262,6 @@ class RezeptDetailPage extends ConsumerWidget {
           ),
         ),
       ],
-    );
-  }
-
-  Widget _buildCalendarSection(Rezept rezept, ThemeData theme) {
-    final colorScheme = theme.colorScheme;
-
-    if (rezept.behandlungen.isEmpty) {
-      return _buildSection(
-        title: 'Behandlungstermine',
-        child: Text(
-          'Noch keine Behandlungstermine eingetragen',
-          style: TextStyle(
-            fontStyle: FontStyle.italic,
-            color: colorScheme.onSurface.withOpacity(0.7),
-          ),
-        ),
-      );
-    }
-
-    final events = rezept.behandlungen.map(CalendarEvent.fromBehandlung).toList();
-
-    return _buildSection(
-      title: 'Behandlungstermine',
-      child: Container(
-        height: 500,
-        decoration: BoxDecoration(
-          color: colorScheme.surface,
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(
-            color: colorScheme.outline.withOpacity(0.2),
-          ),
-        ),
-        // child: WeekCalendarWidget(
-        //   events: events.lock,
-        //   onEventTap: (event) {
-        //     // Event tap handler - could navigate to edit or show details
-        //   },
-        // ),
-      ),
     );
   }
 }

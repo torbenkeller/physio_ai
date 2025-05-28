@@ -50,7 +50,7 @@ sealed class UploadRezeptState with _$UploadRezeptState {
 }
 
 // Notifier class that manages the state and business logic
-class UploadRezeptNotifier extends AutoDisposeNotifier<UploadRezeptState> {
+class UploadRezeptNotifier extends Notifier<UploadRezeptState> {
   late RezeptRepository _rezeptRepository;
   late PatientRepository _patientRepository;
   late ImagePicker _imagePicker;

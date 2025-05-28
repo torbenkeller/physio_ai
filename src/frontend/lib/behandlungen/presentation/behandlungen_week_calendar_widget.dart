@@ -265,6 +265,7 @@ class _WeekCalendarWidgetState extends ConsumerState<BehandlungenWeekCalendarWid
     return Container(
       decoration: boxDecoration,
       child: Stack(
+        fit: StackFit.expand,
         children: [
           // Hour dividers
           Column(
@@ -288,6 +289,41 @@ class _WeekCalendarWidgetState extends ConsumerState<BehandlungenWeekCalendarWid
                 )
             ],
           ),
+          for (int halfHour = 0; halfHour < 24 * 2; halfHour++)
+            Positioned(
+              top: halfHour * widget.hourHeight / 2,
+              right: 0,
+              left: 0,
+              child: SizedBox(
+                height: widget.hourHeight,
+                child: DragTarget(
+                  builder: (context, i, __) {
+                    final event = i.isNotEmpty ? i.first! as BehandlungKalender : null;
+                    if (event == null) {
+                      return Container();
+                    }
+
+                    final startZeit = day.add(Duration(minutes: halfHour * 30));
+                    final endZeit = day.add(
+                      Duration(
+                        minutes:
+                            (halfHour * 30) + event.endZeit.difference(event.startZeit).inMinutes,
+                      ),
+                    );
+
+                    return Container(
+                      margin: const EdgeInsets.only(left: 4, right: 4, bottom: 4),
+                      child: _KalenderEntry(
+                        title: event.patient.name,
+                        startZeit: startZeit,
+                        endZeit: endZeit,
+                        hourHeight: widget.hourHeight,
+                      ),
+                    );
+                  },
+                ),
+              ),
+            ),
           // Events
           for (final event in events)
             _EventEntry(
@@ -334,22 +370,14 @@ class _EventEntryState extends ConsumerState<_EventEntry> {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
-
     // Calculate position and size
     final startMinutes = widget.event.startZeit.hour * 60 + widget.event.startZeit.minute;
-    final endMinutes = widget.event.endZeit.hour * 60 + widget.event.endZeit.minute;
-    final durationMinutes = endMinutes - startMinutes;
-
     final startOffset = startMinutes / 60 * widget.hourHeight;
-    final height = durationMinutes / 60 * widget.hourHeight - 4;
 
     return Positioned(
       top: startOffset,
       left: 4,
       right: 4,
-      height: height,
       child: PortalTarget(
         visible: _isDetailsOpen,
         portalFollower: GestureDetector(
@@ -378,42 +406,27 @@ class _EventEntryState extends ConsumerState<_EventEntry> {
               },
             ),
           ),
-          child: GestureDetector(
-            onTap: () => {
-              setState(() {
-                _isDetailsOpen = true;
-              }),
-            },
-            child: Container(
-              width: double.infinity,
-              height: height,
-              padding: const EdgeInsets.all(4),
-              decoration: BoxDecoration(
-                color: colorScheme.primary,
-                borderRadius: BorderRadius.circular(4),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(
-                    widget.event.patient.name,
-                    style: theme.textTheme.bodySmall?.copyWith(
-                      color: colorScheme.onPrimary,
-                      fontWeight: FontWeight.w500,
-                    ),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                  Text(
-                    '${DateFormat('HH:mm').format(widget.event.startZeit)} - ${DateFormat('HH:mm').format(widget.event.startZeit)}',
-                    style: theme.textTheme.bodySmall?.copyWith(
-                      color: colorScheme.onPrimary.withOpacity(0.8),
-                      fontSize: 10,
-                    ),
-                    maxLines: 1,
-                  ),
-                ],
+          child: Draggable(
+            data: widget.event,
+            feedback: Container(),
+            childWhenDragging: _KalenderEntry(
+              title: widget.event.patient.name,
+              startZeit: widget.event.startZeit,
+              endZeit: widget.event.endZeit,
+              withOpacity: true,
+              hourHeight: widget.hourHeight,
+            ),
+            child: GestureDetector(
+              onTap: () => {
+                setState(() {
+                  _isDetailsOpen = true;
+                }),
+              },
+              child: _KalenderEntry(
+                title: widget.event.patient.name,
+                startZeit: widget.event.startZeit,
+                endZeit: widget.event.endZeit,
+                hourHeight: widget.hourHeight,
               ),
             ),
           ),
@@ -484,6 +497,70 @@ class _EventPopup extends StatelessWidget {
             ],
           ],
         ),
+      ),
+    );
+  }
+}
+
+class _KalenderEntry extends StatelessWidget {
+  const _KalenderEntry({
+    required this.title,
+    required this.startZeit,
+    required this.endZeit,
+    required this.hourHeight,
+    this.withOpacity = false,
+    super.key,
+  });
+
+  final String title;
+  final DateTime startZeit;
+  final DateTime endZeit;
+  final bool withOpacity;
+  final double hourHeight;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+
+    final startMinutes = startZeit.hour * 60 + startZeit.minute;
+    final endMinutes = endZeit.hour * 60 + endZeit.minute;
+    final durationMinutes = endMinutes - startMinutes;
+
+    final height = durationMinutes / 60 * hourHeight - 4;
+
+    final color = withOpacity ? colorScheme.primary.withAlpha(137) : colorScheme.primary;
+
+    return Container(
+      height: height,
+      width: double.infinity,
+      padding: const EdgeInsets.all(4),
+      decoration: BoxDecoration(
+        color: color,
+        borderRadius: BorderRadius.circular(4),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(
+            title,
+            style: theme.textTheme.bodySmall?.copyWith(
+              color: colorScheme.onPrimary,
+              fontWeight: FontWeight.w500,
+            ),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+          ),
+          Text(
+            '${DateFormat('HH:mm').format(startZeit)} - ${DateFormat('HH:mm').format(endZeit)}',
+            style: theme.textTheme.bodySmall?.copyWith(
+              color: colorScheme.onPrimary.withOpacity(0.8),
+              fontSize: 10,
+            ),
+            maxLines: 1,
+          ),
+        ],
       ),
     );
   }

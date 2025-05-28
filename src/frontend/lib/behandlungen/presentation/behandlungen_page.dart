@@ -12,7 +12,7 @@ class BehandlungenPage extends ConsumerStatefulWidget {
 }
 
 class _BehandlungenPageState extends ConsumerState<BehandlungenPage> {
-  DateTime _selectedWeek = DateTime.now();
+  DateTime _selectedWeek = DateUtils.dateOnly(DateTime.now());
 
   @override
   Widget build(BuildContext context) {

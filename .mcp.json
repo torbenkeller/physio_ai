@@ -7,7 +7,8 @@
       ],
       "env": {
         "PORT": "3334",
-        "LOG_LEVEL": "critical"
+        "LOG_LEVEL": "critical",
+        "IMAGES_SUPPORTED": "true"
       },
       "disabled": false
     }

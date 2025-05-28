@@ -24,6 +24,7 @@ class _BehandlungenPageState extends ConsumerState<BehandlungenPage> {
             endTime: b.endZeit,
             title: b.patient.name,
             color: Colors.blueAccent,
+            id: b.id,
           ),
         )
         .toIList();
@@ -42,6 +43,13 @@ class _BehandlungenPageState extends ConsumerState<BehandlungenPage> {
                   child: WeekCalendarWidget(
                     events: calenderEvents,
                     selectedWeek: _selectedWeek,
+                    onEventDialogRequested: (eventId) =>
+                        events.value!.firstWhere((b) => b.id == eventId).let(
+                              (event) => EventDialogInfo(
+                                title: event.patient.name,
+                                timeRange: '${event.startZeit} - ${event.endZeit}',
+                              ),
+                            ),
                     onEventTap: (event) {
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(
@@ -63,5 +71,11 @@ class _BehandlungenPageState extends ConsumerState<BehandlungenPage> {
         ),
       ),
     );
+  }
+}
+
+extension<S> on S {
+  T let<T>(T Function(S) func) {
+    return func(this);
   }
 }

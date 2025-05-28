@@ -91,9 +91,7 @@ class _BehandlungenRepository implements BehandlungenRepository {
     late List<Behandlung> _value;
     try {
       _value = _result.data!
-          .map(
-            (dynamic i) => Behandlung.fromJson(i as Map<String, dynamic>),
-          )
+          .map((dynamic i) => Behandlung.fromJson(i as Map<String, dynamic>))
           .toList();
     } on Object catch (e, s) {
       errorLogger?.logError(e, s, _options);
@@ -122,9 +120,7 @@ class _BehandlungenRepository implements BehandlungenRepository {
     late List<Behandlung> _value;
     try {
       _value = _result.data!
-          .map(
-            (dynamic i) => Behandlung.fromJson(i as Map<String, dynamic>),
-          )
+          .map((dynamic i) => Behandlung.fromJson(i as Map<String, dynamic>))
           .toList();
     } on Object catch (e, s) {
       errorLogger?.logError(e, s, _options);

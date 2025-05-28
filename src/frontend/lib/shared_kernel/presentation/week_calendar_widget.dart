@@ -1,5 +1,9 @@
+import 'dart:async';
+
 import 'package:fast_immutable_collections/fast_immutable_collections.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_portal/flutter_portal.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:intl/intl.dart';
 import 'package:physio_ai/rezepte/model/rezept.dart';
@@ -10,6 +14,7 @@ part 'generated/week_calendar_widget.freezed.dart';
 @freezed
 abstract class CalendarEvent with _$CalendarEvent {
   const factory CalendarEvent({
+    required String id,
     required DateTime startTime,
     required DateTime endTime,
     required String title,
@@ -20,6 +25,7 @@ abstract class CalendarEvent with _$CalendarEvent {
 
   factory CalendarEvent.fromBehandlung(Behandlung behandlung) {
     return CalendarEvent(
+      id: behandlung.id,
       startTime: behandlung.startZeit,
       endTime: behandlung.endZeit,
       title: 'Behandlung',
@@ -30,14 +36,26 @@ abstract class CalendarEvent with _$CalendarEvent {
 
 typedef WorkingHours = ({int startHour, int endHour});
 
+/// Dialog information for calendar events
+@freezed
+abstract class EventDialogInfo with _$EventDialogInfo {
+  const factory EventDialogInfo({
+    required String title,
+    required String timeRange,
+    String? subtitle,
+    String? description,
+    List<String>? details,
+  }) = _EventDialogInfo;
+}
+
 /// Week calendar widget that displays events for a single week
-class WeekCalendarWidget extends StatefulWidget {
+class WeekCalendarWidget extends ConsumerStatefulWidget {
   const WeekCalendarWidget({
     required this.events,
     required this.selectedWeek,
     this.onWeekSelected,
     this.onEventTap,
-    this.eventHeight = 32.0,
+    this.onEventDialogRequested,
     this.hourHeight = 60.0,
     this.workingHours = (startHour: 9, endHour: 18),
     super.key,
@@ -46,16 +64,16 @@ class WeekCalendarWidget extends StatefulWidget {
   final IList<CalendarEvent> events;
   final ValueChanged<DateTime>? onWeekSelected;
   final ValueChanged<CalendarEvent>? onEventTap;
-  final double eventHeight;
+  final EventDialogInfo Function(String eventId)? onEventDialogRequested;
   final double hourHeight;
   final WorkingHours workingHours;
   final DateTime selectedWeek;
 
   @override
-  State<WeekCalendarWidget> createState() => _WeekCalendarWidgetState();
+  ConsumerState<WeekCalendarWidget> createState() => _WeekCalendarWidgetState();
 }
 
-class _WeekCalendarWidgetState extends State<WeekCalendarWidget> {
+class _WeekCalendarWidgetState extends ConsumerState<WeekCalendarWidget> {
   late ScrollController _scrollController;
 
   @override
@@ -99,94 +117,73 @@ class _WeekCalendarWidgetState extends State<WeekCalendarWidget> {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
 
-    return Column(
-      children: [
-        // Header with navigation
-        Padding(
-          padding: const EdgeInsets.only(bottom: 8),
-          child: Row(
-            children: [
-              IconButton(
-                onPressed: _previousWeek,
-                icon: const Icon(Icons.chevron_left),
-              ),
-              Expanded(
-                child: Center(
-                  child: Column(
-                    children: [
-                      Text(
-                        DateFormat('MMMM yyyy', 'de').format(widget.selectedWeek),
-                        style: theme.textTheme.titleMedium?.copyWith(
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      Text(
-                        'KW ${_getWeekNumber(widget.selectedWeek)}',
-                        style: theme.textTheme.bodySmall?.copyWith(
-                          color: colorScheme.onSurface.withOpacity(0.7),
-                        ),
-                      ),
-                    ],
+    return Portal(
+      child: GestureDetector(
+        onTap: () {
+          for (final event in widget.events) {
+            ref.read(isEventDetailsOpenProvider(event.id).notifier).state = false;
+          }
+        },
+        child: Column(
+          children: [
+            // Header with navigation
+            Padding(
+              padding: const EdgeInsets.only(bottom: 8),
+              child: Row(
+                children: [
+                  IconButton(
+                    onPressed: _previousWeek,
+                    icon: const Icon(Icons.chevron_left),
                   ),
-                ),
-              ),
-              TextButton(
-                onPressed: _goToToday,
-                child: const Text('Heute'),
-              ),
-              IconButton(
-                onPressed: _nextWeek,
-                icon: const Icon(Icons.chevron_right),
-              ),
-            ],
-          ),
-        ),
-
-        // Calendar grid
-        Expanded(
-          child: Column(
-            children: [
-              // Day headers
-              Container(
-                height: 48,
-                decoration: BoxDecoration(
-                  border: Border(
-                    bottom: BorderSide(
-                      color: colorScheme.outline.withOpacity(0.2),
-                    ),
-                  ),
-                ),
-                child: Row(
-                  children: [
-                    // Time column header
-                    Container(
-                      width: 60,
-                      decoration: BoxDecoration(
-                        border: Border(
-                          right: BorderSide(
-                            color: colorScheme.outline.withOpacity(0.2),
+                  Expanded(
+                    child: Center(
+                      child: Column(
+                        children: [
+                          Text(
+                            DateFormat('MMMM yyyy', 'de').format(widget.selectedWeek),
+                            style: theme.textTheme.titleMedium?.copyWith(
+                              fontWeight: FontWeight.bold,
+                            ),
                           ),
+                          Text(
+                            'KW ${_getWeekNumber(widget.selectedWeek)}',
+                            style: theme.textTheme.bodySmall?.copyWith(
+                              color: colorScheme.onSurface.withOpacity(0.7),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                  TextButton(
+                    onPressed: _goToToday,
+                    child: const Text('Heute'),
+                  ),
+                  IconButton(
+                    onPressed: _nextWeek,
+                    icon: const Icon(Icons.chevron_right),
+                  ),
+                ],
+              ),
+            ),
+
+            // Calendar grid
+            Expanded(
+              child: Column(
+                children: [
+                  // Day headers
+                  Container(
+                    height: 48,
+                    decoration: BoxDecoration(
+                      border: Border(
+                        bottom: BorderSide(
+                          color: colorScheme.outline.withOpacity(0.2),
                         ),
                       ),
                     ),
-                    // Day headers
-                    for (final day in _weekDays)
-                      Expanded(
-                        child: _buildDayHeader(day, theme),
-                      ),
-                  ],
-                ),
-              ),
-
-              // Calendar body
-              Expanded(
-                child: SingleChildScrollView(
-                  controller: _scrollController,
-                  child: SizedBox(
-                    height: 24 * widget.hourHeight,
                     child: Row(
                       children: [
-                        // Time column
+                        // Time column header
                         Container(
                           width: 60,
                           decoration: BoxDecoration(
@@ -196,64 +193,94 @@ class _WeekCalendarWidgetState extends State<WeekCalendarWidget> {
                               ),
                             ),
                           ),
-                          child: Column(
-                            children: [
-                              for (int hour = 0; hour < 24; hour++) _buildHourLabel(hour, theme),
-                            ],
-                          ),
                         ),
-
-                        // Day columns
+                        // Day headers
                         for (final (index, day) in _weekDays.indexed)
                           Expanded(
-                            child: _buildDayColumn(day, theme, _weekDays.length - 1 == index),
+                            child: _buildDayHeader(index, day, theme),
                           ),
                       ],
                     ),
                   ),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ],
-    );
-  }
 
-  Widget _buildDayHeader(DateTime day, ThemeData theme) {
-    final colorScheme = theme.colorScheme;
-    final isToday = _isToday(day);
+                  // Calendar body
+                  Expanded(
+                    child: SingleChildScrollView(
+                      controller: _scrollController,
+                      child: SizedBox(
+                        height: 24 * widget.hourHeight,
+                        child: Row(
+                          children: [
+                            // Time column
+                            Container(
+                              width: 60,
+                              decoration: BoxDecoration(
+                                border: Border(
+                                  right: BorderSide(
+                                    color: colorScheme.outline.withOpacity(0.2),
+                                  ),
+                                ),
+                              ),
+                              child: Column(
+                                children: [
+                                  for (int hour = 0; hour < 24; hour++)
+                                    _buildHourLabel(hour, theme),
+                                ],
+                              ),
+                            ),
 
-    return GestureDetector(
-      onTap: () => widget.onWeekSelected?.call(day),
-      child: Container(
-        decoration: BoxDecoration(
-          border: Border(
-            right: BorderSide(
-              color: colorScheme.outline.withOpacity(0.2),
-            ),
-          ),
-        ),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text(
-              DateFormat('E', 'de').format(day),
-              style: theme.textTheme.bodySmall?.copyWith(
-                color: isToday ? colorScheme.primary : null,
-                fontWeight: isToday ? FontWeight.bold : null,
-              ),
-            ),
-            const SizedBox(height: 2),
-            Text(
-              '${day.day}',
-              style: theme.textTheme.bodyLarge?.copyWith(
-                color: isToday ? colorScheme.primary : null,
-                fontWeight: isToday ? FontWeight.bold : null,
+                            // Day columns
+                            for (final (index, day) in _weekDays.indexed)
+                              Expanded(
+                                child: _buildDayColumn(day, theme, _weekDays.length - 1 == index),
+                              ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _buildDayHeader(int index, DateTime day, ThemeData theme) {
+    final colorScheme = theme.colorScheme;
+    final isToday = _isToday(day);
+
+    return Container(
+      decoration: index != 6
+          ? BoxDecoration(
+              border: Border(
+                right: BorderSide(
+                  color: colorScheme.outline.withOpacity(0.2),
+                ),
+              ),
+            )
+          : null,
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Text(
+            DateFormat('E', 'de').format(day),
+            style: theme.textTheme.bodySmall?.copyWith(
+              color: isToday ? colorScheme.primary : null,
+              fontWeight: isToday ? FontWeight.bold : null,
+            ),
+          ),
+          const SizedBox(height: 2),
+          Text(
+            '${day.day}',
+            style: theme.textTheme.bodyLarge?.copyWith(
+              color: isToday ? colorScheme.primary : null,
+              fontWeight: isToday ? FontWeight.bold : null,
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -301,71 +328,25 @@ class _WeekCalendarWidgetState extends State<WeekCalendarWidget> {
                         hour < widget.workingHours.startHour || hour > widget.workingHours.endHour
                             ? colorScheme.surfaceContainer
                             : null,
-                    border: Border(
-                      bottom: BorderSide(
-                        color: colorScheme.outline.withOpacity(0.2),
-                      ),
-                    ),
+                    border: hour != 23
+                        ? Border(
+                            bottom: BorderSide(
+                              color: colorScheme.outline.withOpacity(0.2),
+                            ),
+                          )
+                        : null,
                   ),
                 )
             ],
           ),
           // Events
-          for (final event in events) _buildEventWidget(event, day, theme),
+          for (final event in events)
+            _EventEntry(
+              event: event,
+              hourHeight: widget.hourHeight,
+              onEventDialogRequested: widget.onEventDialogRequested,
+            ),
         ],
-      ),
-    );
-  }
-
-  Widget _buildEventWidget(CalendarEvent event, DateTime day, ThemeData theme) {
-    final colorScheme = theme.colorScheme;
-
-    // Calculate position and size
-    final startMinutes = event.startTime.hour * 60 + event.startTime.minute;
-    final endMinutes = event.endTime.hour * 60 + event.endTime.minute;
-    final durationMinutes = endMinutes - startMinutes;
-
-    final startOffset = startMinutes / 60 * widget.hourHeight;
-    final height = durationMinutes / 60 * widget.hourHeight;
-
-    return Positioned(
-      top: startOffset,
-      left: 4,
-      right: 4,
-      height: height.clamp(widget.eventHeight, double.infinity),
-      child: GestureDetector(
-        onTap: () => widget.onEventTap?.call(event),
-        child: Container(
-          padding: const EdgeInsets.all(4),
-          decoration: BoxDecoration(
-            color: event.color ?? colorScheme.primary,
-            borderRadius: BorderRadius.circular(4),
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(
-                event.title,
-                style: theme.textTheme.bodySmall?.copyWith(
-                  color: colorScheme.onPrimary,
-                  fontWeight: FontWeight.w500,
-                ),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-              ),
-              if (height > widget.eventHeight + 16)
-                Text(
-                  '${DateFormat('HH:mm').format(event.startTime)} - ${DateFormat('HH:mm').format(event.endTime)}',
-                  style: theme.textTheme.bodySmall?.copyWith(
-                    color: colorScheme.onPrimary.withOpacity(0.8),
-                    fontSize: 10,
-                  ),
-                  maxLines: 1,
-                ),
-            ],
-          ),
-        ),
       ),
     );
   }
@@ -383,5 +364,197 @@ class _WeekCalendarWidgetState extends State<WeekCalendarWidget> {
     final firstDayOfYear = DateTime(date.year);
     final daysSinceFirstDay = date.difference(firstDayOfYear).inDays;
     return ((daysSinceFirstDay + firstDayOfYear.weekday - 1) / 7).ceil();
+  }
+}
+
+final isEventDetailsOpenProvider = StateProvider.family.autoDispose<bool, String>((ref, eventId) {
+  return false;
+});
+
+class _EventEntry extends ConsumerStatefulWidget {
+  const _EventEntry({
+    required this.hourHeight,
+    required this.event,
+    required this.onEventDialogRequested,
+    super.key,
+  });
+
+  final double hourHeight;
+  final CalendarEvent event;
+  final EventDialogInfo Function(String eventId)? onEventDialogRequested;
+
+  @override
+  ConsumerState<_EventEntry> createState() => _EventEntryState();
+}
+
+class _EventEntryState extends ConsumerState<_EventEntry> {
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    final isDetailsOpen = ref.watch(isEventDetailsOpenProvider(widget.event.id));
+    final dialogInfo = widget.onEventDialogRequested!(widget.event.id);
+
+    // Calculate position and size
+    final startMinutes = widget.event.startTime.hour * 60 + widget.event.startTime.minute;
+    final endMinutes = widget.event.endTime.hour * 60 + widget.event.endTime.minute;
+    final durationMinutes = endMinutes - startMinutes;
+
+    final startOffset = startMinutes / 60 * widget.hourHeight;
+    final height = durationMinutes / 60 * widget.hourHeight - 4;
+
+    return Positioned(
+      top: startOffset,
+      left: 4,
+      right: 4,
+      height: height,
+      child: PortalTarget(
+        visible: isDetailsOpen,
+        anchor: const Aligned(
+          follower: Alignment.topLeft,
+          target: Alignment.topRight,
+          offset: Offset(8, 0),
+        ),
+        portalFollower: SizedBox(
+          width: 280,
+          child: _EventPopup(
+            event: widget.event,
+            dialogInfo: dialogInfo,
+            onClose: () {
+              ref.read(isEventDetailsOpenProvider(widget.event.id).notifier).state = false;
+            },
+          ),
+        ),
+        child: GestureDetector(
+          onTap: () => _handleEventTap(widget.event),
+          child: Container(
+            width: double.infinity,
+            height: height,
+            padding: const EdgeInsets.all(4),
+            decoration: BoxDecoration(
+              color: widget.event.color ?? colorScheme.primary,
+              borderRadius: BorderRadius.circular(4),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  widget.event.title,
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    color: colorScheme.onPrimary,
+                    fontWeight: FontWeight.w500,
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+                Text(
+                  '${DateFormat('HH:mm').format(widget.event.startTime)} - ${DateFormat('HH:mm').format(widget.event.endTime)}',
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    color: colorScheme.onPrimary.withOpacity(0.8),
+                    fontSize: 10,
+                  ),
+                  maxLines: 1,
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Future<void> _handleEventTap(CalendarEvent event) async {
+    if (widget.onEventDialogRequested != null) {
+      ref.read(isEventDetailsOpenProvider(widget.event.id).notifier).state = true;
+    }
+  }
+}
+
+class _EventPopup extends StatelessWidget {
+  const _EventPopup({
+    required this.event,
+    required this.dialogInfo,
+    required this.onClose,
+  });
+
+  final CalendarEvent event;
+  final EventDialogInfo dialogInfo;
+  final VoidCallback onClose;
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      elevation: 8,
+      borderRadius: BorderRadius.circular(12),
+      child: Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: Theme.of(context).colorScheme.surface,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(
+            color: Theme.of(context).colorScheme.outline.withOpacity(0.2),
+          ),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Expanded(
+                  child: Text(
+                    dialogInfo.title,
+                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                          fontWeight: FontWeight.bold,
+                        ),
+                  ),
+                ),
+                IconButton(
+                  onPressed: onClose,
+                  icon: const Icon(Icons.close),
+                  iconSize: 20,
+                ),
+              ],
+            ),
+            const SizedBox(height: 8),
+            Text(
+              dialogInfo.timeRange,
+              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                    color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
+                  ),
+            ),
+            if (dialogInfo.subtitle != null) ...[
+              const SizedBox(height: 8),
+              Text(
+                dialogInfo.subtitle!,
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                      fontWeight: FontWeight.w500,
+                    ),
+              ),
+            ],
+            if (dialogInfo.description != null) ...[
+              const SizedBox(height: 12),
+              Text(
+                dialogInfo.description!,
+                style: Theme.of(context).textTheme.bodyMedium,
+              ),
+            ],
+            if (dialogInfo.details != null && dialogInfo.details!.isNotEmpty) ...[
+              const SizedBox(height: 12),
+              ...dialogInfo.details!.map(
+                (detail) => Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 2),
+                  child: Text(
+                    '• $detail',
+                    style: Theme.of(context).textTheme.bodySmall,
+                  ),
+                ),
+              ),
+            ],
+          ],
+        ),
+      ),
+    );
   }
 }

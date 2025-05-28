@@ -10,9 +10,8 @@ import java.time.LocalDate
 import java.util.UUID
 
 @AggregateRoot
-@ConsistentCopyVisibility
 @Table("patienten")
-data class PatientAggregate internal constructor(
+data class PatientAggregate(
     @Id
     override val id: PatientId,
     override val titel: String?,

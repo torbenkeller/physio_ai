@@ -29,3 +29,22 @@ Content-Type: application/json
 
 GET http://localhost:8080/behandlungen/calender/week?date=2024-04-02
 Content-Type: application/json
+
+###
+
+POST http://localhost:8080/patienten
+Content-Type: application/json
+
+{
+  "titel": null,
+  "vorname": "Torben",
+  "nachname": "Keller",
+  "strasse": "Brunswiker Str.",
+  "hausnummer": "35",
+  "plz": "24103",
+  "stadt": "Kiel",
+  "telMobil": "+49 177 6320739",
+  "telFestnetz": "",
+  "email": "torben2012@live.de",
+  "geburtstag": "1999-09-15"
+}

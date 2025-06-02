@@ -396,6 +396,77 @@ class BehandlungenControllerTest {
     }
 
     @Nested
+    inner class VerschiebeBehandlung {
+        @Test
+        fun `should move behandlung to new time successfully`() {
+            // Arrange
+            val behandlungId = BehandlungId(UUID.fromString("f1e2d3c4-b5a6-9870-1234-567890fedcba"))
+            val patientId = PatientId(UUID.fromString("d7e8f9a0-b1c2-3d4e-5f6a-7b8c9d0e1f2a"))
+            val neueStartZeit = LocalDateTime.of(2024, 1, 15, 14, 0)
+            val neueEndZeit = LocalDateTime.of(2024, 1, 15, 15, 0)
+
+            val verschobeneBehandlung = BehandlungAggregate(
+                id = behandlungId,
+                patientId = patientId,
+                startZeit = neueStartZeit,
+                endZeit = neueEndZeit,
+                rezeptId = null,
+                version = 1,
+            )
+
+            every { behandlungenService.verschiebeBehandlung(behandlungId, neueStartZeit) } returns verschobeneBehandlung
+
+            // Act & Assert
+            mockMvc
+                .perform(
+                    MockMvcRequestBuilders
+                        .put("/behandlungen/${behandlungId.id}/verschiebe")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(
+                            """
+                            {
+                                "nach": "2024-01-15T14:00:00"
+                            }
+                            """,
+                        ),
+                ).andExpect(MockMvcResultMatchers.status().isOk)
+                .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.id").value(behandlungId.id.toString()))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.patientId").value(patientId.id.toString()))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.startZeit").value("2024-01-15T14:00:00"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.endZeit").value("2024-01-15T15:00:00"))
+
+            verify { behandlungenService.verschiebeBehandlung(behandlungId, neueStartZeit) }
+        }
+
+        @Test
+        fun `should return 404 when behandlung does not exist`() {
+            // Arrange
+            val behandlungId = BehandlungId(UUID.fromString("f1e2d3c4-b5a6-9870-1234-567890fedcba"))
+            val neueStartZeit = LocalDateTime.of(2024, 1, 15, 14, 0)
+
+            every { behandlungenService.verschiebeBehandlung(behandlungId, neueStartZeit) } throws AggregateNotFoundException()
+
+            // Act & Assert
+            mockMvc
+                .perform(
+                    MockMvcRequestBuilders
+                        .put("/behandlungen/${behandlungId.id}/verschiebe")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(
+                            """
+                            {
+                                "nach": "2024-01-15T14:00:00"
+                            }
+                            """,
+                        ),
+                ).andExpect(MockMvcResultMatchers.status().isNotFound)
+
+            verify { behandlungenService.verschiebeBehandlung(behandlungId, neueStartZeit) }
+        }
+    }
+
+    @Nested
     inner class GetWeeklyCalendar {
         @Test
         fun `should return treatments grouped by weekdays for given week`() {

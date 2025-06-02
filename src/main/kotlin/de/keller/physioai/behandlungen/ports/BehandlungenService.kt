@@ -27,6 +27,11 @@ interface BehandlungenService {
 
     fun deleteBehandlung(id: BehandlungId)
 
+    fun verschiebeBehandlung(
+        id: BehandlungId,
+        nach: LocalDateTime,
+    ): BehandlungAggregate
+
     fun getWeeklyCalendar(date: LocalDate): Map<LocalDate, List<GetWeeklyCalendarBehandlungResponse>>
 }
 

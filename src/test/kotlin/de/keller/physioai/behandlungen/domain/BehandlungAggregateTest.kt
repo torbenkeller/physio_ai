@@ -130,4 +130,27 @@ class BehandlungAggregateTest {
             )
         }
     }
+
+    @Test
+    fun `should move behandlung to new time keeping duration`() {
+        // Given - existing behandlung with 1 hour duration (10:00-11:00)
+        val patientId = PatientId(UUID.randomUUID())
+        val behandlung = BehandlungAggregate.create(
+            patientId = patientId,
+            startZeit = LocalDateTime.of(2024, 1, 15, 10, 0),
+            endZeit = LocalDateTime.of(2024, 1, 15, 11, 0),
+            rezeptId = null,
+        )
+
+        // When - moving behandlung to 14:00
+        val neueStartZeit = LocalDateTime.of(2024, 1, 15, 14, 0)
+        val verschobeneBehandlung = behandlung.verschiebe(neueStartZeit)
+
+        // Then - behandlung should be moved with same duration (14:00-15:00)
+        assertEquals(behandlung.id, verschobeneBehandlung.id)
+        assertEquals(patientId, verschobeneBehandlung.patientId)
+        assertEquals(neueStartZeit, verschobeneBehandlung.startZeit)
+        assertEquals(LocalDateTime.of(2024, 1, 15, 15, 0), verschobeneBehandlung.endZeit)
+        assertEquals(behandlung.rezeptId, verschobeneBehandlung.rezeptId)
+    }
 }

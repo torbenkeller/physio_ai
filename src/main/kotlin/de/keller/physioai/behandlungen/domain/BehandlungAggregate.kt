@@ -35,6 +35,15 @@ data class BehandlungAggregate(
         )
     }
 
+    fun verschiebe(nach: LocalDateTime): BehandlungAggregate {
+        val duration = java.time.Duration.between(startZeit, endZeit)
+        val neueEndZeit = nach.plus(duration)
+        return copy(
+            startZeit = nach,
+            endZeit = neueEndZeit,
+        )
+    }
+
     companion object {
         fun create(
             patientId: PatientId,

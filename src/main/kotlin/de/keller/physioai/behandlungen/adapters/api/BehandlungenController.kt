@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.ResponseStatus
 import org.springframework.web.bind.annotation.RestController
 import java.time.LocalDate
+import java.time.LocalDateTime
 import java.util.UUID
 
 @PrimaryAdapter
@@ -86,6 +87,15 @@ class BehandlungenController(
         @PathVariable id: UUID,
     ) = behandlungenService.deleteBehandlung(BehandlungId(id))
 
+    @PutMapping("/{id}/verschiebe")
+    fun verschiebeBehandlung(
+        @PathVariable id: UUID,
+        @RequestBody dto: VerschiebeBehandlungDto,
+    ): BehandlungDto {
+        val behandlung = behandlungenService.verschiebeBehandlung(BehandlungId(id), dto.nach)
+        return BehandlungDto.fromDomain(behandlung)
+    }
+
     @GetMapping("/calender/week")
     fun getWeeklyCalendar(
         @RequestParam date: String,
@@ -97,4 +107,8 @@ class BehandlungenController(
                 behandlungen.map { BehandlungKalenderDto.fromDomain(it) }
             }
     }
+
+    data class VerschiebeBehandlungDto(
+        val nach: LocalDateTime,
+    )
 }

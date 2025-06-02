@@ -215,6 +215,63 @@ class BehandlungServiceImplTest {
     }
 
     @Nested
+    inner class VerschiebeBehandlung {
+        @Test
+        fun `should move behandlung to new time successfully`() {
+            // Arrange
+            val behandlungId = BehandlungId(UUID.randomUUID())
+            val patientId = PatientId(UUID.randomUUID())
+            val originalStartZeit = LocalDateTime.of(2024, 1, 15, 10, 0)
+            val originalEndZeit = LocalDateTime.of(2024, 1, 15, 11, 0)
+            val neueStartZeit = LocalDateTime.of(2024, 1, 15, 14, 0)
+
+            val existingBehandlung = BehandlungAggregate(
+                id = behandlungId,
+                patientId = patientId,
+                startZeit = originalStartZeit,
+                endZeit = originalEndZeit,
+                rezeptId = null,
+                version = 0,
+            )
+
+            every { behandlungenRepository.findById(behandlungId) } returns existingBehandlung
+
+            val savedBehandlungSlot = slot<BehandlungAggregate>()
+            every { behandlungenRepository.save(capture(savedBehandlungSlot)) } answers { savedBehandlungSlot.captured }
+
+            // Act
+            val result = behandlungenService.verschiebeBehandlung(behandlungId, neueStartZeit)
+
+            // Assert - verify the returned behandlung has correct new times
+            assertNotNull(result)
+            assertEquals(behandlungId, result.id)
+            assertEquals(patientId, result.patientId)
+            assertEquals(neueStartZeit, result.startZeit)
+            assertEquals(LocalDateTime.of(2024, 1, 15, 15, 0), result.endZeit) // same duration
+
+            verify { behandlungenRepository.findById(behandlungId) }
+            verify { behandlungenRepository.save(any()) }
+        }
+
+        @Test
+        fun `should throw AggregateNotFoundException when behandlung does not exist`() {
+            // Arrange
+            val behandlungId = BehandlungId(UUID.randomUUID())
+            val neueStartZeit = LocalDateTime.of(2024, 1, 15, 14, 0)
+
+            every { behandlungenRepository.findById(behandlungId) } returns null
+
+            // Act & Assert
+            assertFailsWith<AggregateNotFoundException> {
+                behandlungenService.verschiebeBehandlung(behandlungId, neueStartZeit)
+            }
+
+            verify { behandlungenRepository.findById(behandlungId) }
+            verify(exactly = 0) { behandlungenRepository.save(any()) }
+        }
+    }
+
+    @Nested
     inner class DeleteBehandlung {
         @Test
         fun `should delete behandlung successfully`() {

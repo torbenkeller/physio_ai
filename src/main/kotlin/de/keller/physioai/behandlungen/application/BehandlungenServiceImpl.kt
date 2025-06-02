@@ -63,6 +63,17 @@ class BehandlungenServiceImpl(
         return behandlungenRepository.delete(behandlung)
     }
 
+    override fun verschiebeBehandlung(
+        id: BehandlungId,
+        nach: LocalDateTime,
+    ): BehandlungAggregate {
+        val behandlung = behandlungenRepository.findById(id)
+            ?: throw AggregateNotFoundException()
+
+        val verschobeneBehandlung = behandlung.verschiebe(nach)
+        return behandlungenRepository.save(verschobeneBehandlung)
+    }
+
     override fun getWeeklyCalendar(date: LocalDate): Map<LocalDate, List<GetWeeklyCalendarBehandlungResponse>> {
         // Calculate week boundaries (Monday to Sunday)
         val weekStart = date.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY))

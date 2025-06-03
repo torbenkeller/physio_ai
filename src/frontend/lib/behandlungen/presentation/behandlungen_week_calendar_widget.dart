@@ -4,6 +4,9 @@ import 'package:flutter_portal/flutter_portal.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:physio_ai/behandlungen/domain/behandlung.dart';
+import 'package:physio_ai/behandlungen/infrastructure/behandlung_verschiebe_dto.dart';
+import 'package:physio_ai/behandlungen/infrastructure/behandlungen_repository.dart';
+import 'package:physio_ai/behandlungen/presentation/behandlungen_calendar_provider.dart';
 import 'package:physio_ai/rezepte/model/rezept.dart';
 import 'package:physio_ai/rezepte/presentation/rezept_detail_page.dart';
 
@@ -297,6 +300,16 @@ class _WeekCalendarWidgetState extends ConsumerState<BehandlungenWeekCalendarWid
               child: SizedBox(
                 height: widget.hourHeight,
                 child: DragTarget(
+                  onAcceptWithDetails: (details) async {
+                    final event = details.data! as BehandlungKalender;
+                    final startZeit = day.add(Duration(minutes: halfHour * 30));
+                    final dto = BehandlungVerschiebeDto(
+                      nach: startZeit,
+                    );
+
+                    await ref.read(behandlungenRepositoryProvider).verschiebe(event.id, dto);
+                    ref.invalidate(weeklyCalendarProvider(widget.selectedWeek));
+                  },
                   builder: (context, i, __) {
                     final event = i.isNotEmpty ? i.first! as BehandlungKalender : null;
                     if (event == null) {

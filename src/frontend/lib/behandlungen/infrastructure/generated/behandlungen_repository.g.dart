@@ -160,6 +160,33 @@ class _BehandlungenRepository implements BehandlungenRepository {
   }
 
   @override
+  Future<Behandlung> verschiebe(String id, BehandlungVerschiebeDto date) async {
+    final _extra = <String, dynamic>{};
+    final queryParameters = <String, dynamic>{};
+    final _headers = <String, dynamic>{};
+    final _data = date;
+    final _options = _setStreamType<Behandlung>(
+      Options(method: 'PUT', headers: _headers, extra: _extra)
+          .compose(
+            _dio.options,
+            '/behandlungen/${id}/verschiebe',
+            queryParameters: queryParameters,
+            data: _data,
+          )
+          .copyWith(baseUrl: _combineBaseUrls(_dio.options.baseUrl, baseUrl)),
+    );
+    final _result = await _dio.fetch<Map<String, dynamic>>(_options);
+    late Behandlung _value;
+    try {
+      _value = Behandlung.fromJson(_result.data!);
+    } on Object catch (e, s) {
+      errorLogger?.logError(e, s, _options);
+      rethrow;
+    }
+    return _value;
+  }
+
+  @override
   Future<void> deleteBehandlung(String id) async {
     final _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{};

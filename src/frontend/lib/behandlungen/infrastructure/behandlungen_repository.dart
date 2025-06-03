@@ -2,6 +2,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:physio_ai/behandlungen/domain/behandlung.dart';
 import 'package:physio_ai/behandlungen/infrastructure/behandlung_form_dto.dart';
+import 'package:physio_ai/behandlungen/infrastructure/behandlung_verschiebe_dto.dart';
 import 'package:physio_ai/main.dart';
 import 'package:retrofit/retrofit.dart';
 
@@ -32,6 +33,12 @@ abstract class BehandlungenRepository {
   Future<Behandlung> updateBehandlung(
     @Path('id') String id,
     @Body() BehandlungFormDto formDto,
+  );
+
+  @PUT('/behandlungen/{id}/verschiebe')
+  Future<Behandlung> verschiebe(
+    @Path('id') String id,
+    @Body() BehandlungVerschiebeDto date,
   );
 
   @DELETE('/behandlungen/{id}')

@@ -48,3 +48,11 @@ Content-Type: application/json
   "email": "torben2012@live.de",
   "geburtstag": "1999-09-15"
 }
+
+####
+PUT http://localhost:8080/behandlungen/11a2b3c4-d5e6-7f8a-9b0c-1d2e3f4a5b6c/verschiebe
+Content-Type: application/json
+
+{
+  "nach": "2025-06-04T10:00:00"
+}

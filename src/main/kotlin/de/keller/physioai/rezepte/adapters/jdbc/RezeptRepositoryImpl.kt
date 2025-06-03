@@ -3,24 +3,19 @@ package de.keller.physioai.rezepte.adapters.jdbc
 import de.keller.physioai.rezepte.domain.Rezept
 import de.keller.physioai.rezepte.ports.RezeptRepository
 import de.keller.physioai.shared.RezeptId
-import org.springframework.data.jdbc.repository.query.Modifying
-import org.springframework.stereotype.Repository
-import org.springframework.transaction.annotation.Transactional
+import org.jmolecules.architecture.hexagonal.SecondaryAdapter
 
-@Transactional(readOnly = true)
-@Repository
-interface RezeptRepositoryImpl :
-    org.springframework.data.repository.Repository<Rezept, RezeptId>,
-    RezeptRepository {
-    override fun findAll(): List<Rezept>
+@SecondaryAdapter
+@org.springframework.stereotype.Repository
+@org.jmolecules.ddd.annotation.Repository
+class RezeptRepositoryImpl(
+    val dao: RezeptDAO,
+) : RezeptRepository {
+    override fun findAll(): List<Rezept> = dao.findAll()
 
-    override fun findById(rezeptId: RezeptId): Rezept?
+    override fun findById(rezeptId: RezeptId): Rezept? = dao.findById(rezeptId.id)
 
-    @Transactional(readOnly = false)
-    @Modifying
-    override fun deleteById(rezeptId: RezeptId)
+    override fun deleteById(rezeptId: RezeptId) = dao.deleteById(rezeptId.id)
 
-    @Transactional(readOnly = false)
-    @Modifying
-    override fun save(rezept: Rezept): Rezept
+    override fun save(rezept: Rezept): Rezept = dao.save(rezept)
 }

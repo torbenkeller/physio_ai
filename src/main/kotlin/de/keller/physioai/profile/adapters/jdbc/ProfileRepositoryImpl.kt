@@ -5,12 +5,12 @@ import de.keller.physioai.profile.ports.ProfileRepository
 import de.keller.physioai.shared.ProfileId
 import org.jmolecules.architecture.hexagonal.SecondaryAdapter
 import org.springframework.data.jdbc.repository.query.Modifying
-import org.springframework.stereotype.Repository
 import org.springframework.transaction.annotation.Transactional
 
 @SecondaryAdapter
 @Transactional(readOnly = true)
-@Repository
+@org.springframework.stereotype.Repository
+@org.jmolecules.ddd.annotation.Repository
 interface ProfileRepositoryImpl :
     org.springframework.data.repository.Repository<Profile, ProfileId>,
     ProfileRepository {

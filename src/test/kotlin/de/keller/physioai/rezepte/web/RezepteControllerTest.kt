@@ -1,9 +1,10 @@
 package de.keller.physioai.rezepte.web
 
 import com.ninjasquad.springmockk.MockkBean
-import de.keller.physioai.patienten.adapters.jdbc.PatientenRepositoryImpl
-import de.keller.physioai.patienten.domain.PatientAggregate
+import de.keller.physioai.patienten.Patient
+import de.keller.physioai.patienten.PatientenRepository
 import de.keller.physioai.patienten.ports.PatientenService
+import de.keller.physioai.rezepte.TestPatient
 import de.keller.physioai.rezepte.adapters.api.BehandlungsartDto
 import de.keller.physioai.rezepte.adapters.api.RezepteController
 import de.keller.physioai.rezepte.domain.Arzt
@@ -61,7 +62,7 @@ class RezepteControllerTest {
     private lateinit var aerzteRepository: AerzteRepository
 
     @MockkBean
-    private lateinit var patientenRepository: PatientenRepositoryImpl
+    private lateinit var patientenRepository: PatientenRepository
 
     @MockkBean
     private lateinit var rezepteAiService: RezepteAiService
@@ -80,7 +81,7 @@ class RezepteControllerTest {
     private val rezeptId2 = RezeptId(UUID.randomUUID())
     private val ausgestelltAm = LocalDate.of(2023, 1, 1)
 
-    private lateinit var patient: PatientAggregate
+    private lateinit var patient: Patient
     private lateinit var behandlungsart1: Behandlungsart
     private lateinit var behandlungsart2: Behandlungsart
     private lateinit var arzt: Arzt
@@ -90,7 +91,7 @@ class RezepteControllerTest {
     @BeforeEach
     fun setUp() {
         // Initialize test data
-        patient = PatientAggregate(
+        patient = TestPatient(
             id = patientId,
             titel = null,
             vorname = "Max",
@@ -185,7 +186,7 @@ class RezepteControllerTest {
             // Arrange
             every { rezeptRepository.findAll() } returns listOf(rezept1, rezept2)
             every { aerzteRepository.findAllByIdIn(listOf(arztId)) } returns listOf(arzt)
-            every { patientenRepository.findAllByIdIn(listOf(patientId, patientId)) } returns listOf(patient)
+            every { patientenRepository.findAllByIdIn(setOf(patientId)) } returns listOf(patient)
 
             // Act & Assert
             mockMvc
@@ -203,7 +204,7 @@ class RezepteControllerTest {
 
             verify { rezeptRepository.findAll() }
             verify { aerzteRepository.findAllByIdIn(listOf(arztId)) }
-            verify { patientenRepository.findAllByIdIn(listOf(patientId, patientId)) }
+            verify { patientenRepository.findAllByIdIn(setOf(patientId)) }
         }
 
         @Test
@@ -211,7 +212,7 @@ class RezepteControllerTest {
             // Arrange
             every { rezeptRepository.findAll() } returns listOf(rezept1)
             every { aerzteRepository.findAllByIdIn(listOf(arztId)) } returns listOf(arzt)
-            every { patientenRepository.findAllByIdIn(listOf(patientId)) } returns listOf(patient)
+            every { patientenRepository.findAllByIdIn(setOf(patientId)) } returns listOf(patient)
 
             // Act & Assert
             mockMvc
@@ -225,7 +226,7 @@ class RezepteControllerTest {
 
             verify { rezeptRepository.findAll() }
             verify { aerzteRepository.findAllByIdIn(listOf(arztId)) }
-            verify { patientenRepository.findAllByIdIn(listOf(patientId)) }
+            verify { patientenRepository.findAllByIdIn(setOf(patientId)) }
         }
     }
 

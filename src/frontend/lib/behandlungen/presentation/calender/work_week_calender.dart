@@ -54,8 +54,6 @@ class WorkWeekCalenderContent extends StatefulWidget {
 }
 
 class _WorkWeekCalenderContentState extends State<WorkWeekCalenderContent> {
-  DateTime? _createBehandlungStartZeit;
-
   final scrollController = ScrollController();
 
   @override
@@ -82,12 +80,6 @@ class _WorkWeekCalenderContentState extends State<WorkWeekCalenderContent> {
                   Positioned.fill(
                     child: WorkWeekCalenderCreateGestureDetector(
                       configuration: widget.configuration,
-                      isCreatingBehandlung: _createBehandlungStartZeit != null,
-                      onCreateBehandlungStarted: (dateTime) {
-                        setState(() {
-                          _createBehandlungStartZeit = dateTime;
-                        });
-                      },
                     ),
                   ),
                   Positioned.fill(
@@ -106,12 +98,6 @@ class _WorkWeekCalenderContentState extends State<WorkWeekCalenderContent> {
                   Positioned.fill(
                     child: WorkWeekCalenderCreator(
                       configuration: widget.configuration,
-                      createBehandlungStartZeit: _createBehandlungStartZeit,
-                      onCreateFinished: () {
-                        setState(() {
-                          _createBehandlungStartZeit = null;
-                        });
-                      },
                     ),
                   ),
                 ],

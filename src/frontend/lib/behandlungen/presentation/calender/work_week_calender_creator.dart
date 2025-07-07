@@ -6,33 +6,30 @@ import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:physio_ai/behandlungen/presentation/calender/work_week_calender_configuration.dart';
 import 'package:physio_ai/behandlungen/presentation/calender/work_week_calender_event_entry.dart';
+import 'package:physio_ai/behandlungen/presentation/calender/work_week_calender_notifier.dart';
 import 'package:physio_ai/patienten/domain/patient.dart';
 import 'package:physio_ai/patienten/presentation/patienten_page.dart';
 
-class WorkWeekCalenderCreator extends StatefulWidget {
+class WorkWeekCalenderCreator extends ConsumerStatefulWidget {
   const WorkWeekCalenderCreator({
     required this.configuration,
-    required this.onCreateFinished,
-    required this.createBehandlungStartZeit,
     super.key,
   });
 
   final WorkWeekCalenderConfiguration configuration;
 
-  final DateTime? createBehandlungStartZeit;
-
-  final VoidCallback onCreateFinished;
-
   @override
-  State<WorkWeekCalenderCreator> createState() => _WorkWeekCalenderCreatorState();
+  ConsumerState<WorkWeekCalenderCreator> createState() => _WorkWeekCalenderCreatorState();
 }
 
-class _WorkWeekCalenderCreatorState extends State<WorkWeekCalenderCreator> {
+class _WorkWeekCalenderCreatorState extends ConsumerState<WorkWeekCalenderCreator> {
   Patient? _selectedPatient;
 
   @override
   Widget build(BuildContext context) {
-    if (widget.createBehandlungStartZeit == null) {
+    final createBehandlungStartZeit = ref.watch(workWeekCalenderCreateBehandlungStartZeitProvider);
+
+    if (createBehandlungStartZeit == null) {
       return Container();
     }
 
@@ -57,17 +54,16 @@ class _WorkWeekCalenderCreatorState extends State<WorkWeekCalenderCreator> {
                   top:
                       gridHeight *
                       2 *
-                      (widget.createBehandlungStartZeit!.hour +
-                          widget.createBehandlungStartZeit!.minute / 60),
-                  left: gridWidth * (widget.createBehandlungStartZeit!.weekday - 1),
+                      (createBehandlungStartZeit.hour + createBehandlungStartZeit.minute / 60),
+                  left: gridWidth * (createBehandlungStartZeit.weekday - 1),
                   height: gridHeight * 2,
                   width: gridWidth,
                   child: WorkWeekCalenderEventEntry(
                     title: _selectedPatient?.fullName ?? '(Kein Patient ausgewählt)',
-                    startZeit: widget.createBehandlungStartZeit!,
-                    endZeit: widget.createBehandlungStartZeit!.add(const Duration(hours: 1)),
-                    onClosePopupMenu: widget.onCreateFinished,
-                    popUpLocation: widget.createBehandlungStartZeit!.weekday <= 3
+                    startZeit: createBehandlungStartZeit,
+                    endZeit: createBehandlungStartZeit.add(const Duration(hours: 1)),
+                    onClosePopupMenu: _onCreateFinished,
+                    popUpLocation: createBehandlungStartZeit.weekday <= 3
                         ? PopUpLocation.topRight
                         : PopUpLocation.topLeft,
                     popupMenu: SizedBox(
@@ -80,13 +76,13 @@ class _WorkWeekCalenderCreatorState extends State<WorkWeekCalenderCreator> {
                           });
                         },
                         onClose: () {
-                          widget.onCreateFinished.call();
+                          _onCreateFinished();
                           setState(() {
                             _selectedPatient = null;
                           });
                         },
-                        startZeit: widget.createBehandlungStartZeit!,
-                        endZeit: widget.createBehandlungStartZeit!.add(const Duration(hours: 1)),
+                        startZeit: createBehandlungStartZeit,
+                        endZeit: createBehandlungStartZeit.add(const Duration(hours: 1)),
                       ),
                     ),
                   ),
@@ -97,6 +93,10 @@ class _WorkWeekCalenderCreatorState extends State<WorkWeekCalenderCreator> {
         ),
       ),
     );
+  }
+
+  void _onCreateFinished() {
+    ref.read(workWeekCalenderCreateBehandlungStartZeitProvider.notifier).stopCreating();
   }
 }
 

@@ -8,18 +8,16 @@ typedef OnCreateBehandlungStarted = void Function(DateTime behandlungStartDate);
 class WorkWeekCalenderCreateGestureDetector extends ConsumerWidget {
   const WorkWeekCalenderCreateGestureDetector({
     required this.configuration,
-    required this.isCreatingBehandlung,
-    required this.onCreateBehandlungStarted,
     super.key,
   });
 
   final WorkWeekCalenderConfiguration configuration;
-  final bool isCreatingBehandlung;
-  final OnCreateBehandlungStarted onCreateBehandlungStarted;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final selectedWeek = ref.watch(workWeekCalenderSelectedWeekProvider);
+    final isCreatingBehandlung =
+        ref.watch(workWeekCalenderCreateBehandlungStartZeitProvider) != null;
 
     return LayoutBuilder(
       builder: (context, constraints) {
@@ -43,10 +41,14 @@ class WorkWeekCalenderCreateGestureDetector extends ConsumerWidget {
             );
             final startZeit = day.add(startHour);
 
-            onCreateBehandlungStarted.call(startZeit);
+            _onStartCreating(ref, startZeit);
           },
         );
       },
     );
+  }
+
+  void _onStartCreating(WidgetRef ref, DateTime startZeit) {
+    ref.read(workWeekCalenderCreateBehandlungStartZeitProvider.notifier).startCreating(startZeit);
   }
 }

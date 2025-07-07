@@ -61,9 +61,9 @@ ON CONFLICT DO NOTHING;
 
 -- Insert test behandlungen
 INSERT INTO behandlungen (id, patient_id, rezept_id, start_zeit, end_zeit, version)
-VALUES ('11a2b3c4-d5e6-7f8a-9b0c-1d2e3f4a5b6c', 'a1b2c3d4-e5f6-7a8b-9c0d-1e2f3a4b5c6d', 'e5f6a7b8-c9d0-1e2f-3a4b-5c6d7e8f9a0b', '2024-03-18 09:00:00', '2024-03-18 10:00:00', 1),
-       ('22b3c4d5-e6f7-8a9b-0c1d-2e3f4a5b6c7d', 'a1b2c3d4-e5f6-7a8b-9c0d-1e2f3a4b5c6d', 'e5f6a7b8-c9d0-1e2f-3a4b-5c6d7e8f9a0b', '2024-03-20 14:30:00', '2024-03-20 15:30:00', 1),
-       ('33c4d5e6-f7a8-9b0c-1d2e-3f4a5b6c7d8e', 'a1b2c3d4-e5f6-7a8b-9c0d-1e2f3a4b5c6d', null, '2024-03-22 11:15:00', '2024-03-22 12:15:00', 1),
+VALUES ('11a2b3c4-d5e6-7f8a-9b0c-1d2e3f4a5b6c', 'a1b2c3d4-e5f6-7a8b-9c0d-1e2f3a4b5c6d', 'e5f6a7b8-c9d0-1e2f-3a4b-5c6d7e8f9a0b', '2025-07-01 09:00:00', '2025-07-01 10:00:00', 1),
+       ('22b3c4d5-e6f7-8a9b-0c1d-2e3f4a5b6c7d', 'a1b2c3d4-e5f6-7a8b-9c0d-1e2f3a4b5c6d', 'e5f6a7b8-c9d0-1e2f-3a4b-5c6d7e8f9a0b', '2025-07-02 14:30:00', '2025-07-02 15:30:00', 1),
+       ('33c4d5e6-f7a8-9b0c-1d2e-3f4a5b6c7d8e', 'a1b2c3d4-e5f6-7a8b-9c0d-1e2f3a4b5c6d', null, '2025-07-03 11:15:00', '2025-07-03 12:15:00', 1),
 
        ('44d5e6f7-a8b9-0c1d-2e3f-4a5b6c7d8e9f', 'b2c3d4e5-f6a7-8b9c-0d1e-2f3a4b5c6d7e', 'f6a7b8c9-d0e1-2f3a-4b5c-6d7e8f9a0b1c', '2024-03-25 08:00:00', '2024-03-25 09:00:00', 1),
        ('55e6f7a8-b9c0-1d2e-3f4a-5b6c7d8e9f0a', 'b2c3d4e5-f6a7-8b9c-0d1e-2f3a4b5c6d7e', 'f6a7b8c9-d0e1-2f3a-4b5c-6d7e8f9a0b1c', '2024-03-27 13:45:00', '2024-03-27 14:45:00', 1),

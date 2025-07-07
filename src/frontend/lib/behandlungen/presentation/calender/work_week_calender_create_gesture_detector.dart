@@ -1,24 +1,26 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:physio_ai/behandlungen/presentation/calender/work_week_calender_configuration.dart';
+import 'package:physio_ai/behandlungen/presentation/calender/work_week_calender_notifier.dart';
 
 typedef OnCreateBehandlungStarted = void Function(DateTime behandlungStartDate);
 
-class WorkWeekCalenderCreateGestureDetector extends StatelessWidget {
+class WorkWeekCalenderCreateGestureDetector extends ConsumerWidget {
   const WorkWeekCalenderCreateGestureDetector({
     required this.configuration,
     required this.isCreatingBehandlung,
     required this.onCreateBehandlungStarted,
-    required this.selectedWeek,
     super.key,
   });
 
   final WorkWeekCalenderConfiguration configuration;
   final bool isCreatingBehandlung;
   final OnCreateBehandlungStarted onCreateBehandlungStarted;
-  final DateTime selectedWeek;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final selectedWeek = ref.watch(workWeekCalenderSelectedWeekProvider);
+
     return LayoutBuilder(
       builder: (context, constraints) {
         const daysInKalender = 5; // Monday to Friday

@@ -12,15 +12,12 @@ import 'package:physio_ai/patienten/presentation/patienten_page.dart';
 class WorkWeekCalenderCreator extends StatefulWidget {
   const WorkWeekCalenderCreator({
     required this.configuration,
-    required this.selectedWeek,
     required this.onCreateFinished,
     required this.createBehandlungStartZeit,
     super.key,
   });
 
   final WorkWeekCalenderConfiguration configuration;
-
-  final DateTime selectedWeek;
 
   final DateTime? createBehandlungStartZeit;
 

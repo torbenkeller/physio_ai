@@ -1,23 +1,23 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:physio_ai/behandlungen/domain/behandlung.dart';
+import 'package:physio_ai/behandlungen/presentation/calender/work_week_calender_notifier.dart';
 
-class WorkWeekCalenderHeader extends StatelessWidget {
+class WorkWeekCalenderHeader extends ConsumerWidget {
   const WorkWeekCalenderHeader({
-    required this.selectedWeek,
-    required this.onWeekSelected,
     this.daysToShow = 5,
     super.key,
   });
 
-  final DateTime selectedWeek;
-  final ValueChanged<DateTime> onWeekSelected;
   final int daysToShow;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
+
+    final selectedWeek = ref.watch(workWeekCalenderSelectedWeekProvider);
 
     final today = DateUtils.dateOnly(DateTime.now());
 
@@ -47,26 +47,26 @@ class WorkWeekCalenderHeader extends StatelessWidget {
                 ),
               ),
               DragTarget<BehandlungKalender>(
-                builder: (context, _, __) => IconButton(
-                  onPressed: _previousWeek,
+                builder: (context, _, _) => IconButton(
+                  onPressed: () => _previousWeek(ref),
                   icon: const Icon(Icons.chevron_left),
                 ),
                 onWillAcceptWithDetails: (details) {
-                  _previousWeek();
+                  _previousWeek(ref);
                   return false;
                 },
               ),
               TextButton(
-                onPressed: _goToToday,
+                onPressed: () => _goToToday(ref),
                 child: const Text('Heute'),
               ),
               DragTarget<BehandlungKalender>(
-                builder: (context, _, __) => IconButton(
-                  onPressed: _nextWeek,
+                builder: (context, _, _) => IconButton(
+                  onPressed: () => _nextWeek(ref),
                   icon: const Icon(Icons.chevron_right),
                 ),
                 onWillAcceptWithDetails: (details) {
-                  _nextWeek();
+                  _nextWeek(ref);
                   return false;
                 },
               ),
@@ -89,18 +89,16 @@ class WorkWeekCalenderHeader extends StatelessWidget {
     );
   }
 
-  void _previousWeek() {
-    final previousWeek = selectedWeek.subtract(const Duration(days: 7));
-    onWeekSelected(previousWeek);
+  void _previousWeek(WidgetRef ref) {
+    ref.read(workWeekCalenderSelectedWeekProvider.notifier).previousWeek();
   }
 
-  void _nextWeek() {
-    final nextWeek = selectedWeek.add(const Duration(days: 7));
-    onWeekSelected(nextWeek);
+  void _nextWeek(WidgetRef ref) {
+    ref.read(workWeekCalenderSelectedWeekProvider.notifier).nextWeek();
   }
 
-  void _goToToday() {
-    onWeekSelected(DateTime.now());
+  void _goToToday(WidgetRef ref) {
+    ref.read(workWeekCalenderSelectedWeekProvider.notifier).today();
   }
 
   int _getWeekNumber(DateTime date) {

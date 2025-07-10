@@ -54,18 +54,18 @@ class WorkWeekCalenderContent extends StatefulWidget {
 }
 
 class _WorkWeekCalenderContentState extends State<WorkWeekCalenderContent> {
-  final scrollController = ScrollController();
+  final _scrollController = ScrollController();
 
   @override
   void dispose() {
-    scrollController.dispose();
+    _scrollController.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
-      controller: scrollController,
+      controller: _scrollController,
       child: Portal(
         child: Row(
           children: [
@@ -92,7 +92,7 @@ class _WorkWeekCalenderContentState extends State<WorkWeekCalenderContent> {
                     child: WorkWeekCalenderDragTargets(
                       events: widget.events,
                       configuration: widget.configuration,
-                      scrollController: scrollController,
+                      scrollController: _scrollController,
                     ),
                   ),
                   Positioned.fill(

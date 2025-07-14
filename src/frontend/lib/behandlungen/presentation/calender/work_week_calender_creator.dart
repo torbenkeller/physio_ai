@@ -114,39 +114,42 @@ class _EventPopup extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 4),
-      child: Material(
-        elevation: 8,
-        borderRadius: BorderRadius.circular(12),
-        child: Container(
-          padding: const EdgeInsets.all(16),
-          decoration: BoxDecoration(
-            color: Theme.of(context).colorScheme.surface,
-            borderRadius: BorderRadius.circular(12),
-          ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            spacing: 16,
-            children: [
-              Row(
-                children: [
-                  Expanded(
-                    child: Text(
-                      'Behandlung erstellen',
-                      style: Theme.of(context).textTheme.titleLarge?.copyWith(),
+    return FocusScope(
+      autofocus: true,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 4),
+        child: Material(
+          elevation: 8,
+          borderRadius: BorderRadius.circular(12),
+          child: Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: Theme.of(context).colorScheme.surface,
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              spacing: 16,
+              children: [
+                Row(
+                  children: [
+                    Expanded(
+                      child: Text(
+                        'Behandlung erstellen',
+                        style: Theme.of(context).textTheme.titleLarge?.copyWith(),
+                      ),
                     ),
-                  ),
-                  IconButton(
-                    onPressed: onClose,
-                    icon: const Icon(Icons.close),
-                    iconSize: 20,
-                  ),
-                ],
-              ),
-              CreateBehandlungForm(startZeit: startZeit),
-            ],
+                    IconButton(
+                      onPressed: onClose,
+                      icon: const Icon(Icons.close),
+                      iconSize: 20,
+                    ),
+                  ],
+                ),
+                CreateBehandlungForm(startZeit: startZeit),
+              ],
+            ),
           ),
         ),
       ),

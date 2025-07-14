@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:physio_ai/behandlungen/infrastructure/behandlung_form_dto.dart';
 import 'package:physio_ai/patienten/domain/patient.dart';
 import 'package:physio_ai/shared_kernel/presentation/form_container.dart';
 import 'package:physio_ai/shared_kernel/presentation/form_field_container.dart';
@@ -40,9 +41,13 @@ class CreateBehandlungFormContainer extends FormContainer {
   final FormFieldContainer<DateTime> endZeit;
   final FormFieldContainer<Patient?> patient;
 
-  // CreateBehandlungDto toFormDto() {
-  //
-  // }
+  BehandlungFormDto toFormDto() {
+    return BehandlungFormDto(
+      startZeit: startZeit.value,
+      endZeit: endZeit.value,
+      patientId: patient.value!.id,
+    );
+  }
 
   @override
   List<FormFieldContainer<dynamic>> get requiredFields => [startZeit, endZeit, patient];

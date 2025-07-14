@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_portal/flutter_portal.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:intl/intl.dart';
 import 'package:physio_ai/behandlungen/presentation/calender/create_behandlung_form/create_behandlung_form.dart';
 import 'package:physio_ai/behandlungen/presentation/calender/work_week_calender_configuration.dart';
 import 'package:physio_ai/behandlungen/presentation/calender/work_week_calender_event_entry.dart';
@@ -114,6 +115,10 @@ class _EventPopup extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    final textTheme = theme.textTheme;
+
     return FocusScope(
       autofocus: true,
       child: Padding(
@@ -124,7 +129,7 @@ class _EventPopup extends StatelessWidget {
           child: Container(
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: Theme.of(context).colorScheme.surface,
+              color: colorScheme.surface,
               borderRadius: BorderRadius.circular(12),
             ),
             child: Column(
@@ -135,9 +140,22 @@ class _EventPopup extends StatelessWidget {
                 Row(
                   children: [
                     Expanded(
-                      child: Text(
-                        'Behandlung erstellen',
-                        style: Theme.of(context).textTheme.titleLarge?.copyWith(),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Behandlung erstellen',
+                            style: textTheme.titleLarge,
+                          ),
+                          Text(
+                            DateFormat(
+                              'EEE d.MM.yyyy',
+                            ).format(startZeit),
+                            style: textTheme.titleSmall?.copyWith(
+                              fontWeight: FontWeight.w400,
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                     IconButton(

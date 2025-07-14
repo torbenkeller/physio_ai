@@ -11,11 +11,13 @@ class PatientSelect extends StatefulWidget {
   const PatientSelect({
     required this.patient,
     required this.onPatientSelected,
+    this.errorText,
     super.key,
   });
 
   final ValueChanged<Patient?> onPatientSelected;
   final Patient? patient;
+  final String? errorText;
 
   @override
   State<PatientSelect> createState() => _PatientSelectState();
@@ -49,8 +51,10 @@ class _PatientSelectState extends State<PatientSelect> {
         isFocused: _isFocused,
         isHovering: _isHovering,
         isEmpty: widget.patient == null,
-        decoration: const InputDecoration(
+        decoration: InputDecoration(
           hintText: 'Patient auswählen',
+          suffixIcon: Icon(Icons.arrow_drop_down),
+          errorText: widget.errorText,
         ),
         child: widget.patient?.let(
           (patient) => ListTile(

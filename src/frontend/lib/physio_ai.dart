@@ -52,6 +52,12 @@ class _PhysioAiState extends ConsumerState<PhysioAi> with WidgetsBindingObserver
       theme: ThemeData(
         primarySwatch: Colors.blue,
         useMaterial3: true,
+        inputDecorationTheme: InputDecorationTheme(
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(4),
+          ),
+          contentPadding: const EdgeInsets.symmetric(horizontal: 16),
+        ),
       ),
       routerConfig: ref.watch(routerProvider),
     );

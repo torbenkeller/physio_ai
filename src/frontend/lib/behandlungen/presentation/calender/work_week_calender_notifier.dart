@@ -2,6 +2,7 @@ import 'package:fast_immutable_collections/fast_immutable_collections.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:physio_ai/behandlungen/domain/behandlung.dart';
+import 'package:physio_ai/behandlungen/infrastructure/behandlung_form_dto.dart';
 import 'package:physio_ai/behandlungen/infrastructure/behandlung_verschiebe_dto.dart';
 import 'package:physio_ai/behandlungen/infrastructure/behandlungen_repository.dart';
 
@@ -68,6 +69,14 @@ class WorkWeekCalenderBehandlungenNotifier
     if (oldEventWeekStart != selectedWeek) {
       ref.invalidate(workWeekCalenderBehandlungenProvider(oldEventWeekStart));
     }
+
+    ref.invalidateSelf(asReload: true);
+  }
+
+  Future<void> erstelleBehandlung(BehandlungFormDto dto) async {
+    final repository = ref.read(behandlungenRepositoryProvider);
+
+    await repository.createBehandlung(dto);
 
     ref.invalidateSelf(asReload: true);
   }

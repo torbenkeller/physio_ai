@@ -1,13 +1,13 @@
-import 'dart:developer';
-
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:physio_ai/behandlungen/presentation/calender/create_behandlung_form/create_behandlung_form_container.dart';
+import 'package:physio_ai/behandlungen/presentation/calender/work_week_calender_notifier.dart';
 import 'package:physio_ai/patienten/presentation/patient_select.dart';
 import 'package:physio_ai/shared_kernel/presentation/form_field_proxy.dart';
 import 'package:physio_ai/shared_kernel/presentation/form_proxy.dart';
 
-class CreateBehandlungForm extends StatefulWidget {
+class CreateBehandlungForm extends ConsumerStatefulWidget {
   const CreateBehandlungForm({
     required this.startZeit,
     super.key,
@@ -16,10 +16,10 @@ class CreateBehandlungForm extends StatefulWidget {
   final DateTime startZeit;
 
   @override
-  State<CreateBehandlungForm> createState() => _CreateBehandlungFormState();
+  ConsumerState<CreateBehandlungForm> createState() => _CreateBehandlungFormState();
 }
 
-class _CreateBehandlungFormState extends State<CreateBehandlungForm> {
+class _CreateBehandlungFormState extends ConsumerState<CreateBehandlungForm> {
   late final CreateBehandlungFormContainer _formContainer;
 
   @override
@@ -91,17 +91,41 @@ class _CreateBehandlungFormState extends State<CreateBehandlungForm> {
               return PatientSelect(
                 patient: state.value,
                 onPatientSelected: state.didChange,
+                errorText: state.errorText,
               );
             },
           ),
-          ElevatedButton(
-            onPressed: () {
-              log(_formContainer.formKey.currentState!.validate().toString());
-            },
-            child: const Text('validate'),
+          Align(
+            alignment: Alignment.centerRight,
+            child: ElevatedButton(
+              onPressed: _createBehandlung,
+              child: const Text('Erstellen'),
+            ),
           ),
         ],
       ),
     );
+  }
+
+  Future<void> _createBehandlung() async {
+    if (!_formContainer.validate()) {
+      return;
+    }
+
+    final selectedWeek = ref.read(workWeekCalenderSelectedWeekProvider);
+
+    final notifier = ref.read(
+      workWeekCalenderBehandlungenProvider(selectedWeek).notifier,
+    );
+
+    final creatingDialogNotifier = ref.read(
+      workWeekCalenderCreateBehandlungStartZeitProvider.notifier,
+    );
+
+    final dto = _formContainer.toFormDto();
+
+    await notifier.erstelleBehandlung(dto);
+
+    creatingDialogNotifier.stopCreating();
   }
 }

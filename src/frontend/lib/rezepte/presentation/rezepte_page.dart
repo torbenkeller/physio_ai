@@ -10,6 +10,16 @@ final rezepteProvider = FutureProvider((ref) async {
   return (await repo.getRezepte()).lock;
 });
 
+final rezepteOfPatientProvider = FutureProvider.family<IList<Rezept>, String>((
+  ref,
+  patientId,
+) async {
+  final rezepte = await ref.watch(rezepteProvider.future);
+  return rezepte.where((rezept) => rezept.patient.id == patientId).toIList().sort((a, b) {
+    return b.ausgestelltAm.compareTo(a.ausgestelltAm);
+  });
+});
+
 class SplittedRezeptePage extends StatelessWidget {
   const SplittedRezeptePage({
     required this.isContextCreate,
@@ -119,8 +129,9 @@ class RezeptListTile extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final dateFormat =
-        DateTime.now().difference(rezept.ausgestelltAm).inDays < 365 ? 'dd.MM.' : 'dd.MM.yyyy';
+    final dateFormat = DateTime.now().difference(rezept.ausgestelltAm).inDays < 365
+        ? 'dd.MM.'
+        : 'dd.MM.yyyy';
     final formattedDate =
         '${rezept.ausgestelltAm.day}.${rezept.ausgestelltAm.month}.${rezept.ausgestelltAm.year}';
 

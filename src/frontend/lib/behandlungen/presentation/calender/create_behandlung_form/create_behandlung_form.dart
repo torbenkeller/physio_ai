@@ -4,6 +4,7 @@ import 'package:intl/intl.dart';
 import 'package:physio_ai/behandlungen/presentation/calender/create_behandlung_form/create_behandlung_form_container.dart';
 import 'package:physio_ai/behandlungen/presentation/calender/work_week_calender_notifier.dart';
 import 'package:physio_ai/patienten/presentation/patient_select.dart';
+import 'package:physio_ai/rezepte/presentation/rezept_select.dart';
 import 'package:physio_ai/shared_kernel/presentation/form_field_proxy.dart';
 import 'package:physio_ai/shared_kernel/presentation/form_proxy.dart';
 
@@ -22,6 +23,8 @@ class CreateBehandlungForm extends ConsumerStatefulWidget {
 class _CreateBehandlungFormState extends ConsumerState<CreateBehandlungForm> {
   late final CreateBehandlungFormContainer _formContainer;
 
+  bool isCreateButtonEnabled = false;
+
   @override
   void initState() {
     super.initState();
@@ -34,6 +37,11 @@ class _CreateBehandlungFormState extends ConsumerState<CreateBehandlungForm> {
   Widget build(BuildContext context) {
     return FormProxy(
       formContainer: _formContainer,
+      onRequiredFieldsFilled: (areRequiredFieldsFilled) {
+        setState(() {
+          isCreateButtonEnabled = areRequiredFieldsFilled;
+        });
+      },
       child: Column(
         mainAxisSize: MainAxisSize.min,
         spacing: 16,
@@ -46,8 +54,10 @@ class _CreateBehandlungFormState extends ConsumerState<CreateBehandlungForm> {
                 formFieldContainer: _formContainer.startZeit,
                 builder: (state) {
                   return DropdownMenu(
+                    label: const Text('Von'),
                     menuHeight: 400,
                     initialSelection: _formContainer.startZeit.initialValue,
+                    errorText: state.errorText,
                     dropdownMenuEntries: [
                       for (var i = 0; i < 24 * 2; i++)
                         DropdownMenuEntry(
@@ -62,10 +72,12 @@ class _CreateBehandlungFormState extends ConsumerState<CreateBehandlungForm> {
                   );
                 },
               ),
+              const Text('-'),
               FormFieldProxy(
                 formFieldContainer: _formContainer.endZeit,
                 builder: (state) {
                   return DropdownMenu(
+                    label: const Text('Bis'),
                     menuHeight: 400,
                     initialSelection: _formContainer.endZeit.initialValue,
                     onSelected: state.didChange,
@@ -88,17 +100,37 @@ class _CreateBehandlungFormState extends ConsumerState<CreateBehandlungForm> {
           FormFieldProxy(
             formFieldContainer: _formContainer.patient,
             builder: (state) {
-              return PatientSelect(
+              final patientSelect = PatientSelect(
                 patient: state.value,
                 onPatientSelected: state.didChange,
                 errorText: state.errorText,
               );
+
+              if (state.value != null) {
+                return Column(
+                  mainAxisSize: MainAxisSize.min,
+                  spacing: 16,
+                  children: [
+                    patientSelect,
+                    FormFieldProxy(
+                      builder: (rezeptState) => RezeptSelect(
+                        onRezeptSelected: rezeptState.didChange,
+                        rezept: rezeptState.value,
+                        errorText: rezeptState.errorText,
+                        patientId: state.value!.id,
+                      ),
+                      formFieldContainer: _formContainer.rezept,
+                    ),
+                  ],
+                );
+              }
+              return patientSelect;
             },
           ),
           Align(
             alignment: Alignment.centerRight,
             child: ElevatedButton(
-              onPressed: _createBehandlung,
+              onPressed: isCreateButtonEnabled ? _createBehandlung : null,
               child: const Text('Erstellen'),
             ),
           ),

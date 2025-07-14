@@ -1,28 +1,23 @@
 import 'package:flutter/material.dart';
 
-class AnchoredOverlay extends StatefulWidget {
-  const AnchoredOverlay({
-    required this.anchor,
+class FullScreenOverlay extends StatefulWidget {
+  const FullScreenOverlay({
+    required this.child,
     required this.overlayContent,
-    required this.overlayConstraints,
-    this.overlayOffset = Offset.zero,
     this.isShowing = false,
     super.key,
   });
 
   final bool isShowing;
-  final Widget anchor;
+  final Widget child;
   final Widget overlayContent;
-  final BoxConstraints overlayConstraints;
-  final Offset overlayOffset;
 
   @override
-  State<AnchoredOverlay> createState() => _AnchoredOverlayState();
+  State<FullScreenOverlay> createState() => _FullScreenOverlayState();
 }
 
-class _AnchoredOverlayState extends State<AnchoredOverlay> {
+class _FullScreenOverlayState extends State<FullScreenOverlay> {
   final OverlayPortalController _overlayPortalController = OverlayPortalController();
-  final _anchorKey = GlobalKey();
 
   @override
   void initState() {
@@ -35,7 +30,7 @@ class _AnchoredOverlayState extends State<AnchoredOverlay> {
   }
 
   @override
-  void didUpdateWidget(AnchoredOverlay oldWidget) {
+  void didUpdateWidget(FullScreenOverlay oldWidget) {
     if (widget.isShowing && !_overlayPortalController.isShowing) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         _overlayPortalController.show();
@@ -62,24 +57,13 @@ class _AnchoredOverlayState extends State<AnchoredOverlay> {
   @override
   Widget build(BuildContext context) {
     return OverlayPortal.overlayChildLayoutBuilder(
-      key: _anchorKey,
       controller: _overlayPortalController,
-      overlayChildBuilder: (_, info) {
-        final overlay = Overlay.of(context).context.findRenderObject()! as RenderBox;
-
-        final anchor = _anchorKey.currentContext!.findRenderObject()! as RenderBox;
-        final anchorPosition = anchor.localToGlobal(Offset.zero, ancestor: overlay);
-
-        return Positioned(
-          left: anchorPosition.dx + widget.overlayOffset.dx,
-          top: anchorPosition.dy + widget.overlayOffset.dy,
-          child: ConstrainedBox(
-            constraints: widget.overlayConstraints,
-            child: widget.overlayContent,
-          ),
+      overlayChildBuilder: (_, _) {
+        return Positioned.fill(
+          child: widget.overlayContent,
         );
       },
-      child: widget.anchor,
+      child: widget.child,
     );
   }
 }

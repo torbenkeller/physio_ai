@@ -6,6 +6,8 @@ import 'package:intl/intl.dart';
 import 'package:physio_ai/patienten/domain/patient.dart';
 import 'package:physio_ai/patienten/presentation/patienten_page.dart';
 import 'package:physio_ai/shared_kernel/presentation/anchored_overlay.dart';
+import 'package:physio_ai/shared_kernel/presentation/full_screen_overlay.dart';
+import 'package:physio_ai/shared_kernel/utils.dart';
 
 class PatientSelect extends StatefulWidget {
   const PatientSelect({
@@ -52,8 +54,17 @@ class _PatientSelectState extends State<PatientSelect> {
         isHovering: _isHovering,
         isEmpty: widget.patient == null,
         decoration: InputDecoration(
+          labelText: 'Patient',
+          floatingLabelBehavior: FloatingLabelBehavior.always,
           hintText: 'Patient auswählen',
-          suffixIcon: Icon(Icons.arrow_drop_down),
+          suffixIcon: widget.patient == null
+              ? const Icon(Icons.arrow_drop_down)
+              : IconButton(
+                  onPressed: () {
+                    widget.onPatientSelected(null);
+                  },
+                  icon: const Icon(Icons.close),
+                ),
           errorText: widget.errorText,
         ),
         child: widget.patient?.let(
@@ -61,7 +72,7 @@ class _PatientSelectState extends State<PatientSelect> {
             mouseCursor: MouseCursor.uncontrolled,
             contentPadding: EdgeInsets.zero,
             title: Text(patient.fullName),
-            subtitle: Text(DateFormat.yMd().format(widget.patient!.geburtstag)),
+            subtitle: Text(DateFormat.yMd().format(patient.geburtstag)),
           ),
         ),
       ),
@@ -69,19 +80,31 @@ class _PatientSelectState extends State<PatientSelect> {
 
     return LayoutBuilder(
       builder: (_, constraints) {
-        return AnchoredOverlay(
+        return FullScreenOverlay(
           isShowing: _isOverlayShowing,
-          overlaySize: Size(constraints.maxWidth, 64 * 5),
-          anchor: selectContent,
-          overlayOffset: const Offset(0, -8),
-          overlayContent: _PatientOverlay(
-            patient: widget.patient,
-            onPatientSelected: (patient) {
+          overlayContent: GestureDetector(
+            onTap: () {
               setState(() {
                 _isOverlayShowing = false;
               });
-              widget.onPatientSelected(patient);
             },
+          ),
+          child: AnchoredOverlay(
+            isShowing: _isOverlayShowing,
+            overlayConstraints: BoxConstraints(
+              maxWidth: constraints.maxWidth,
+            ),
+            anchor: selectContent,
+            overlayOffset: const Offset(0, -16),
+            overlayContent: _PatientOverlay(
+              patient: widget.patient,
+              onPatientSelected: (patient) {
+                setState(() {
+                  _isOverlayShowing = false;
+                });
+                widget.onPatientSelected(patient);
+              },
+            ),
           ),
         );
       },
@@ -105,19 +128,25 @@ class _PatientOverlay extends StatefulWidget {
 
 class _PatientOverlayState extends State<_PatientOverlay> {
   late final TextEditingController _controller;
-  String? _selectedText;
 
   @override
   void initState() {
     super.initState();
     _controller = TextEditingController()..text = widget.patient?.fullName ?? '';
-    _selectedText = widget.patient?.fullName;
+    _controller.addListener(_onTextUpdated);
   }
 
   @override
   void dispose() {
-    _controller.dispose();
+    _controller
+      ..removeListener(_onTextUpdated)
+      ..dispose();
+
     super.dispose();
+  }
+
+  void _onTextUpdated() {
+    setState(() {});
   }
 
   @override
@@ -135,30 +164,26 @@ class _PatientOverlayState extends State<_PatientOverlay> {
       child: Material(
         elevation: 8,
         borderRadius: const BorderRadius.all(Radius.circular(8)),
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            spacing: 16,
-            children: [
-              Row(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          spacing: 8,
+          children: [
+            Padding(
+              padding: const EdgeInsets.only(left: 16, right: 16, top: 16),
+              child: Row(
                 spacing: 16,
                 children: [
                   Expanded(
                     child: TextField(
                       autofocus: true,
                       controller: _controller,
-                      onChanged: (value) {
-                        setState(() {
-                          _selectedText = value;
-                        });
-                      },
                       decoration: InputDecoration(
-                        labelText: 'Patient auswählen',
+                        hintText: 'Patient suchen...',
+                        prefixIcon: const Icon(Icons.search),
                         suffixIcon: IconButton(
                           icon: const Icon(Icons.close),
                           onPressed: () {
-                            widget.onPatientSelected(null);
+                            _controller.clear();
                           },
                         ),
                       ),
@@ -172,16 +197,18 @@ class _PatientOverlayState extends State<_PatientOverlay> {
                   ),
                 ],
               ),
-              Expanded(
-                child: _PatientenSearchResults(
-                  searchText: _selectedText,
-                  onPatientSelected: (patient) {
-                    widget.onPatientSelected(patient);
-                  },
-                ),
+            ),
+            SizedBox(
+              height: 64 * 4,
+              child: _PatientenSearchResults(
+                searchText: _controller.text,
+                onPatientSelected: (patient) {
+                  widget.onPatientSelected(patient);
+                },
               ),
-            ],
-          ),
+            ),
+            const SizedBox(height: 4),
+          ],
         ),
       ),
     );
@@ -195,7 +222,7 @@ class _PatientenSearchResults extends ConsumerWidget {
     super.key,
   });
 
-  final String? searchText;
+  final String searchText;
 
   final ValueChanged<Patient> onPatientSelected;
 
@@ -208,14 +235,13 @@ class _PatientenSearchResults extends ConsumerWidget {
       children: [
         ...patienten
             .where(
-              (patient) => patient.fullName.toLowerCase().contains(searchText?.toLowerCase() ?? ''),
+              (patient) => patient.fullName.toLowerCase().contains(searchText.toLowerCase()),
             )
             .map(
               (patient) {
                 return ListTile(
-                  contentPadding: EdgeInsets.zero,
                   title: Text(patient.fullName),
-                  subtitle: Text(patient.geburtstag.toString()),
+                  subtitle: Text('Geboren: ${DateFormat('dd.MM.y').format(patient.geburtstag)}'),
                   onTap: () {
                     onPatientSelected(patient);
                   },
@@ -224,12 +250,5 @@ class _PatientenSearchResults extends ConsumerWidget {
             ),
       ],
     );
-  }
-}
-
-extension ObjectExt<T> on T? {
-  S? let<S>(S Function(T) fn) {
-    if (this == null) return null;
-    return fn(this as T);
   }
 }

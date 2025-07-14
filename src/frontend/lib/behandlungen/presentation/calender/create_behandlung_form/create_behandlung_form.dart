@@ -3,7 +3,7 @@ import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:physio_ai/behandlungen/presentation/calender/create_behandlung_form/create_behandlung_form_container.dart';
-import 'package:physio_ai/patienten/presentation/patienten_select.dart';
+import 'package:physio_ai/patienten/presentation/patient_select.dart';
 import 'package:physio_ai/shared_kernel/presentation/form_field_proxy.dart';
 import 'package:physio_ai/shared_kernel/presentation/form_proxy.dart';
 

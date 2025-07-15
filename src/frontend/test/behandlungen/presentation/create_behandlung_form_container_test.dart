@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:physio_ai/behandlungen/infrastructure/behandlung_form_dto.dart';
-import 'package:physio_ai/behandlungen/presentation/create_behandlung_form_container.dart';
+import 'package:physio_ai/behandlungen/presentation/calender/create_behandlung_form/create_behandlung_form_container.dart';
 import 'package:physio_ai/generated/l10n.dart';
 import 'package:physio_ai/patienten/domain/patient.dart';
 import 'package:physio_ai/rezepte/model/rezept.dart';

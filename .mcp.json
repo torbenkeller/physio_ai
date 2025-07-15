@@ -11,6 +11,10 @@
         "IMAGES_SUPPORTED": "true"
       },
       "disabled": false
+    },
+    "jetbrains": {
+      "command": "npx",
+      "args": ["-y", "@jetbrains/mcp-proxy"]
     }
   }
 }

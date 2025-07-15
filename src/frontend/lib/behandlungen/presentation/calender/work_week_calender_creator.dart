@@ -61,9 +61,7 @@ class _WorkWeekCalenderCreatorState extends ConsumerState<WorkWeekCalenderCreato
                     startZeit: createBehandlungStartZeit,
                     endZeit: createBehandlungStartZeit.add(const Duration(hours: 1)),
                     onClosePopupMenu: _onCreateFinished,
-                    popUpLocation: createBehandlungStartZeit.weekday <= 3
-                        ? PopUpLocation.topRight
-                        : PopUpLocation.topLeft,
+                    popUpLocation: PopUpLocation.fromStartZeit(createBehandlungStartZeit),
                     popupMenu: SizedBox(
                       width: gridWidth * 2,
                       child: _EventPopup(

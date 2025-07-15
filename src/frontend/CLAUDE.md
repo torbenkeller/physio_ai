@@ -38,6 +38,7 @@ Before you begin coding, please carefully read through the following guidelines 
    - Lint code: `flutter analyze`
    - Format code: `dart format <directory / files / . for all>`
    - Fix lint issues: `dart fix --apply`
+   - Get dependencies: `flutter pub get`
    - Run all tests: use the jetbrains mcp server
    - Run specific test: use the jetbrains mcp server
 
@@ -48,7 +49,7 @@ Before you begin coding, please carefully read through the following guidelines 
 
 7. Tools:
    - Use the `flutterInspector` tool to get debug details of the running flutter app
-   - Use the `jetbrains` mcp server to get details collected by the IDE
+   - Use the `jetbrains` mcp server to interact with the IDE
 
 Now, please approach the coding task using the following steps:
 

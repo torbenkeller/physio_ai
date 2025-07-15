@@ -6,6 +6,15 @@ import 'package:intl/intl.dart';
 enum PopUpLocation {
   topRight,
   topLeft,
+  bottomRight,
+  bottomLeft;
+
+  static PopUpLocation fromStartZeit(DateTime startZeit) {
+    if (startZeit.weekday <= 3) {
+      return startZeit.hour < 16 ? PopUpLocation.topRight : PopUpLocation.bottomRight;
+    }
+    return startZeit.hour < 16 ? PopUpLocation.topLeft : PopUpLocation.bottomLeft;
+  }
 }
 
 class WorkWeekCalenderEventEntry extends StatefulWidget {
@@ -13,8 +22,8 @@ class WorkWeekCalenderEventEntry extends StatefulWidget {
     required this.title,
     required this.startZeit,
     required this.endZeit,
-    this.isDragged = false,
     required this.popupMenu,
+    this.isDragged = false,
     this.popUpLocation = PopUpLocation.topRight,
     this.showPopupMenu = true,
     this.onClosePopupMenu,
@@ -100,6 +109,16 @@ class _WorkWeekCalenderEventEntryState extends State<WorkWeekCalenderEventEntry>
                 PopUpLocation.topLeft => Aligned(
                   target: Alignment.topLeft,
                   follower: Alignment.topRight,
+                  offset: Offset(-constraints.maxWidth / 3 * (animationController.value - 1), 0),
+                ),
+                PopUpLocation.bottomRight => Aligned(
+                  target: Alignment.bottomRight,
+                  follower: Alignment.bottomLeft,
+                  offset: Offset(constraints.maxWidth / 3 * (animationController.value - 1), 0),
+                ),
+                PopUpLocation.bottomLeft => Aligned(
+                  target: Alignment.bottomLeft,
+                  follower: Alignment.bottomRight,
                   offset: Offset(-constraints.maxWidth / 3 * (animationController.value - 1), 0),
                 ),
               },

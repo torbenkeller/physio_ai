@@ -6,8 +6,11 @@ import 'package:intl/intl.dart';
 import 'package:physio_ai/behandlungen/domain/behandlung.dart';
 import 'package:physio_ai/behandlungen/presentation/calender/work_week_calender_configuration.dart';
 import 'package:physio_ai/behandlungen/presentation/calender/work_week_calender_event_entry.dart';
+import 'package:physio_ai/patienten/domain/patient.dart';
+import 'package:physio_ai/patienten/presentation/patient_detail_page.dart';
 import 'package:physio_ai/rezepte/model/rezept.dart';
 import 'package:physio_ai/rezepte/presentation/rezept_detail_page.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 const _closePortalTargetDetectorLabel = PortalLabel('closeTargetDetector');
 
@@ -118,9 +121,7 @@ class _EventEntryState extends ConsumerState<_EventEntry> {
               endZeit: widget.event.endZeit,
               isDragged: _isDragged,
               showPopupMenu: _isDetailsOpen,
-              popUpLocation: widget.event.startZeit.weekday <= 3
-                  ? PopUpLocation.topRight
-                  : PopUpLocation.topLeft,
+              popUpLocation: PopUpLocation.fromStartZeit(widget.event.startZeit),
               onClosePopupMenu: () {
                 setState(() {
                   _isDetailsOpen = false;
@@ -145,7 +146,7 @@ class _EventEntryState extends ConsumerState<_EventEntry> {
   }
 }
 
-class _EventPopup extends StatelessWidget {
+class _EventPopup extends ConsumerWidget {
   const _EventPopup({
     required this.event,
     required this.onClose,
@@ -155,7 +156,10 @@ class _EventPopup extends StatelessWidget {
   final VoidCallback onClose;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final textTheme = Theme.of(context).textTheme;
+    final asyncPatient = ref.watch(patientProvider(event.patient.id));
+
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 4),
       child: GestureDetector(
@@ -173,14 +177,24 @@ class _EventPopup extends StatelessWidget {
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                // Enhanced title section with same styling as behandlung creator
                 Row(
                   children: [
                     Expanded(
-                      child: Text(
-                        event.patient.name,
-                        style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                          fontWeight: FontWeight.bold,
-                        ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            event.patient.name,
+                            style: textTheme.titleLarge,
+                          ),
+                          Text(
+                            '${DateFormat('HH:mm').format(event.startZeit)} - ${DateFormat('HH:mm').format(event.endZeit)}',
+                            style: textTheme.titleSmall?.copyWith(
+                              fontWeight: FontWeight.w400,
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                     IconButton(
@@ -190,26 +204,101 @@ class _EventPopup extends StatelessWidget {
                     ),
                   ],
                 ),
-                const SizedBox(height: 8),
-                Text(
-                  '${DateFormat('HH:mm').format(event.startZeit)} - ${DateFormat('HH:mm').format(event.endZeit)}',
-                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
-                  ),
+                const SizedBox(height: 16),
+                // Patient data section with ListTiles and expressive icons
+                asyncPatient.when(
+                  data: (patient) => patient != null
+                      ? _buildPatientData(context, patient)
+                      : const SizedBox.shrink(),
+                  loading: () => const CircularProgressIndicator(),
+                  error: (_, __) => const SizedBox.shrink(),
                 ),
-                if (event.rezeptId != null) ...[
-                  const SizedBox(height: 8),
-                  const Text(
-                    'Rezept:',
-                    style: TextStyle(fontWeight: FontWeight.bold),
-                  ),
-                  _BehandlungDetailPopupRezept(rezeptId: event.rezeptId!),
-                ],
+                // Rezept section - always show, either with data or placeholder
+                const SizedBox(height: 16),
+                event.rezeptId != null
+                    ? _BehandlungDetailPopupRezept(rezeptId: event.rezeptId!)
+                    : _buildNoRezeptSection(context),
               ],
             ),
           ),
         ),
       ),
+    );
+  }
+
+  Widget _buildPatientData(BuildContext context, Patient patient) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        ListTile(
+          leading: const Icon(Icons.cake),
+          title: Text(DateFormat('dd.MM.yyyy').format(patient.geburtstag)),
+          contentPadding: EdgeInsets.zero,
+          dense: true,
+        ),
+        // Address information
+
+        // Contact information - clickable
+        if (patient.telMobil?.isNotEmpty ?? false)
+          ListTile(
+            leading: const Icon(Icons.phone),
+            title: Text(patient.telMobil!),
+            contentPadding: EdgeInsets.zero,
+            dense: true,
+            onTap: () => _launchPhone(patient.telMobil!),
+          ),
+        if (patient.telFestnetz?.isNotEmpty ?? false)
+          ListTile(
+            leading: const Icon(Icons.phone_in_talk),
+            title: Text(patient.telFestnetz!),
+            contentPadding: EdgeInsets.zero,
+            dense: true,
+            onTap: () => _launchPhone(patient.telFestnetz!),
+          ),
+        if (patient.email?.isNotEmpty ?? false)
+          ListTile(
+            leading: const Icon(Icons.email),
+            title: Text(patient.email!),
+            contentPadding: EdgeInsets.zero,
+            dense: true,
+            onTap: () => _launchEmail(patient.email!),
+          ),
+      ],
+    );
+  }
+
+  Future<void> _launchPhone(String phoneNumber) async {
+    final uri = Uri(scheme: 'tel', path: phoneNumber);
+    if (await canLaunchUrl(uri)) {
+      await launchUrl(uri);
+    }
+  }
+
+  Future<void> _launchEmail(String email) async {
+    final uri = Uri(scheme: 'mailto', path: email);
+    if (await canLaunchUrl(uri)) {
+      await launchUrl(uri);
+    }
+  }
+
+  Widget _buildNoRezeptSection(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Divider(),
+        const SizedBox(height: 8),
+        Text(
+          'Rezept',
+          style: Theme.of(context).textTheme.titleMedium?.copyWith(),
+        ),
+        const SizedBox(height: 8),
+        ListTile(
+          leading: const Icon(Icons.receipt_long),
+          title: const Text('Kein Rezept verbunden'),
+          contentPadding: EdgeInsets.zero,
+          dense: true,
+        ),
+      ],
     );
   }
 }
@@ -226,9 +315,41 @@ class _BehandlungDetailPopupRezept extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final asyncRezept = ref.watch(rezeptProvider(rezeptId));
     return switch (asyncRezept) {
-      final AsyncData<Rezept> data => Text(data.value.preisGesamt.toString()),
+      final AsyncData<Rezept> data => _buildRezeptDetails(context, data.value),
       AsyncLoading<Rezept?>() => const CircularProgressIndicator(),
       AsyncError<Rezept?>() => Container(),
     };
+  }
+
+  Widget _buildRezeptDetails(BuildContext context, Rezept rezept) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Divider(),
+        const SizedBox(height: 8),
+        Text(
+          'Rezept',
+          style: Theme.of(context).textTheme.titleMedium?.copyWith(),
+        ),
+        const SizedBox(height: 8),
+        ListTile(
+          leading: const Icon(Icons.calendar_month),
+          title: Text('Ausgestellt am ${DateFormat('dd.MM.yyyy').format(rezept.ausgestelltAm)}'),
+          contentPadding: EdgeInsets.zero,
+          dense: true,
+        ),
+        if (rezept.positionen.isNotEmpty)
+          ListTile(
+            leading: const Icon(Icons.medical_services),
+            title: Text(
+              rezept.positionen
+                  .map((position) => '${position.anzahl}x ${position.behandlungsart.name}')
+                  .join('\n'),
+            ),
+            contentPadding: EdgeInsets.zero,
+            dense: true,
+          ),
+      ],
+    );
   }
 }

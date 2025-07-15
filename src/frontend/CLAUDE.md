@@ -33,14 +33,13 @@ Before you begin coding, please carefully read through the following guidelines 
    - Handle errors gracefully with user-friendly messages
 
 5. Commands:
-   - Run app: `flutter run`
-   - Build app: `flutter build <platform>`
+   - Run app: use the jetbrains mcp server
    - Run Build Runner: `dart run build_runner build --delete-conflicting-outputs`
    - Lint code: `flutter analyze`
    - Format code: `dart format <directory / files / . for all>`
    - Fix lint issues: `dart fix --apply`
-   - Run all tests: `flutter test`
-   - Run specific test: `flutter test test/<path_to_test_file>.dart`
+   - Run all tests: use the jetbrains mcp server
+   - Run specific test: use the jetbrains mcp server
 
 6. Testing Strategy:
    - There are no unit tests of Repositories because their functionality is highly dependent on the backend responses

@@ -1,64 +1,76 @@
-# Frontend (Flutter)
+You are an expert frontend developer working with Flutter. Your task is to implement a new feature or fix a bug based on the following coding task:
 
-This file is only related to the frontend code. You MUST NOT respect this file when editing the backend code.
+Before you begin coding, please carefully read through the following guidelines and requirements:
 
-## Commands
+1. Technology Stack:
+   - Frontend: Flutter
+   - Language: Dart
+   - State Management: flutter_riverpod
+   - Navigation: go_router
+   - Data Models: freezed and json_serializable
+   - API Layer: retrofit
+   - Collections: fast_immutable_collections
+   - Localization: flutter_intl (German as main locale)
 
-### Build Commands
+2. Code Style and Best Practices:
+   - Follow the [very_good_analysis](https://pub.dev/packages/very_good_analysis) style guide
+   - Max line length is 120 (default 80-char limit is disabled)
+   - Use Dart's strong typing features throughout the codebase
+   - Do NOT modify files inside `**/generated/**` folders
+   - Always add trailing commas
+   - Always use the latest language features
+   - Always use the text styles and colors from the App Theme
 
-- Run app: `flutter run`
-- Build app: `flutter build <platform>`
-- Run the Build Runner: `dart run build_runner build --delete-conflicting-outputs`
+3. Architecture Principles:
+   - Use immutable data classes for state management
+   - Use Repositories to access APIs
+   - Create new widgets when the build method gets too long
+   - Use only dart-doc comments when commenting code
+   - Use IList from fast_immutable_collections instead of List
 
-### Lint Commands
+4. Error Handling:
+   - Use proper Exception types and logging
+   - Handle errors gracefully with user-friendly messages
 
-- Lint code: `flutter analyze`
-- Format code: `dart format <directory / files / . for all>`
-- Fix lint issues: `dart fix --apply`
-- Custom lint: `dart r8un custom_lint`
+5. Commands:
+   - Run app: `flutter run`
+   - Build app: `flutter build <platform>`
+   - Run Build Runner: `dart run build_runner build --delete-conflicting-outputs`
+   - Lint code: `flutter analyze`
+   - Format code: `dart format <directory / files / . for all>`
+   - Fix lint issues: `dart fix --apply`
+   - Run all tests: `flutter test`
+   - Run specific test: `flutter test test/<path_to_test_file>.dart`
 
-### Test Commands
+6. Testing Strategy:
+   - There are no unit tests of Repositories because their functionality is highly dependent on the backend responses
+   - End-to-End Tests MUST test the important user journeys of the product
+   - Unit Test all `FormContainer` implementations
 
-- Run all tests: `flutter test`
-- Run a specific test: `flutter test test/<path_to_test_file>.dart`
+7. Tools:
+   - Use the `flutterInspector` tool to get debug details of the running flutter app
+   - Use the `jetbrains` mcp server to get details collected by the IDE
 
-### Tools
+Now, please approach the coding task using the following steps:
 
-- Use the `flutterInspector` tool to get debug details of the running flutter app
-- Use the `pubdev` tool to get documentation details about packages
+1. In <analysis> tags:
+   - Break down the coding task into smaller steps
+   - Identify which widgets, providers, and services will need to be created or modified
+   - Consider the user experience and navigation flow
 
-## Decisions
+2. In <implementation> tags:
+   - Write the implementation code
+   - Include comments explaining the purpose of each significant part
+   - Follow the established patterns and architecture
 
-### Code Style
+3. In <testing> tags:
+   - Write appropriate tests for the implementation
+   - Focus on testing business logic and user interactions
+   - Skip repository tests as per project guidelines
 
-- Flutter: Follow the [very_good_analysis](https://pub.dev/packages/very_good_analysis) style guide
-- Max line length is 120 (default 80-char limit is disabled)
-- Use dart's strong typing features throughout the codebase
-- Do NOT modify files inside `**/generated/**` folders
-- Always add trailing commas
-- Always use the latest language features
-- Always use the text styles and colors from the App Theme
+4. In <validation> tags:
+   - Ensure code follows the style guide
+   - Verify proper error handling
+   - Check that the implementation meets the requirements
 
-### Packages
-
-- Use freezed for immutable models and json_serializable for DTOs
-- Use flutter_riverpod for state management
-- Use go_router for navigation
-- Use retrofit for repositories
-- Use IList from fast_immutable_collections instead of List
-- Use flutter_intl for Localizations with German as main locale
-
-### Rules
-
-- Error handling should use proper Exception types and logging
-- Use only dart-doc comments when commenting code
-- Use immutable data classes for state management
-- Use Repositories to access API's
-- Create new widgets when the build method gets too long
-- You MUST always format the code before finishing a task
-
-### Testing the Frontend
-
-- There are no unit tests of Repositories because their functionality is highly dependent on the backend responses
-- End-to-End Tests MUST test the important user journeys of the product
-- Unit Test the all `FormContainer` implementations
+Remember to ALWAYS format the code before finishing any task using `dart format`.

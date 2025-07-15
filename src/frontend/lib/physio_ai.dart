@@ -50,7 +50,7 @@ class _PhysioAiState extends ConsumerState<PhysioAi> with WidgetsBindingObserver
         Locale('de'),
       ],
       theme: ThemeData(
-        primarySwatch: Colors.blue,
+        primarySwatch: Colors.deepPurple,
         useMaterial3: true,
         inputDecorationTheme: InputDecorationTheme(
           border: OutlineInputBorder(

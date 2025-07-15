@@ -1,4 +1,4 @@
-import 'package:fast_immutable_collections/src/ilist/ilist.dart';
+import 'package:fast_immutable_collections/fast_immutable_collections.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_portal/flutter_portal.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -106,37 +106,36 @@ class _EventEntryState extends ConsumerState<_EventEntry> {
           },
           feedback: Container(),
           data: widget.event,
-          child: InkWell(
-            focusColor: Colors.transparent,
-            hoverColor: Colors.transparent,
-            highlightColor: Colors.transparent,
-            splashColor: Colors.transparent,
-            onTap: () => {
-              setState(() {
-                _isDetailsOpen = true;
-              }),
-            },
-            child: WorkWeekCalenderEventEntry(
-              title: widget.event.patient.name,
-              startZeit: widget.event.startZeit,
-              endZeit: widget.event.endZeit,
-              isDragged: _isDragged,
-              showPopupMenu: _isDetailsOpen,
-              popUpLocation: PopUpLocation.fromStartZeit(widget.event.startZeit),
-              onClosePopupMenu: () {
+          child: MouseRegion(
+            cursor: SystemMouseCursors.click,
+            child: GestureDetector(
+              onTap: () => {
                 setState(() {
-                  _isDetailsOpen = false;
-                });
+                  _isDetailsOpen = true;
+                }),
               },
-              popupMenu: SizedBox(
-                width: widget.width * 2,
-                child: _EventPopup(
-                  event: widget.event,
-                  onClose: () {
-                    setState(() {
-                      _isDetailsOpen = false;
-                    });
-                  },
+              child: WorkWeekCalenderEventEntry(
+                title: widget.event.patient.name,
+                startZeit: widget.event.startZeit,
+                endZeit: widget.event.endZeit,
+                isDragged: _isDragged,
+                showPopupMenu: _isDetailsOpen,
+                popUpLocation: PopUpLocation.fromStartZeit(widget.event.startZeit),
+                onClosePopupMenu: () {
+                  setState(() {
+                    _isDetailsOpen = false;
+                  });
+                },
+                popupMenu: SizedBox(
+                  width: widget.width * 2,
+                  child: _EventPopup(
+                    event: widget.event,
+                    onClose: () {
+                      setState(() {
+                        _isDetailsOpen = false;
+                      });
+                    },
+                  ),
                 ),
               ),
             ),
@@ -233,13 +232,14 @@ class _EventPopup extends ConsumerWidget {
                       ? _buildPatientData(context, patient)
                       : const SizedBox.shrink(),
                   loading: () => const CircularProgressIndicator(),
-                  error: (_, __) => const SizedBox.shrink(),
+                  error: (_, _) => const SizedBox.shrink(),
                 ),
                 // Rezept section - always show, either with data or placeholder
                 const SizedBox(height: 16),
-                event.rezeptId != null
-                    ? _BehandlungDetailPopupRezept(rezeptId: event.rezeptId!)
-                    : _buildNoRezeptSection(context),
+                if (event.rezeptId != null)
+                  _BehandlungDetailPopupRezept(rezeptId: event.rezeptId!)
+                else
+                  _buildNoRezeptSection(context),
               ],
             ),
           ),
@@ -344,9 +344,9 @@ class _EventPopup extends ConsumerWidget {
           style: Theme.of(context).textTheme.titleMedium?.copyWith(),
         ),
         const SizedBox(height: 8),
-        ListTile(
-          leading: const Icon(Icons.receipt_long),
-          title: const Text('Kein Rezept verbunden'),
+        const ListTile(
+          leading: Icon(Icons.receipt_long),
+          title: Text('Kein Rezept verbunden'),
           contentPadding: EdgeInsets.zero,
           dense: true,
         ),

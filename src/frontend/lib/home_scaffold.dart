@@ -1,5 +1,4 @@
-import 'package:flutter/material.dart'
-    hide NavigationDrawer, NavigationDrawerDestination;
+import 'package:flutter/material.dart' hide NavigationDrawer, NavigationDrawerDestination;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:physio_ai/profile/infrastructure/profile_repository.dart';
@@ -30,12 +29,10 @@ enum Breakpoint {
 }
 
 final profilePictureUrlProvider = FutureProvider((ref) {
-  return ref
-      .watch(profileProvider.selectAsync((value) => value.profilePictureUrl));
+  return ref.watch(profileProvider.selectAsync((value) => value.profilePictureUrl));
 });
 
-final profileButtonTextProvider =
-    FutureProvider<({String inhaberName, String praxisName})>((ref) {
+final profileButtonTextProvider = FutureProvider<({String inhaberName, String praxisName})>((ref) {
   return ref.watch(
     profileProvider.selectAsync(
       (value) => (inhaberName: value.inhaberName, praxisName: value.praxisName),
@@ -80,74 +77,73 @@ class HomeScaffold extends StatelessWidget {
 
     return switch (Breakpoint.fromWidth(width)) {
       Breakpoint.mobile => Scaffold(
-          body: navigationShell,
-          bottomNavigationBar: NavigationBar(
-            selectedIndex: navigationShell.currentIndex,
-            destinations: <Widget>[
-              for (final item in _navigationItems)
-                NavigationDestination(
-                  icon: Icon(item.icon),
-                  label: item.label,
-                ),
-              const NavigationDestination(
-                icon: _ProfileIcon(),
-                label: 'Profile',
+        body: navigationShell,
+        bottomNavigationBar: NavigationBar(
+          selectedIndex: navigationShell.currentIndex,
+          destinations: <Widget>[
+            for (final item in _navigationItems)
+              NavigationDestination(
+                icon: Icon(item.icon),
+                label: item.label,
               ),
-            ],
-            onDestinationSelected: _goBranch,
-          ),
+            const NavigationDestination(
+              icon: _ProfileIcon(),
+              label: 'Profile',
+            ),
+          ],
+          onDestinationSelected: _goBranch,
         ),
+      ),
       Breakpoint.tablet => Scaffold(
-          body: Row(
-            children: [
-              NavigationRail(
-                onDestinationSelected: _goBranch,
-                selectedIndex: navigationShell.currentIndex,
-                labelType: NavigationRailLabelType.all,
-                destinations: [
-                  for (final item in _navigationItems)
-                    NavigationRailDestination(
-                      label: Text(item.label),
-                      icon: Icon(item.icon),
-                    ),
-                  const NavigationRailDestination(
-                    icon: _ProfileIcon(),
-                    label: Text('Profil'),
+        body: Row(
+          children: [
+            NavigationRail(
+              onDestinationSelected: _goBranch,
+              selectedIndex: navigationShell.currentIndex,
+              labelType: NavigationRailLabelType.all,
+              destinations: [
+                for (final item in _navigationItems)
+                  NavigationRailDestination(
+                    label: Text(item.label),
+                    icon: Icon(item.icon),
                   ),
-                ],
-              ),
-              Expanded(child: navigationShell),
-            ],
-          ),
-        ),
-      Breakpoint.desktop => Scaffold(
-          body: Row(
-            children: [
-              NavigationDrawer(
-                onDestinationSelected: _goBranch,
-                selectedIndex: navigationShell.currentIndex,
-                padding: const EdgeInsets.all(12),
-                header: Padding(
-                  padding: const EdgeInsets.fromLTRB(16, 16, 16, 10),
-                  child: Text('Physio.ai',
-                      style: Theme.of(context).textTheme.titleSmall),
-                ),
-                footer: const NavigationDrawerDestination(
-                  label: _ProfileLabel(),
+                const NavigationRailDestination(
                   icon: _ProfileIcon(),
+                  label: Text('Profil'),
                 ),
-                children: <Widget>[
-                  for (final item in _navigationItems)
-                    NavigationDrawerDestination(
-                      label: Text(item.label),
-                      icon: Icon(item.icon),
-                    ),
-                ],
-              ),
-              Expanded(child: navigationShell),
-            ],
-          ),
+              ],
+            ),
+            Expanded(child: navigationShell),
+          ],
         ),
+      ),
+      Breakpoint.desktop => Scaffold(
+        body: Row(
+          children: [
+            NavigationDrawer(
+              onDestinationSelected: _goBranch,
+              selectedIndex: navigationShell.currentIndex,
+              padding: const EdgeInsets.all(12),
+              header: Padding(
+                padding: const EdgeInsets.fromLTRB(16, 16, 16, 10),
+                child: Text('Physio.ai', style: Theme.of(context).textTheme.titleSmall),
+              ),
+              footer: const NavigationDrawerDestination(
+                label: _ProfileLabel(),
+                icon: _ProfileIcon(),
+              ),
+              children: <Widget>[
+                for (final item in _navigationItems)
+                  NavigationDrawerDestination(
+                    label: Text(item.label),
+                    icon: Icon(item.icon),
+                  ),
+              ],
+            ),
+            Expanded(child: navigationShell),
+          ],
+        ),
+      ),
     };
   }
 

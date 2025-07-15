@@ -85,11 +85,14 @@ class _WorkWeekCalenderEventEntryState extends State<WorkWeekCalenderEventEntry>
 
   @override
   Widget build(BuildContext context) {
-    final eventEntry = RawWorkWeekCalenderEventEntry(
-      title: widget.title,
-      startZeit: widget.startZeit,
-      endZeit: widget.endZeit,
-      isDragged: widget.isDragged,
+    final eventEntry = Focus(
+      canRequestFocus: true,
+      child: RawWorkWeekCalenderEventEntry(
+        title: widget.title,
+        startZeit: widget.startZeit,
+        endZeit: widget.endZeit,
+        isDragged: widget.isDragged,
+      ),
     );
 
     return LayoutBuilder(
@@ -168,12 +171,21 @@ class RawWorkWeekCalenderEventEntry extends StatelessWidget {
 
     final color = isDragged ? colorScheme.primary.withAlpha(51) : colorScheme.primary;
 
+    final hasFocus = Focus.of(context).hasFocus;
+
     return Padding(
       padding: const EdgeInsets.only(left: 4, bottom: 4, right: 4),
       child: DecoratedBox(
         decoration: BoxDecoration(
           color: color,
           borderRadius: BorderRadius.circular(4),
+          border: hasFocus
+              ? Border.all(
+                  color: colorScheme.outlineVariant,
+                  width: 2,
+                  strokeAlign: BorderSide.strokeAlignOutside,
+                )
+              : null,
         ),
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),

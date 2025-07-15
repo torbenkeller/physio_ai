@@ -80,6 +80,14 @@ class WorkWeekCalenderBehandlungenNotifier
 
     ref.invalidateSelf(asReload: true);
   }
+
+  Future<void> deleteBehandlung(String behandlungId) async {
+    final repository = ref.read(behandlungenRepositoryProvider);
+
+    await repository.deleteBehandlung(behandlungId);
+
+    ref.invalidateSelf(asReload: true);
+  }
 }
 
 class WorkWeekCalenderCreateBehandlungStartZeitNotifier extends Notifier<DateTime?> {

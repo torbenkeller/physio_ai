@@ -6,6 +6,7 @@ import 'package:intl/intl.dart';
 import 'package:physio_ai/behandlungen/domain/behandlung.dart';
 import 'package:physio_ai/behandlungen/presentation/calender/work_week_calender_configuration.dart';
 import 'package:physio_ai/behandlungen/presentation/calender/work_week_calender_event_entry.dart';
+import 'package:physio_ai/behandlungen/presentation/calender/work_week_calender_notifier.dart';
 import 'package:physio_ai/patienten/domain/patient.dart';
 import 'package:physio_ai/patienten/presentation/patient_detail_page.dart';
 import 'package:physio_ai/rezepte/model/rezept.dart';
@@ -197,6 +198,27 @@ class _EventPopup extends ConsumerWidget {
                         ],
                       ),
                     ),
+                    PopupMenuButton<String>(
+                      icon: const Icon(Icons.more_vert),
+                      iconSize: 20,
+                      onSelected: (value) async {
+                        if (value == 'delete') {
+                          await _deleteBehandlung(context, ref);
+                        }
+                      },
+                      itemBuilder: (context) => [
+                        const PopupMenuItem(
+                          value: 'delete',
+                          child: Row(
+                            children: [
+                              Icon(Icons.delete),
+                              SizedBox(width: 8),
+                              Text('Löschen'),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
                     IconButton(
                       onPressed: onClose,
                       icon: const Icon(Icons.close),
@@ -279,6 +301,36 @@ class _EventPopup extends ConsumerWidget {
     if (await canLaunchUrl(uri)) {
       await launchUrl(uri);
     }
+  }
+
+  Future<void> _deleteBehandlung(BuildContext context, WidgetRef ref) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Behandlung löschen'),
+        content: const Text('Möchten Sie diese Behandlung wirklich löschen?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: const Text('Abbrechen'),
+          ),
+          FilledButton.tonal(
+            autofocus: true,
+            onPressed: () => Navigator.of(context).pop(true),
+            child: const Text('Löschen'),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed == null || !confirmed) {
+      return;
+    }
+
+    final selectedWeek = ref.read(workWeekCalenderSelectedWeekProvider);
+    await ref
+        .read(workWeekCalenderBehandlungenProvider(selectedWeek).notifier)
+        .deleteBehandlung(event.id);
   }
 
   Widget _buildNoRezeptSection(BuildContext context) {

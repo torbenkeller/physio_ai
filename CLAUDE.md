@@ -79,5 +79,8 @@ Now, please approach the coding task using the following steps:
 
 5. In <refactor> tags, if necessary, suggest any refactoring that should be done.
 
+ALWAYS use your own tools to interact with the file system.
+ALWAYS use UTF-8 Encoding.
+
 Remember to adhere strictly to TDD principles throughout this process. Your output should clearly demonstrate that
 you're writing the test first, then the minimal production code to make it pass.

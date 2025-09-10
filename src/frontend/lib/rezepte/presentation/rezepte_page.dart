@@ -22,12 +22,12 @@ final rezepteOfPatientProvider = FutureProvider.family<IList<Rezept>, String>((
 
 class SplittedRezeptePage extends StatelessWidget {
   const SplittedRezeptePage({
-    required this.isContextCreate,
+    required this.showCreateButton,
     required this.rightPane,
     super.key,
   });
 
-  final bool isContextCreate;
+  final bool showCreateButton;
 
   final Widget rightPane;
 
@@ -39,7 +39,7 @@ class SplittedRezeptePage extends StatelessWidget {
           child: FocusTraversalGroup(
             child: RezeptePage(
               key: const ValueKey('rezeptePage'),
-              showAddButton: !isContextCreate,
+              showAddButton: showCreateButton,
             ),
           ),
         ),

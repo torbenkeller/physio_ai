@@ -14,11 +14,14 @@ class SplittedPatientenPage extends StatelessWidget {
   const SplittedPatientenPage({
     required this.rightPane,
     required this.isContextCreate,
+    this.selectedPatientId,
     super.key,
   });
 
   final Widget rightPane;
   final bool isContextCreate;
+
+  final String? selectedPatientId;
 
   @override
   Widget build(BuildContext context) {
@@ -26,6 +29,7 @@ class SplittedPatientenPage extends StatelessWidget {
       children: [
         Expanded(
           child: PatientenPage(
+            selectedPatientId: selectedPatientId,
             showAddButton: !isContextCreate,
           ),
         ),
@@ -37,21 +41,28 @@ class SplittedPatientenPage extends StatelessWidget {
 
 class PatientenPage extends ConsumerWidget {
   const PatientenPage({
-    super.key,
     this.showAddButton = true,
+    this.selectedPatientId,
+    super.key,
   });
 
   final bool showAddButton;
+
+  final String? selectedPatientId;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final asyncPatienten = ref.watch(patientenProvider);
     final content = asyncPatienten.when(
       data: (patienten) => ListView.builder(
+        padding: const EdgeInsets.symmetric(horizontal: 16),
         itemCount: patienten.length,
         itemBuilder: (context, index) {
           final patient = patienten[index];
-          return PatientListTile(patient: patient);
+          return PatientListTile(
+            patient: patient,
+            selected: patient.id == selectedPatientId,
+          );
         },
       ),
       error: (error, __) {
@@ -87,14 +98,22 @@ class PatientenPage extends ConsumerWidget {
 class PatientListTile extends ConsumerWidget {
   const PatientListTile({
     required this.patient,
+    required this.selected,
     super.key,
   });
 
   final Patient patient;
 
+  final bool selected;
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return ListTile(
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(16),
+      ),
+      selected: selected,
+      selectedTileColor: Theme.of(context).colorScheme.primaryContainer,
       onTap: () {
         context.go('/patienten/${patient.id}');
       },

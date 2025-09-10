@@ -27,6 +27,7 @@ class WorkWeekCalenderEventEntry extends StatefulWidget {
     this.popUpLocation = PopUpLocation.topRight,
     this.showPopupMenu = true,
     this.onClosePopupMenu,
+    this.onOpenPopupMenu,
     super.key,
   });
 
@@ -38,6 +39,7 @@ class WorkWeekCalenderEventEntry extends StatefulWidget {
   final PopUpLocation popUpLocation;
   final bool showPopupMenu;
   final VoidCallback? onClosePopupMenu;
+  final VoidCallback? onOpenPopupMenu;
 
   @override
   State<WorkWeekCalenderEventEntry> createState() => _WorkWeekCalenderEventEntryState();
@@ -47,7 +49,7 @@ class _WorkWeekCalenderEventEntryState extends State<WorkWeekCalenderEventEntry>
     with SingleTickerProviderStateMixin {
   late final AnimationController animationController;
 
-  final _focusNode = FocusNode();
+  final _popupFocusNode = FocusNode();
 
   @override
   void initState() {
@@ -61,7 +63,7 @@ class _WorkWeekCalenderEventEntryState extends State<WorkWeekCalenderEventEntry>
     if (widget.showPopupMenu) {
       animationController.animateTo(1, curve: Curves.easeOut);
     }
-    _focusNode.requestFocus();
+    _popupFocusNode.requestFocus();
   }
 
   @override
@@ -75,7 +77,7 @@ class _WorkWeekCalenderEventEntryState extends State<WorkWeekCalenderEventEntry>
     if (widget.showPopupMenu != oldWidget.showPopupMenu) {
       if (widget.showPopupMenu) {
         animationController.animateTo(1, curve: Curves.easeOut);
-        _focusNode.requestFocus();
+        _popupFocusNode.requestFocus();
       } else {
         animationController.reset();
       }
@@ -87,11 +89,36 @@ class _WorkWeekCalenderEventEntryState extends State<WorkWeekCalenderEventEntry>
   Widget build(BuildContext context) {
     final eventEntry = Focus(
       canRequestFocus: true,
+      onKeyEvent: (focusNode, key) {
+        if (key is KeyDownEvent && key.logicalKey == LogicalKeyboardKey.escape) {
+          if (widget.showPopupMenu) {
+            widget.onClosePopupMenu?.call();
+            return KeyEventResult.handled;
+          } else {
+            focusNode.unfocus();
+            return KeyEventResult.handled;
+          }
+        }
+
+        if (widget.showPopupMenu) {
+          return KeyEventResult.ignored;
+        }
+
+        if (key is KeyDownEvent &&
+            (key.logicalKey == LogicalKeyboardKey.space ||
+                key.logicalKey == LogicalKeyboardKey.enter)) {
+          widget.onOpenPopupMenu?.call();
+          return KeyEventResult.handled;
+        }
+
+        return KeyEventResult.ignored;
+      },
       child: RawWorkWeekCalenderEventEntry(
         title: widget.title,
         startZeit: widget.startZeit,
         endZeit: widget.endZeit,
         isDragged: widget.isDragged,
+        isPopupVisible: widget.showPopupMenu,
       ),
     );
 
@@ -127,7 +154,7 @@ class _WorkWeekCalenderEventEntryState extends State<WorkWeekCalenderEventEntry>
               },
               visible: widget.showPopupMenu,
               portalFollower: Focus(
-                focusNode: _focusNode,
+                focusNode: _popupFocusNode,
                 onKeyEvent: (focus, event) {
                   if (event.logicalKey == LogicalKeyboardKey.escape) {
                     if (widget.showPopupMenu) {
@@ -155,6 +182,7 @@ class RawWorkWeekCalenderEventEntry extends StatelessWidget {
     required this.title,
     required this.startZeit,
     required this.endZeit,
+    this.isPopupVisible = false,
     this.isDragged = false,
     super.key,
   });
@@ -163,15 +191,24 @@ class RawWorkWeekCalenderEventEntry extends StatelessWidget {
   final DateTime startZeit;
   final DateTime endZeit;
   final bool isDragged;
+  final bool isPopupVisible;
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
 
-    final color = isDragged ? colorScheme.primary.withAlpha(51) : colorScheme.primary;
-
     final hasFocus = Focus.of(context).hasFocus;
+
+    final color = isDragged
+        ? colorScheme.primary.withAlpha(51)
+        : hasFocus || isPopupVisible
+        ? colorScheme.primaryContainer
+        : colorScheme.primary;
+
+    final textColor = hasFocus || isPopupVisible
+        ? colorScheme.onPrimaryContainer
+        : colorScheme.onPrimary;
 
     return Padding(
       padding: const EdgeInsets.only(left: 4, bottom: 4, right: 4),
@@ -179,13 +216,6 @@ class RawWorkWeekCalenderEventEntry extends StatelessWidget {
         decoration: BoxDecoration(
           color: color,
           borderRadius: BorderRadius.circular(4),
-          border: hasFocus
-              ? Border.all(
-                  color: colorScheme.outlineVariant,
-                  width: 2,
-                  strokeAlign: BorderSide.strokeAlignOutside,
-                )
-              : null,
         ),
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
@@ -197,7 +227,7 @@ class RawWorkWeekCalenderEventEntry extends StatelessWidget {
                 child: Text(
                   title,
                   style: theme.textTheme.bodySmall?.copyWith(
-                    color: colorScheme.onPrimary,
+                    color: textColor,
                     fontWeight: FontWeight.w600,
                   ),
                 ),
@@ -205,7 +235,7 @@ class RawWorkWeekCalenderEventEntry extends StatelessWidget {
               Text(
                 '${DateFormat('HH:mm').format(startZeit)} - ${DateFormat('HH:mm').format(endZeit)}',
                 style: theme.textTheme.labelSmall?.copyWith(
-                  color: colorScheme.onPrimary,
+                  color: textColor,
                   fontWeight: FontWeight.w300,
                 ),
                 overflow: TextOverflow.clip,

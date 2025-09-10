@@ -24,16 +24,18 @@ class WorkWeekCalender extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        const WorkWeekCalenderHeader(),
-        Expanded(
-          child: WorkWeekCalenderContent(
-            configuration: const WorkWeekCalenderConfiguration(),
-            events: events,
+    return FocusTraversalGroup(
+      child: Column(
+        children: [
+          const WorkWeekCalenderHeader(),
+          Expanded(
+            child: WorkWeekCalenderContent(
+              configuration: const WorkWeekCalenderConfiguration(),
+              events: events,
+            ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 }
@@ -54,7 +56,16 @@ class WorkWeekCalenderContent extends StatefulWidget {
 }
 
 class _WorkWeekCalenderContentState extends State<WorkWeekCalenderContent> {
-  final _scrollController = ScrollController();
+  late final ScrollController _scrollController;
+
+  @override
+  void initState() {
+    super.initState();
+    _scrollController = ScrollController(
+      initialScrollOffset:
+          widget.configuration.hourHeight * (widget.configuration.workingHoursStartHour - 1) - 10,
+    );
+  }
 
   @override
   void dispose() {

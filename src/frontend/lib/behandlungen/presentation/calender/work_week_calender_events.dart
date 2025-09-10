@@ -2,6 +2,7 @@ import 'package:fast_immutable_collections/fast_immutable_collections.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_portal/flutter_portal.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:physio_ai/behandlungen/domain/behandlung.dart';
 import 'package:physio_ai/behandlungen/presentation/calender/work_week_calender_configuration.dart';
@@ -121,6 +122,11 @@ class _EventEntryState extends ConsumerState<_EventEntry> {
                 isDragged: _isDragged,
                 showPopupMenu: _isDetailsOpen,
                 popUpLocation: PopUpLocation.fromStartZeit(widget.event.startZeit),
+                onOpenPopupMenu: () {
+                  setState(() {
+                    _isDetailsOpen = true;
+                  });
+                },
                 onClosePopupMenu: () {
                   setState(() {
                     _isDetailsOpen = false;
@@ -162,86 +168,79 @@ class _EventPopup extends ConsumerWidget {
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 4),
-      child: GestureDetector(
-        onTap: () {},
-        child: Material(
-          elevation: 8,
-          borderRadius: BorderRadius.circular(12),
-          child: Container(
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              color: Theme.of(context).colorScheme.surface,
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // Enhanced title section with same styling as behandlung creator
-                Row(
-                  children: [
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            event.patient.name,
-                            style: textTheme.titleLarge,
-                          ),
-                          Text(
-                            '${DateFormat('HH:mm').format(event.startZeit)} - ${DateFormat('HH:mm').format(event.endZeit)}',
-                            style: textTheme.titleSmall?.copyWith(
-                              fontWeight: FontWeight.w400,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    PopupMenuButton<String>(
-                      icon: const Icon(Icons.more_vert),
-                      iconSize: 20,
-                      onSelected: (value) async {
-                        if (value == 'delete') {
-                          await _deleteBehandlung(context, ref);
-                        }
-                      },
-                      itemBuilder: (context) => [
-                        const PopupMenuItem(
-                          value: 'delete',
-                          child: Row(
-                            children: [
-                              Icon(Icons.delete),
-                              SizedBox(width: 8),
-                              Text('Löschen'),
-                            ],
+      child: Material(
+        elevation: 8,
+        borderRadius: BorderRadius.circular(12),
+        child: Container(
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: Theme.of(context).colorScheme.surface,
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          event.patient.name,
+                          style: textTheme.titleLarge,
+                        ),
+                        Text(
+                          '${DateFormat('HH:mm').format(event.startZeit)} - ${DateFormat('HH:mm').format(event.endZeit)}',
+                          style: textTheme.titleSmall?.copyWith(
+                            fontWeight: FontWeight.w400,
                           ),
                         ),
                       ],
                     ),
-                    IconButton(
-                      onPressed: onClose,
-                      icon: const Icon(Icons.close),
-                      iconSize: 20,
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 16),
-                // Patient data section with ListTiles and expressive icons
-                asyncPatient.when(
-                  data: (patient) => patient != null
-                      ? _buildPatientData(context, patient)
-                      : const SizedBox.shrink(),
-                  loading: () => const CircularProgressIndicator(),
-                  error: (_, _) => const SizedBox.shrink(),
-                ),
-                // Rezept section - always show, either with data or placeholder
-                const SizedBox(height: 16),
-                if (event.rezeptId != null)
-                  _BehandlungDetailPopupRezept(rezeptId: event.rezeptId!)
-                else
-                  _buildNoRezeptSection(context),
-              ],
-            ),
+                  ),
+                  PopupMenuButton<String>(
+                    icon: const Icon(Icons.more_vert),
+                    itemBuilder: (context) => [
+                      PopupMenuItem(
+                        child: const ListTile(
+                          leading: Icon(Icons.person),
+                          title: Text('Zum Patienten'),
+                        ),
+                        onTap: () => context.go('/patienten/${event.patient.id}'),
+                      ),
+                      PopupMenuItem(
+                        child: const ListTile(
+                          leading: Icon(Icons.delete),
+                          title: Text('Löschen'),
+                        ),
+                        onTap: () => _deleteBehandlung(context, ref),
+                      ),
+                    ],
+                  ),
+                  IconButton(
+                    onPressed: onClose,
+                    icon: const Icon(Icons.close),
+                    iconSize: 20,
+                  ),
+                ],
+              ),
+              const SizedBox(height: 16),
+              // Patient data section with ListTiles and expressive icons
+              asyncPatient.when(
+                data: (patient) =>
+                    patient != null ? _buildPatientData(context, patient) : const SizedBox.shrink(),
+                loading: () => const CircularProgressIndicator(),
+                error: (_, _) => const SizedBox.shrink(),
+              ),
+              // Rezept section - always show, either with data or placeholder
+              const SizedBox(height: 16),
+              if (event.rezeptId != null)
+                _BehandlungDetailPopupRezept(rezeptId: event.rezeptId!)
+              else
+                _buildNoRezeptSection(context),
+            ],
           ),
         ),
       ),

@@ -38,7 +38,19 @@ class _PhysioAiState extends ConsumerState<PhysioAi> with WidgetsBindingObserver
 
   @override
   Widget build(BuildContext context) {
+    final theme = ThemeData(
+      colorSchemeSeed: Colors.deepPurple,
+      useMaterial3: true,
+      inputDecorationTheme: InputDecorationTheme(
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(4),
+        ),
+        contentPadding: const EdgeInsets.symmetric(horizontal: 16),
+      ),
+    );
+
     return MaterialApp.router(
+      debugShowCheckedModeBanner: false,
       title: 'Physio AI',
       localizationsDelegates: const [
         PhysioAiLocalizations.delegate,
@@ -49,16 +61,7 @@ class _PhysioAiState extends ConsumerState<PhysioAi> with WidgetsBindingObserver
       supportedLocales: const [
         Locale('de'),
       ],
-      theme: ThemeData(
-        primarySwatch: Colors.deepPurple,
-        useMaterial3: true,
-        inputDecorationTheme: InputDecorationTheme(
-          border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(4),
-          ),
-          contentPadding: const EdgeInsets.symmetric(horizontal: 16),
-        ),
-      ),
+      theme: theme,
       routerConfig: ref.watch(routerProvider),
     );
   }

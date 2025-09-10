@@ -65,10 +65,6 @@ class HomeScaffold extends StatelessWidget {
       icon: Icons.medical_services,
       label: 'Behandlungen',
     ),
-    (
-      icon: Icons.document_scanner,
-      label: 'Rezepte',
-    ),
   ];
 
   @override
@@ -120,25 +116,27 @@ class HomeScaffold extends StatelessWidget {
       Breakpoint.desktop => Scaffold(
         body: Row(
           children: [
-            NavigationDrawer(
-              onDestinationSelected: _goBranch,
-              selectedIndex: navigationShell.currentIndex,
-              padding: const EdgeInsets.all(12),
-              header: Padding(
-                padding: const EdgeInsets.fromLTRB(16, 16, 16, 10),
-                child: Text('Physio.ai', style: Theme.of(context).textTheme.titleSmall),
+            FocusTraversalGroup(
+              child: NavigationDrawer(
+                onDestinationSelected: _goBranch,
+                selectedIndex: navigationShell.currentIndex,
+                padding: const EdgeInsets.all(12),
+                header: Padding(
+                  padding: const EdgeInsets.fromLTRB(16, 16, 16, 10),
+                  child: Text('Physio.ai', style: Theme.of(context).textTheme.titleSmall),
+                ),
+                footer: const NavigationDrawerDestination(
+                  label: _ProfileLabel(),
+                  icon: _ProfileIcon(),
+                ),
+                children: <Widget>[
+                  for (final item in _navigationItems)
+                    NavigationDrawerDestination(
+                      label: Text(item.label),
+                      icon: Icon(item.icon),
+                    ),
+                ],
               ),
-              footer: const NavigationDrawerDestination(
-                label: _ProfileLabel(),
-                icon: _ProfileIcon(),
-              ),
-              children: <Widget>[
-                for (final item in _navigationItems)
-                  NavigationDrawerDestination(
-                    label: Text(item.label),
-                    icon: Icon(item.icon),
-                  ),
-              ],
             ),
             Expanded(child: navigationShell),
           ],

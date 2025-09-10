@@ -13,6 +13,7 @@ import 'package:physio_ai/rezepte/presentation/rezept_edit_page.dart';
 import 'package:physio_ai/rezepte/presentation/rezepte_page.dart';
 import 'package:physio_ai/rezepte/presentation/upload_rezept/upload_rezept_page.dart';
 import 'package:physio_ai/shared_kernel/presentation/home_page.dart';
+import 'package:physio_ai/shared_kernel/presentation/splitted_page.dart';
 
 final _rootNavigatorKey = GlobalKey<NavigatorState>();
 final _shellKey = GlobalKey<StatefulNavigationShellState>();
@@ -164,10 +165,65 @@ final _desktopRouterConfig = RoutingConfig(
               path: '/patienten/:id',
               pageBuilder: (context, state) => NoTransitionPage(
                 child: SplittedPatientenPage(
+                  selectedPatientId: state.pathParameters['id']!,
                   rightPane: PatientDetailPage(id: state.pathParameters['id']!),
                   isContextCreate: true,
                 ),
               ),
+              routes: [
+                GoRoute(
+                  path: '/rezepte',
+                  redirect: (context, state) {
+                    if (state.fullPath == '/patienten/${state.pathParameters['id']!}/rezepte') {
+                      return '/patienten/${state.pathParameters['id']!}';
+                    }
+                    return null;
+                  },
+                  routes: [
+                    GoRoute(
+                      path: 'create',
+                      pageBuilder: (context, state) => NoTransitionPage(
+                        key: ValueKey('rezepteCreatePage'),
+                        child: SplittedPage(
+                          leftPane: PatientDetailPage(id: state.pathParameters['id']!),
+                          rightPane: const CreateRezeptPage(),
+                        ),
+                      ),
+                    ),
+                    GoRoute(
+                      path: 'upload',
+                      pageBuilder: (context, state) => const NoTransitionPage(
+                        key: ValueKey('rezepteUploadPage'),
+                        child: SplittedRezeptePage(
+                          rightPane: UploadRezeptContent(),
+                          showCreateButton: false,
+                        ),
+                      ),
+                    ),
+                    GoRoute(
+                      path: ':rezeptId',
+                      pageBuilder: (context, state) => NoTransitionPage(
+                        child: SplittedPage(
+                          leftPane: PatientDetailPage(id: state.pathParameters['id']!),
+                          rightPane: RezeptDetailContent(id: state.pathParameters['rezeptId']!),
+                        ),
+                      ),
+                      routes: [
+                        GoRoute(
+                          path: 'edit',
+                          pageBuilder: (context, state) => NoTransitionPage(
+                            key: ValueKey('rezepteEditPage-${state.pathParameters['id']}'),
+                            child: SplittedRezeptePage(
+                              rightPane: RezeptEditPage(id: state.pathParameters['id']!),
+                              showCreateButton: false,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ],
             ),
           ],
         ),
@@ -176,64 +232,6 @@ final _desktopRouterConfig = RoutingConfig(
             GoRoute(
               path: '/behandlungen',
               builder: (context, state) => const BehandlungenPage(),
-            ),
-          ],
-        ),
-        StatefulShellBranch(
-          routes: [
-            GoRoute(
-              path: '/rezepte',
-              pageBuilder: (context, state) => const NoTransitionPage(
-                key: ValueKey('rezeptePage'),
-                child: SplittedRezeptePage(
-                  rightPane: SizedBox(),
-                  isContextCreate: false,
-                ),
-              ),
-              routes: [
-                GoRoute(
-                  path: 'create',
-                  pageBuilder: (context, state) => const NoTransitionPage(
-                    key: ValueKey('rezepteCreatePage'),
-                    child: SplittedRezeptePage(
-                      rightPane: CreateRezeptPage(),
-                      isContextCreate: true,
-                    ),
-                  ),
-                ),
-                GoRoute(
-                  path: 'upload',
-                  pageBuilder: (context, state) => const NoTransitionPage(
-                    key: ValueKey('rezepteUploadPage'),
-                    child: SplittedRezeptePage(
-                      rightPane: UploadRezeptContent(),
-                      isContextCreate: true,
-                    ),
-                  ),
-                ),
-                GoRoute(
-                  path: ':id',
-                  pageBuilder: (context, state) => NoTransitionPage(
-                    key: ValueKey('rezepteDetailPage-${state.pathParameters['id']}'),
-                    child: SplittedRezeptePage(
-                      rightPane: RezeptDetailPage(id: state.pathParameters['id']!),
-                      isContextCreate: true,
-                    ),
-                  ),
-                  routes: [
-                    GoRoute(
-                      path: 'edit',
-                      pageBuilder: (context, state) => NoTransitionPage(
-                        key: ValueKey('rezepteEditPage-${state.pathParameters['id']}'),
-                        child: SplittedRezeptePage(
-                          rightPane: RezeptEditPage(id: state.pathParameters['id']!),
-                          isContextCreate: true,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ],
             ),
           ],
         ),

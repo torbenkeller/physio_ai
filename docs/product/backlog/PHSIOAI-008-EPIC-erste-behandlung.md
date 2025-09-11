@@ -14,6 +14,7 @@ Dieses Epic umfasst alle Funktionen und Prozesse, die während der ersten Behand
 - Nahtlose Verknüpfung von bereits vereinbarten Terminen mit dem Rezept optimiert den Workflow
 
 ## User Stories
-- [ ] [PHSIOAI-009](./PHSIOAI-009-STORY-rezept-upload-und-extraktion.md) Als Physiotherapeut möchte ich ein fotografiertes Rezept ins System hochladen können, damit das System automatisch alle Rezeptdaten extrahiert und ich Zeit bei der manuellen Eingabe spare
+- [ ] [PHSIOAI-009](./PHSIOAI-009-STORY-rezept-upload-und-speicherung.md) Als Physiotherapeut möchte ich ein fotografiertes Rezept ins System hochladen und speichern können, damit ich das Rezeptbild digital verfügbar habe und für die spätere Datenextraktion nutzen kann
+- [ ] [PHSIOAI-023](./PHSIOAI-023-STORY-rezept-datenextraktion-ki.md) Als Physiotherapeut möchte ich, dass das System automatisch alle relevanten Daten aus einem hochgeladenen Rezeptbild extrahiert, damit ich Zeit bei der manuellen Eingabe spare und Eingabefehler minimiere
 - [ ] [PHSIOAI-010](./PHSIOAI-010-STORY-rezeptdaten-validierung.md) Als Physiotherapeut möchte ich die extrahierten Rezeptdaten im System überprüfen und korrigieren können, damit nur korrekte Daten gespeichert werden
 - [ ] [PHSIOAI-011](./PHSIOAI-011-STORY-automatische-termin-zuordnung.md) Als Physiotherapeut möchte ich dass das System automatisch alle passenden bestehenden Behandlungstermine einem Rezept zuordnet, damit ich diese nicht manuell verknüpfen muss

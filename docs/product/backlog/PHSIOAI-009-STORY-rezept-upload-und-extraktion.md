@@ -1,5 +1,5 @@
 ---
-Ticket-ID: PHSIOAI-009-STORY-rezept-upload-und-extraktion
+Ticket-ID: PHSIOAI-009-STORY-rezept-upload-und-speicherung
 Created-At: 2025-09-10
 Epic: PHSIOAI-008-EPIC-erste-behandlung
 Status: To-Do
@@ -7,27 +7,24 @@ Blocked-By:
 Planning-Document:
 ---
 
-# Rezept Upload und Extraktion
+# Rezept Upload und Speicherung
 
 ## User Story
-Als Physiotherapeut möchte ich ein fotografiertes Rezept ins System hochladen können, damit das System automatisch alle Rezeptdaten extrahiert und ich Zeit bei der manuellen Eingabe spare.
+Als Physiotherapeut möchte ich ein fotografiertes Rezept ins System hochladen und speichern können, damit ich das Rezeptbild digital verfügbar habe und für die spätere Datenextraktion nutzen kann.
 
 ## Beschreibung
-Diese User Story bildet den ersten Schritt der Rezeptdigitalisierung in Physio AI. Während der ersten Behandlung eines bereits bestehenden Patienten (der für den ersten Behandlungstermin bereits angelegt wurde) soll Carsten das physische Papierrezept mit seinem Smartphone oder einer Kamera fotografieren und das Bild über die Patientendetailseite in das System hochladen können. Das System analysiert dann automatisch das hochgeladene Rezeptbild mittels KI-basierter Texterkennung und extrahiert alle relevanten Rezeptdaten wie Patientendaten, verordnete Behandlungen, Häufigkeit und Zeitraum.
+Diese User Story bildet den ersten Schritt der Rezeptdigitalisierung in Physio AI. Während der ersten Behandlung eines bereits bestehenden Patienten (der für den ersten Behandlungstermin bereits angelegt wurde) soll Carsten das physische Papierrezept mit seinem Smartphone oder einer Kamera fotografieren und das Bild über die Patientendetailseite in das System hochladen können. Das System speichert das Rezeptbild sicher und ordnet es dem entsprechenden Patienten zu.
 
-Da der Patient bereits existiert, kann das System die extrahierten Patientendaten zur Validierung mit den bestehenden Patientenstammdaten abgleichen. Zusätzlich sollen extrahierte Stammdaten die bestehende Patientenakte anreichern, falls bestimmte Felder noch nicht ausgefüllt sind. Die automatische Extraktion reduziert den manuellen Aufwand erheblich und minimiert Eingabefehler. Carsten kann sich darauf konzentrieren, die extrahierten Daten zu validieren, anstatt alle Informationen manuell einzutippen.
+Diese Story fokussiert sich ausschließlich auf den Upload-Mechanismus und die sichere Speicherung von Rezeptbildern, ohne die komplexe KI-basierte Datenextraktion. Dies ermöglicht es Carsten, Rezepte sofort digital zu archivieren und schafft die Grundlage für die nachgelagerte automatische Datenextraktion.
 
 ## Akzeptanzkriterien
 - [ ] Ein Upload-Bereich für Rezeptbilder ist in der Patientendetailseite integriert
 - [ ] Das System akzeptiert gängige Bildformate (JPEG, PNG, PDF)
-- [ ] Hochgeladene Bilder werden automatisch mittels OCR/KI analysiert
-- [ ] Das System extrahiert Patientenstammdaten (Name, Geburtsdatum, Adresse) aus dem Rezept und gleicht diese mit den bestehenden Patientendaten ab
-- [ ] Extrahierte Patientenstammdaten reichern automatisch die bestehende Patientenakte an, falls Felder noch nicht ausgefüllt sind
-- [ ] Das System extrahiert verordnete Behandlungsarten und deren Häufigkeit
-- [ ] Das System extrahiert den Verordnungszeitraum und das Ausstellungsdatum
-- [ ] Extrahierte Daten werden in einer strukturierten Vorschau angezeigt
-- [ ] Bei Unstimmigkeiten zwischen extrahierten und bestehenden Patientendaten wird eine Warnung angezeigt
-- [ ] Bei unklaren oder unlesbaren Rezeptteilen wird eine entsprechende Warnung angezeigt
+- [ ] Hochgeladene Bilder werden sicher im System gespeichert
+- [ ] Rezeptbilder werden dem entsprechenden Patienten zugeordnet
+- [ ] Eine Vorschau des hochgeladenen Bildes wird angezeigt
+- [ ] Upload-Status wird dem Benutzer angezeigt (Fortschritt, Erfolg, Fehler)
+- [ ] Fehlermeldungen werden bei ungültigen Dateiformaten oder Upload-Problemen angezeigt
 
 ## Definition of Done
 - [ ] Akzeptanzkriterien erfüllt

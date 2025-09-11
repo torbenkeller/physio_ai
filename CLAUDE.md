@@ -84,3 +84,4 @@ ALWAYS use UTF-8 Encoding.
 
 Remember to adhere strictly to TDD principles throughout this process. Your output should clearly demonstrate that
 you're writing the test first, then the minimal production code to make it pass.
+- use ALWAYS your built in tools to interact with the file system

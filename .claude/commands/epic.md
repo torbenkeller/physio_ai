@@ -32,9 +32,9 @@ Brief description of what this epic aims to achieve and why it's valuable to the
 Clear statement of the business value this epic will deliver
 
 ## User Stories
-- [ ] [PHSIOAI-<TICKET_NUMBER>](./PHSIOAI-<TICKET_NUMBER>-STORY-<STORY_NAME>.md) As a <user type>, I want <functionality> so that <benefit>
-- [ ] [PHSIOAI-<TICKET_NUMBER>](./PHSIOAI-<TICKET_NUMBER>-STORY-<STORY_NAME>.md) As a <user type>, I want <functionality> so that <benefit>
-- [ ] [PHSIOAI-<TICKET_NUMBER>](./PHSIOAI-<TICKET_NUMBER>-STORY-<STORY_NAME>.md) As a <user type>, I want <functionality> so that <benefit>
+- [ ] [PHSIOAI-<TICKET_NUMBER>](./PHSIOAI-<TICKET_NUMBER>-STORY-<STORY_NAME>.md) Als <persona> möchte ich <funktionalität>, damit <benefit>
+- [ ] [PHSIOAI-<TICKET_NUMBER>](./PHSIOAI-<TICKET_NUMBER>-STORY-<STORY_NAME>.md) Als <persona> möchte ich <funktionalität>, damit <benefit>
+- [ ] [PHSIOAI-<TICKET_NUMBER>](./PHSIOAI-<TICKET_NUMBER>-STORY-<STORY_NAME>.md) Als <persona> möchte ich <funktionalität>, damit <benefit>
 
 ```
 

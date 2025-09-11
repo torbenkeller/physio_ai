@@ -7,27 +7,23 @@ Blocked-By:
 Planning-Document:
 ---
 
-# Kalender anzeigen
+# Basis-Kalender anzeigen
 
 ## User Story
-Als Physiotherapeut möchte ich den Kalender anzeigen können, damit ich mit dem Patienten am Telefon geeignete Behandlungszeiten abstimmen kann
+Als Physiotherapeut möchte ich eine grundlegende Wochenansicht des Kalenders mit Navigation anzeigen können, damit ich mich zeitlich orientieren und zwischen Wochen navigieren kann während der Patientengespräche am Telefon.
 
 ## Beschreibung
-Der Physiotherapeut benötigt eine übersichtliche Kalenderansicht, um während Patientengesprächen am Telefon schnell verfügbare Behandlungszeiten zu identifizieren und gemeinsam mit dem Patienten passende Termine zu finden. Die Kalenderansicht soll eine intuitive Darstellung der Arbeitszeiten, bereits belegten Termine und freien Zeitslots bieten.
+Der Physiotherapeut benötigt eine grundlegende Kalenderansicht als Basis für die Terminkoordination. Diese Story fokussiert sich auf die essentiellen Kalender-Grundfunktionen: eine übersichtliche Wochenansicht mit den Arbeitszeiten und die Möglichkeit, zwischen verschiedenen Wochen zu navigieren.
 
-Ein wichtiger Aspekt ist die Integration privater Kalender, damit private Termine als Information sichtbar sind. Der Nutzer behält dabei die volle Entscheidungsfreiheit und kann auch bei Überschneidungen mit privaten Terminen Behandlungstermine buchen, falls gewünscht.
-
-Dies ist ein zentraler Baustein für die Terminkoordination im ersten Patientenkontakt, da Carsten während des Telefonats mit neuen oder bestehenden Patienten direkt geeignete Behandlungszeiten vorschlagen können muss.
+Die Kalenderansicht bildet das Fundament für alle weiteren Termine-bezogenen Funktionen und muss eine intuitive Navigation sowie eine klare Darstellung der verfügbaren Arbeitszeiten ermöglichen. Dies ist der erste Schritt für die Terminkoordination im ersten Patientenkontakt.
 
 ## Akzeptanzkriterien
 - [ ] Der Kalender zeigt eine Wochenansicht mit den Arbeitszeiten an
-- [ ] Bereits belegte Behandlungstermine sind deutlich sichtbar markiert
-- [ ] Private Kalendertermine werden als Information angezeigt, ohne die Terminbuchung zu verhindern
-- [ ] Private und Behandlungstermine sind visuell unterscheidbar (z.B. durch verschiedene Farben oder Markierungen)
-- [ ] Freie Zeitslots sind klar erkennbar und von belegten Terminen unterscheidbar
 - [ ] Der Kalender ist navigierbar (vorherige/nächste Woche)
-- [ ] Die Kalenderansicht lädt schnell und ist auch bei vielen Terminen performant
+- [ ] Die Kalenderansicht lädt schnell und ist performant
 - [ ] Die Darstellung ist für die Nutzung während Telefonaten optimiert (große, gut lesbare Elemente)
+- [ ] Freie Zeitslots sind klar erkennbar
+- [ ] Die aktuelle Woche ist deutlich erkennbar
 
 ## Definition of Done
 - [ ] Akzeptanzkriterien erfüllt

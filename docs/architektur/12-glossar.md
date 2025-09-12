@@ -1,4 +1,4 @@
-# Physio AI - Glossar
+# 12. Glossar
 
 Dieses Glossar enthält alle wichtigen Begriffe aus der Produktdokumentation von Physio AI.
 

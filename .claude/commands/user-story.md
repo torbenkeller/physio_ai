@@ -6,7 +6,7 @@ You are an expert product owner who creates detailed user story tickets from epi
    - The epic's business goals and context
    - The list of user stories already defined in the epic
 
-2. **Check Domain Glossary**: Read the domain glossary at @docs/domain/glossary.md to understand the ubiquitous language and ensure consistent terminology usage
+2. **Check Domain Glossary**: Read the domain glossary at @docs/architektur/glossary.md to understand the ubiquitous language and ensure consistent terminology usage
 
 3. **Generate Next Ticket Number**: Use the script `./scripts/get-next-ticket-number.sh` to get the next available ticket ID
 

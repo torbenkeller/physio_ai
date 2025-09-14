@@ -10,6 +10,13 @@
     "context7": {
       "type": "http",
       "url": "https://mcp.context7.com/mcp"
+    },
+    "dart": {
+      "command": "dart",
+      "args": [
+        "mcp-server",
+        "--experimental-mcp-server"
+      ]
     }
   }
 }

@@ -48,7 +48,7 @@ Before you begin coding, please carefully read through the following guidelines 
    - Unit Test all `FormContainer` implementations
 
 7. Tools:
-   - Use the `flutterInspector` tool to get debug details of the running flutter app
+   - Use the `dart` mcp server to get details of the running flutter app
    - Use the `jetbrains` mcp server to interact with the IDE
 
 Now, please approach the coding task using the following steps:

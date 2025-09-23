@@ -47,9 +47,11 @@ final _mobileRouterConfig = RoutingConfig(
               routes: [
                 GoRoute(
                   path: 'create',
-                  pageBuilder: (context, state) => const MaterialPage(
+                  pageBuilder: (context, state) => MaterialPage(
                     fullscreenDialog: true,
-                    child: CreatePatientPage(),
+                    child: CreatePatientPage(
+                      redirectTo: state.uri.queryParameters['to'],
+                    ),
                   ),
                 ),
                 GoRoute(
@@ -154,9 +156,11 @@ final _desktopRouterConfig = RoutingConfig(
             ),
             GoRoute(
               path: '/patienten/create',
-              pageBuilder: (context, state) => const NoTransitionPage(
+              pageBuilder: (context, state) => NoTransitionPage(
                 child: SplittedPatientenPage(
-                  rightPane: CreatePatientContent(),
+                  rightPane: CreatePatientContent(
+                    redirectTo: state.uri.queryParameters['to'],
+                  ),
                   isContextCreate: true,
                 ),
               ),

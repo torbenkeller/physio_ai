@@ -2,7 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:physio_ai/patienten/presentation/patient_form.dart';
 
 class CreatePatientPage extends StatelessWidget {
-  const CreatePatientPage({super.key});
+  const CreatePatientPage({
+    this.redirectTo,
+    super.key,
+  });
+
+  final String? redirectTo;
 
   @override
   Widget build(BuildContext context) {
@@ -10,16 +15,24 @@ class CreatePatientPage extends StatelessWidget {
       appBar: AppBar(
         title: const Text('Patient Erstellen'),
       ),
-      body: const CreatePatientContent(),
+      body: CreatePatientContent(redirectTo: redirectTo),
     );
   }
 }
 
 class CreatePatientContent extends StatelessWidget {
-  const CreatePatientContent({super.key});
+  const CreatePatientContent({
+    this.redirectTo,
+    super.key,
+  });
+
+  final String? redirectTo;
 
   @override
   Widget build(BuildContext context) {
-    return const PatientForm(patient: null);
+    return PatientForm(
+      patient: null,
+      redirectTo: redirectTo,
+    );
   }
 }

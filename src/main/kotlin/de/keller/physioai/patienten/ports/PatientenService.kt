@@ -10,8 +10,8 @@ interface PatientenService {
     /**
      * Creates a new patient with the given information
      * @param titel Optional academic title of the patient
-     * @param vorname First name of the patient
-     * @param nachname Last name of the patient
+     * @param vorname First name of the patient (must not be blank)
+     * @param nachname Last name of the patient (must not be blank)
      * @param strasse Optional street name of patient's address
      * @param hausnummer Optional house number of patient's address
      * @param plz Optional postal code of patient's address
@@ -21,6 +21,7 @@ interface PatientenService {
      * @param email Optional email address
      * @param geburtstag Optional date of birth
      * @return The newly created patient
+     * @throws IllegalArgumentException if vorname or nachname is blank
      */
     fun createPatient(
         titel: String?,
@@ -40,8 +41,8 @@ interface PatientenService {
      * Updates an existing patient with the given information
      * @param id The unique identifier of the patient to update
      * @param titel Optional academic title of the patient
-     * @param vorname First name of the patient
-     * @param nachname Last name of the patient
+     * @param vorname First name of the patient (must not be blank)
+     * @param nachname Last name of the patient (must not be blank)
      * @param strasse Optional street name of patient's address
      * @param hausnummer Optional house number of patient's address
      * @param plz Optional postal code of patient's address
@@ -51,6 +52,7 @@ interface PatientenService {
      * @param email Optional email address
      * @param geburtstag Optional date of birth
      * @return The updated patient
+     * @throws IllegalArgumentException if vorname or nachname is blank
      */
     fun updatePatient(
         id: PatientId,

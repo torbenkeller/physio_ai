@@ -10,10 +10,12 @@ import 'package:physio_ai/patienten/presentation/patienten_page.dart';
 class PatientForm extends ConsumerStatefulWidget {
   const PatientForm({
     required this.patient,
+    this.redirectTo,
     super.key,
   });
 
   final Patient? patient;
+  final String? redirectTo;
 
   @override
   ConsumerState<PatientForm> createState() => _PatientFormState();
@@ -235,21 +237,70 @@ class _PatientFormState extends ConsumerState<PatientForm> {
       _loading = true;
     });
 
-    if (widget.patient == null) {
-      await repo.createPatient(formContainer.toFormDto());
-    } else {
-      await repo.updatePatient(
-        widget.patient!.id,
-        formContainer.toFormDto(),
-      );
-    }
+    try {
+      if (widget.patient == null) {
+        final createdPatient = await repo.createPatient(formContainer.toFormDto());
 
-    if (mounted) {
-      setState(() {
-        _loading = false;
-      });
-    }
+        if (mounted) {
+          // Show success confirmation
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(
+                'Patient ${formContainer.vorname.value} ${formContainer.nachname.value} wurde erfolgreich angelegt',
+              ),
+              duration: const Duration(seconds: 3),
+            ),
+          );
 
-    ref.invalidate(patientenProvider);
+          // Reset form state
+          formContainer.formKey.currentState!.reset();
+
+          // Handle redirect logic
+          if (widget.redirectTo != null) {
+            // Replace {patientId} placeholder with actual patient ID
+            final redirectUrl = widget.redirectTo!.replaceAll('{patientId}', createdPatient.id);
+            context.go(redirectUrl);
+          } else {
+            // Default: navigate to patient detail page
+            context.go('/patienten/${createdPatient.id}');
+          }
+        }
+      } else {
+        await repo.updatePatient(
+          widget.patient!.id,
+          formContainer.toFormDto(),
+        );
+
+        if (mounted) {
+          // Show success confirmation for update
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(
+                'Patient ${formContainer.vorname.value} ${formContainer.nachname.value} wurde erfolgreich aktualisiert',
+              ),
+              duration: const Duration(seconds: 3),
+            ),
+          );
+        }
+      }
+
+      ref.invalidate(patientenProvider);
+    } on Exception catch (e) {
+      if (mounted) {
+        // Show error message
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Fehler beim Speichern: $e'),
+            backgroundColor: Theme.of(context).colorScheme.error,
+          ),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() {
+          _loading = false;
+        });
+      }
+    }
   }
 }

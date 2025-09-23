@@ -28,6 +28,9 @@ class PatientenServiceImpl(
         email: String?,
         geburtstag: LocalDate?,
     ): PatientAggregate {
+        // Validate required fields
+        require(vorname.isNotBlank()) { "Vorname darf nicht leer sein" }
+        require(nachname.isNotBlank()) { "Nachname darf nicht leer sein" }
         val p = PatientAggregate.create(
             titel = titel,
             vorname = vorname,
@@ -60,6 +63,9 @@ class PatientenServiceImpl(
         email: String?,
         geburtstag: LocalDate?,
     ): PatientAggregate {
+        // Validate required fields
+        require(vorname.isNotBlank()) { "Vorname darf nicht leer sein" }
+        require(nachname.isNotBlank()) { "Nachname darf nicht leer sein" }
         val patient = patientenRepository.findById(id) ?: throw AggregateNotFoundException()
 
         val updatedPatient = patient.update(

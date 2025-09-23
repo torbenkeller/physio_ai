@@ -7,27 +7,27 @@ import 'package:physio_ai/shared_kernel/validation/validators.dart';
 
 class PatientFormContainer extends FormContainer {
   PatientFormContainer({required Patient? patient})
-      : vorname = FormFieldContainer(
-          initialValue: patient?.vorname ?? '',
-          validators: [validateRequired],
-        ),
-        nachname = FormFieldContainer(
-          initialValue: patient?.nachname ?? '',
-          validators: [validateRequired],
-        ),
-        geburtstag = FormFieldContainer(
-          initialValue: patient?.geburtstag,
-          validators: [validateRequired],
-        ),
-        titel = FormFieldContainer(initialValue: patient?.titel),
-        strasse = FormFieldContainer(initialValue: patient?.strasse),
-        hausnummer = FormFieldContainer(initialValue: patient?.hausnummer),
-        plz = FormFieldContainer(initialValue: patient?.plz),
-        stadt = FormFieldContainer(initialValue: patient?.stadt),
-        telMobil = FormFieldContainer(initialValue: patient?.telMobil),
-        telFestnetz = FormFieldContainer(initialValue: patient?.telFestnetz),
-        email = FormFieldContainer(initialValue: patient?.email),
-        super(formKey: GlobalKey());
+    : vorname = FormFieldContainer(
+        initialValue: patient?.vorname ?? '',
+        validators: [validateRequired],
+      ),
+      nachname = FormFieldContainer(
+        initialValue: patient?.nachname ?? '',
+        validators: [validateRequired],
+      ),
+      geburtstag = FormFieldContainer(
+        initialValue: patient?.geburtstag,
+        validators: [validateRequired],
+      ),
+      titel = FormFieldContainer(initialValue: patient?.titel),
+      strasse = FormFieldContainer(initialValue: patient?.strasse),
+      hausnummer = FormFieldContainer(initialValue: patient?.hausnummer),
+      plz = FormFieldContainer(initialValue: patient?.plz),
+      stadt = FormFieldContainer(initialValue: patient?.stadt),
+      telMobil = FormFieldContainer(initialValue: patient?.telMobil),
+      telFestnetz = FormFieldContainer(initialValue: patient?.telFestnetz),
+      email = FormFieldContainer(initialValue: patient?.email),
+      super(formKey: GlobalKey());
 
   final FormFieldContainer<String> vorname;
   final FormFieldContainer<String> nachname;
@@ -59,8 +59,8 @@ class PatientFormContainer extends FormContainer {
 
   @override
   List<FormFieldContainer<dynamic>> get requiredFields => [
-        vorname,
-        nachname,
-        geburtstag,
-      ];
+    vorname,
+    nachname,
+    geburtstag,
+  ];
 }

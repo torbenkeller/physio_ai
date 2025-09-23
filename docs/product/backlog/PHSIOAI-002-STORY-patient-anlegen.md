@@ -2,7 +2,7 @@
 Ticket-ID: PHSIOAI-002-STORY-patient-anlegen
 Created-At: 2025-09-10
 Epic: PHSIOAI-001-EPIC-erster-kontakt
-Status: To-Do
+Status: DONE
 Blocked-By: 
 Planning-Document: 
 ---

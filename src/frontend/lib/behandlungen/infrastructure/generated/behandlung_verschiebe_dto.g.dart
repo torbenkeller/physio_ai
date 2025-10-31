@@ -7,13 +7,9 @@ part of '../behandlung_verschiebe_dto.dart';
 // **************************************************************************
 
 _BehandlungVerschiebeDto _$BehandlungVerschiebeDtoFromJson(
-        Map<String, dynamic> json) =>
-    _BehandlungVerschiebeDto(
-      nach: DateTime.parse(json['nach'] as String),
-    );
+  Map<String, dynamic> json,
+) => _BehandlungVerschiebeDto(nach: DateTime.parse(json['nach'] as String));
 
 Map<String, dynamic> _$BehandlungVerschiebeDtoToJson(
-        _BehandlungVerschiebeDto instance) =>
-    <String, dynamic>{
-      'nach': instance.nach.toIso8601String(),
-    };
+  _BehandlungVerschiebeDto instance,
+) => <String, dynamic>{'nach': instance.nach.toIso8601String()};

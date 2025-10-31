@@ -15,46 +15,47 @@ T _$identity<T>(T value) => value;
 
 /// @nodoc
 mixin _$BehandlungVerschiebeDto {
-  DateTime get nach;
 
-  /// Create a copy of BehandlungVerschiebeDto
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  @pragma('vm:prefer-inline')
-  $BehandlungVerschiebeDtoCopyWith<BehandlungVerschiebeDto> get copyWith =>
-      _$BehandlungVerschiebeDtoCopyWithImpl<BehandlungVerschiebeDto>(
-          this as BehandlungVerschiebeDto, _$identity);
+ DateTime get nach;
+/// Create a copy of BehandlungVerschiebeDto
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+$BehandlungVerschiebeDtoCopyWith<BehandlungVerschiebeDto> get copyWith => _$BehandlungVerschiebeDtoCopyWithImpl<BehandlungVerschiebeDto>(this as BehandlungVerschiebeDto, _$identity);
 
   /// Serializes this BehandlungVerschiebeDto to a JSON map.
   Map<String, dynamic> toJson();
 
-  @override
-  bool operator ==(Object other) {
-    return identical(this, other) ||
-        (other.runtimeType == runtimeType &&
-            other is BehandlungVerschiebeDto &&
-            (identical(other.nach, nach) || other.nach == nach));
-  }
 
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  @override
-  int get hashCode => Object.hash(runtimeType, nach);
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is BehandlungVerschiebeDto&&(identical(other.nach, nach) || other.nach == nach));
+}
 
-  @override
-  String toString() {
-    return 'BehandlungVerschiebeDto(nach: $nach)';
-  }
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode => Object.hash(runtimeType,nach);
+
+@override
+String toString() {
+  return 'BehandlungVerschiebeDto(nach: $nach)';
+}
+
+
 }
 
 /// @nodoc
-abstract mixin class $BehandlungVerschiebeDtoCopyWith<$Res> {
-  factory $BehandlungVerschiebeDtoCopyWith(BehandlungVerschiebeDto value,
-          $Res Function(BehandlungVerschiebeDto) _then) =
-      _$BehandlungVerschiebeDtoCopyWithImpl;
-  @useResult
-  $Res call({DateTime nach});
-}
+abstract mixin class $BehandlungVerschiebeDtoCopyWith<$Res>  {
+  factory $BehandlungVerschiebeDtoCopyWith(BehandlungVerschiebeDto value, $Res Function(BehandlungVerschiebeDto) _then) = _$BehandlungVerschiebeDtoCopyWithImpl;
+@useResult
+$Res call({
+ DateTime nach
+});
 
+
+
+
+}
 /// @nodoc
 class _$BehandlungVerschiebeDtoCopyWithImpl<$Res>
     implements $BehandlungVerschiebeDtoCopyWith<$Res> {
@@ -63,77 +64,67 @@ class _$BehandlungVerschiebeDtoCopyWithImpl<$Res>
   final BehandlungVerschiebeDto _self;
   final $Res Function(BehandlungVerschiebeDto) _then;
 
-  /// Create a copy of BehandlungVerschiebeDto
-  /// with the given fields replaced by the non-null parameter values.
-  @pragma('vm:prefer-inline')
-  @override
-  $Res call({
-    Object? nach = null,
-  }) {
-    return _then(_self.copyWith(
-      nach: null == nach
-          ? _self.nach
-          : nach // ignore: cast_nullable_to_non_nullable
-              as DateTime,
-    ));
-  }
+/// Create a copy of BehandlungVerschiebeDto
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') @override $Res call({Object? nach = null,}) {
+  return _then(_self.copyWith(
+nach: null == nach ? _self.nach : nach // ignore: cast_nullable_to_non_nullable
+as DateTime,
+  ));
 }
+
+}
+
 
 /// @nodoc
 @JsonSerializable()
+
 class _BehandlungVerschiebeDto extends BehandlungVerschiebeDto {
-  const _BehandlungVerschiebeDto({required this.nach}) : super._();
-  factory _BehandlungVerschiebeDto.fromJson(Map<String, dynamic> json) =>
-      _$BehandlungVerschiebeDtoFromJson(json);
+  const _BehandlungVerschiebeDto({required this.nach}): super._();
+  factory _BehandlungVerschiebeDto.fromJson(Map<String, dynamic> json) => _$BehandlungVerschiebeDtoFromJson(json);
 
-  @override
-  final DateTime nach;
+@override final  DateTime nach;
 
-  /// Create a copy of BehandlungVerschiebeDto
-  /// with the given fields replaced by the non-null parameter values.
-  @override
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  @pragma('vm:prefer-inline')
-  _$BehandlungVerschiebeDtoCopyWith<_BehandlungVerschiebeDto> get copyWith =>
-      __$BehandlungVerschiebeDtoCopyWithImpl<_BehandlungVerschiebeDto>(
-          this, _$identity);
+/// Create a copy of BehandlungVerschiebeDto
+/// with the given fields replaced by the non-null parameter values.
+@override @JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+_$BehandlungVerschiebeDtoCopyWith<_BehandlungVerschiebeDto> get copyWith => __$BehandlungVerschiebeDtoCopyWithImpl<_BehandlungVerschiebeDto>(this, _$identity);
 
-  @override
-  Map<String, dynamic> toJson() {
-    return _$BehandlungVerschiebeDtoToJson(
-      this,
-    );
-  }
+@override
+Map<String, dynamic> toJson() {
+  return _$BehandlungVerschiebeDtoToJson(this, );
+}
 
-  @override
-  bool operator ==(Object other) {
-    return identical(this, other) ||
-        (other.runtimeType == runtimeType &&
-            other is _BehandlungVerschiebeDto &&
-            (identical(other.nach, nach) || other.nach == nach));
-  }
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _BehandlungVerschiebeDto&&(identical(other.nach, nach) || other.nach == nach));
+}
 
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  @override
-  int get hashCode => Object.hash(runtimeType, nach);
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode => Object.hash(runtimeType,nach);
 
-  @override
-  String toString() {
-    return 'BehandlungVerschiebeDto(nach: $nach)';
-  }
+@override
+String toString() {
+  return 'BehandlungVerschiebeDto(nach: $nach)';
+}
+
+
 }
 
 /// @nodoc
-abstract mixin class _$BehandlungVerschiebeDtoCopyWith<$Res>
-    implements $BehandlungVerschiebeDtoCopyWith<$Res> {
-  factory _$BehandlungVerschiebeDtoCopyWith(_BehandlungVerschiebeDto value,
-          $Res Function(_BehandlungVerschiebeDto) _then) =
-      __$BehandlungVerschiebeDtoCopyWithImpl;
-  @override
-  @useResult
-  $Res call({DateTime nach});
-}
+abstract mixin class _$BehandlungVerschiebeDtoCopyWith<$Res> implements $BehandlungVerschiebeDtoCopyWith<$Res> {
+  factory _$BehandlungVerschiebeDtoCopyWith(_BehandlungVerschiebeDto value, $Res Function(_BehandlungVerschiebeDto) _then) = __$BehandlungVerschiebeDtoCopyWithImpl;
+@override @useResult
+$Res call({
+ DateTime nach
+});
 
+
+
+
+}
 /// @nodoc
 class __$BehandlungVerschiebeDtoCopyWithImpl<$Res>
     implements _$BehandlungVerschiebeDtoCopyWith<$Res> {
@@ -142,20 +133,16 @@ class __$BehandlungVerschiebeDtoCopyWithImpl<$Res>
   final _BehandlungVerschiebeDto _self;
   final $Res Function(_BehandlungVerschiebeDto) _then;
 
-  /// Create a copy of BehandlungVerschiebeDto
-  /// with the given fields replaced by the non-null parameter values.
-  @override
-  @pragma('vm:prefer-inline')
-  $Res call({
-    Object? nach = null,
-  }) {
-    return _then(_BehandlungVerschiebeDto(
-      nach: null == nach
-          ? _self.nach
-          : nach // ignore: cast_nullable_to_non_nullable
-              as DateTime,
-    ));
-  }
+/// Create a copy of BehandlungVerschiebeDto
+/// with the given fields replaced by the non-null parameter values.
+@override @pragma('vm:prefer-inline') $Res call({Object? nach = null,}) {
+  return _then(_BehandlungVerschiebeDto(
+nach: null == nach ? _self.nach : nach // ignore: cast_nullable_to_non_nullable
+as DateTime,
+  ));
+}
+
+
 }
 
 // dart format on

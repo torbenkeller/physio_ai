@@ -37,7 +37,7 @@ class UploadRezeptContent extends ConsumerWidget {
         UploadRezeptPageImageSelectedContent(selectedImage: image),
       UploadRezeptStateRezeptEingelesen(
         response: final response,
-        selectedImage: final selectedImage
+        selectedImage: final selectedImage,
       ) =>
         UploadRezeptPageSelectPatientContent(
           response: response,
@@ -46,15 +46,16 @@ class UploadRezeptContent extends ConsumerWidget {
       UploadRezeptStatePatientSelected(
         response: final response,
         selectedPatient: final selectedPatient,
-        selectedImage: final selectedImage
+        selectedImage: final selectedImage,
       ) =>
         UploadRezeptPagePatientSelectedContent(
           response: response,
           selectedPatient: selectedPatient,
           selectedImage: selectedImage,
         ),
-      UploadRezeptStateError(message: final message) =>
-        UploadRezeptPageErrorContent(message: message),
+      UploadRezeptStateError(message: final message) => UploadRezeptPageErrorContent(
+        message: message,
+      ),
     };
   }
 }

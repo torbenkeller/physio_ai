@@ -95,7 +95,8 @@ class _UploadRezeptPagePatientSelectedContentState
               ),
               child: _PatientDataCard(
                 name: '${widget.selectedPatient.vorname} ${widget.selectedPatient.nachname}',
-                address: '${widget.selectedPatient.strasse} '
+                address:
+                    '${widget.selectedPatient.strasse} '
                     '${widget.selectedPatient.hausnummer}\n'
                     '${widget.selectedPatient.plz} '
                     '${widget.selectedPatient.stadt}',
@@ -188,8 +189,9 @@ class _UploadRezeptPagePatientSelectedContentState
       );
 
       // Create the rezept
-      final rezept =
-          await ref.read(uploadRezeptNotifierProvider.notifier).createRezept(rezeptFormDto);
+      final rezept = await ref
+          .read(uploadRezeptNotifierProvider.notifier)
+          .createRezept(rezeptFormDto);
 
       // Navigate to the Rezept detail page on success
       if (mounted) {

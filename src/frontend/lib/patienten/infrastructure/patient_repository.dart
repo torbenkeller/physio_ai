@@ -34,5 +34,5 @@ abstract class PatientRepository {
   Future<Patient> createPatient(@Body() PatientFormDto patient);
 
   @PATCH('/{id}')
-  Future<void> updatePatient(@Path('id') String id, @Body() PatientFormDto formDto);
+  Future<Patient> updatePatient(@Path('id') String id, @Body() PatientFormDto formDto);
 }

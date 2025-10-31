@@ -28,10 +28,7 @@ class PhysioAiLocalizations {
   static const AppLocalizationDelegate delegate = AppLocalizationDelegate();
 
   static Future<PhysioAiLocalizations> load(Locale locale) {
-    final name =
-        (locale.countryCode?.isEmpty ?? false)
-            ? locale.languageCode
-            : locale.toString();
+    final name = (locale.countryCode?.isEmpty ?? false) ? locale.languageCode : locale.toString();
     final localeName = Intl.canonicalizedLocale(name);
     return initializeMessages(localeName).then((_) {
       Intl.defaultLocale = localeName;
@@ -69,8 +66,7 @@ class PhysioAiLocalizations {
   }
 }
 
-class AppLocalizationDelegate
-    extends LocalizationsDelegate<PhysioAiLocalizations> {
+class AppLocalizationDelegate extends LocalizationsDelegate<PhysioAiLocalizations> {
   const AppLocalizationDelegate();
 
   List<Locale> get supportedLocales {
@@ -80,8 +76,7 @@ class AppLocalizationDelegate
   @override
   bool isSupported(Locale locale) => _isSupported(locale);
   @override
-  Future<PhysioAiLocalizations> load(Locale locale) =>
-      PhysioAiLocalizations.load(locale);
+  Future<PhysioAiLocalizations> load(Locale locale) => PhysioAiLocalizations.load(locale);
   @override
   bool shouldReload(AppLocalizationDelegate old) => false;
 

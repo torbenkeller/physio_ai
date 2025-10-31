@@ -136,38 +136,42 @@ class NavigationDrawer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final int totalNumberOfDestinations =
-        children.whereType<NavigationDrawerDestination>().toList().length;
+    final int totalNumberOfDestinations = children
+        .whereType<NavigationDrawerDestination>()
+        .toList()
+        .length;
 
     int destinationIndex = 0;
 
     Widget wrapChild(Widget child, int index) => _SelectableAnimatedBuilder(
-          duration: const Duration(milliseconds: 500),
-          isSelected: index == selectedIndex,
-          builder: (BuildContext context, Animation<double> animation) {
-            return _NavigationDrawerDestinationInfo(
-              index: index,
-              totalNumberOfDestinations: totalNumberOfDestinations,
-              selectedAnimation: animation,
-              indicatorColor: indicatorColor,
-              indicatorShape: indicatorShape,
-              tilePadding: tilePadding,
-              onTap: () => onDestinationSelected?.call(index),
-              child: child,
-            );
-          },
+      duration: const Duration(milliseconds: 500),
+      isSelected: index == selectedIndex,
+      builder: (BuildContext context, Animation<double> animation) {
+        return _NavigationDrawerDestinationInfo(
+          index: index,
+          totalNumberOfDestinations: totalNumberOfDestinations,
+          selectedAnimation: animation,
+          indicatorColor: indicatorColor,
+          indicatorShape: indicatorShape,
+          tilePadding: tilePadding,
+          onTap: () => onDestinationSelected?.call(index),
+          child: child,
         );
+      },
+    );
 
-    final wrappedHeader =
-        (header is! NavigationDrawerDestination) ? header : wrapChild(header!, destinationIndex++);
+    final wrappedHeader = (header is! NavigationDrawerDestination)
+        ? header
+        : wrapChild(header!, destinationIndex++);
 
     final List<Widget> wrappedChildren = <Widget>[
       for (final Widget child in children)
         if (child is! NavigationDrawerDestination) child else wrapChild(child, destinationIndex++),
     ];
 
-    final wrappedFooter =
-        (footer is! NavigationDrawerDestination) ? footer : wrapChild(footer!, destinationIndex++);
+    final wrappedFooter = (footer is! NavigationDrawerDestination)
+        ? footer
+        : wrapChild(footer!, destinationIndex++);
 
     final NavigationDrawerThemeData navigationDrawerTheme = NavigationDrawerTheme.of(context);
 
@@ -257,20 +261,22 @@ class NavigationDrawerDestination extends StatelessWidget {
     final NavigationDrawerThemeData navigationDrawerTheme = NavigationDrawerTheme.of(context);
     final NavigationDrawerThemeData defaults = _NavigationDrawerDefaultsM3(context);
 
-    final Animation<double> animation =
-        _NavigationDrawerDestinationInfo.of(context).selectedAnimation;
+    final Animation<double> animation = _NavigationDrawerDestinationInfo.of(
+      context,
+    ).selectedAnimation;
 
     return _NavigationDestinationBuilder(
       buildIcon: (BuildContext context) {
         final Widget selectedIconWidget = IconTheme.merge(
-          data: navigationDrawerTheme.iconTheme?.resolve(enabled ? selectedState : disabledState) ??
+          data:
+              navigationDrawerTheme.iconTheme?.resolve(enabled ? selectedState : disabledState) ??
               defaults.iconTheme!.resolve(enabled ? selectedState : disabledState)!,
           child: selectedIcon ?? icon,
         );
         final Widget unselectedIconWidget = IconTheme.merge(
           data:
               navigationDrawerTheme.iconTheme?.resolve(enabled ? unselectedState : disabledState) ??
-                  defaults.iconTheme!.resolve(enabled ? unselectedState : disabledState)!,
+              defaults.iconTheme!.resolve(enabled ? unselectedState : disabledState)!,
           child: icon,
         );
 
@@ -279,14 +285,14 @@ class NavigationDrawerDestination extends StatelessWidget {
       buildLabel: (BuildContext context) {
         final TextStyle? effectiveSelectedLabelTextStyle =
             navigationDrawerTheme.labelTextStyle?.resolve(
-                  enabled ? selectedState : disabledState,
-                ) ??
-                defaults.labelTextStyle!.resolve(enabled ? selectedState : disabledState);
+              enabled ? selectedState : disabledState,
+            ) ??
+            defaults.labelTextStyle!.resolve(enabled ? selectedState : disabledState);
         final TextStyle? effectiveUnselectedLabelTextStyle =
             navigationDrawerTheme.labelTextStyle?.resolve(
-                  enabled ? unselectedState : disabledState,
-                ) ??
-                defaults.labelTextStyle!.resolve(enabled ? unselectedState : disabledState);
+              enabled ? unselectedState : disabledState,
+            ) ??
+            defaults.labelTextStyle!.resolve(enabled ? unselectedState : disabledState);
 
         return DefaultTextStyle(
           style: animation.isForwardOrCompleted
@@ -369,10 +375,12 @@ class _NavigationDestinationBuilder extends StatelessWidget {
         children: <Widget>[
           NavigationIndicator(
             animation: info.selectedAnimation,
-            color: info.indicatorColor ??
+            color:
+                info.indicatorColor ??
                 navigationDrawerTheme.indicatorColor ??
                 defaults.indicatorColor!,
-            shape: info.indicatorShape ??
+            shape:
+                info.indicatorShape ??
                 navigationDrawerTheme.indicatorShape ??
                 defaults.indicatorShape!,
             width: (navigationDrawerTheme.indicatorSize ?? defaults.indicatorSize!).width,
@@ -579,8 +587,8 @@ class _NavigationDrawerDestinationInfo extends InheritedWidget {
   /// Used by widgets that are implementing a navigation destination info to
   /// get information like the selected animation and destination number.
   static _NavigationDrawerDestinationInfo of(BuildContext context) {
-    final _NavigationDrawerDestinationInfo? result =
-        context.dependOnInheritedWidgetOfExactType<_NavigationDrawerDestinationInfo>();
+    final _NavigationDrawerDestinationInfo? result = context
+        .dependOnInheritedWidgetOfExactType<_NavigationDrawerDestinationInfo>();
     assert(
       result != null,
       'Navigation destinations need a _NavigationDrawerDestinationInfo parent, '

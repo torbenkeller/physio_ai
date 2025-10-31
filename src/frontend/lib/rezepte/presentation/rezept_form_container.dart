@@ -12,8 +12,8 @@ class RezeptFormContainer extends FormContainer {
     required this.patientId,
     required Behandlungsart initialBehandlungsart,
     required this.positionen,
-  })  : _initialBehandlungsart = initialBehandlungsart,
-        super(formKey: GlobalKey<FormState>());
+  }) : _initialBehandlungsart = initialBehandlungsart,
+       super(formKey: GlobalKey<FormState>());
 
   /// Factory constructor to create a form container from a Rezept
   factory RezeptFormContainer.fromRezept({
@@ -30,7 +30,8 @@ class RezeptFormContainer extends FormContainer {
       validators: [validateRequired],
     );
 
-    final positionen = rezept?.positionen
+    final positionen =
+        rezept?.positionen
             .map((pos) => RezeptPositionFormGroup.fromPosition(rezeptPos: pos))
             .toIList() ??
         IListConst([RezeptPositionFormGroup.empty(initialBehandlungsart: initialBehandlungsart)]);
@@ -50,8 +51,9 @@ class RezeptFormContainer extends FormContainer {
   final Behandlungsart _initialBehandlungsart;
 
   void addPosition() {
-    final newPosition =
-        RezeptPositionFormGroup.empty(initialBehandlungsart: _initialBehandlungsart);
+    final newPosition = RezeptPositionFormGroup.empty(
+      initialBehandlungsart: _initialBehandlungsart,
+    );
     positionen = positionen.add(newPosition);
   }
 
@@ -96,24 +98,24 @@ class RezeptFormContainer extends FormContainer {
 
   @override
   List<FormFieldContainer<dynamic>> get requiredFields => [
-        ausgestelltAm,
-        patientId,
-        ...positionen.expand((p) => [p.anzahl, p.behandlungsart]),
-      ];
+    ausgestelltAm,
+    patientId,
+    ...positionen.expand((p) => [p.anzahl, p.behandlungsart]),
+  ];
 }
 
 class RezeptPositionFormGroup {
   RezeptPositionFormGroup._({
     required int initialAnzahl,
     required Behandlungsart initialBehandlungsart,
-  })  : anzahl = FormFieldContainer<String>(
-          initialValue: initialAnzahl.toString(),
-          validators: [validateRequired],
-        ),
-        behandlungsart = FormFieldContainer<Behandlungsart>(
-          initialValue: initialBehandlungsart,
-          validators: [validateRequired],
-        );
+  }) : anzahl = FormFieldContainer<String>(
+         initialValue: initialAnzahl.toString(),
+         validators: [validateRequired],
+       ),
+       behandlungsart = FormFieldContainer<Behandlungsart>(
+         initialValue: initialBehandlungsart,
+         validators: [validateRequired],
+       );
 
   factory RezeptPositionFormGroup.empty({required Behandlungsart initialBehandlungsart}) {
     return RezeptPositionFormGroup._(

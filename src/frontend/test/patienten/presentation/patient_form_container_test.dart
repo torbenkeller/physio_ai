@@ -88,8 +88,9 @@ void main() {
       expect(dto.email, equals('test@example.com'));
     });
 
-    testWidgets('toFormDto returns updated field values when form fields are changed',
-        (WidgetTester tester) async {
+    testWidgets('toFormDto returns updated field values when form fields are changed', (
+      WidgetTester tester,
+    ) async {
       final patient = createTestPatient();
       final container = PatientFormContainer(patient: patient);
       final updatedBirthday = DateTime(1985, 5, 15);

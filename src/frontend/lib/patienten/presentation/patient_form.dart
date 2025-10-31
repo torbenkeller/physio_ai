@@ -238,53 +238,39 @@ class _PatientFormState extends ConsumerState<PatientForm> {
     });
 
     try {
-      if (widget.patient == null) {
-        final createdPatient = await repo.createPatient(formContainer.toFormDto());
+      final createPatient = widget.patient == null;
 
-        if (mounted) {
-          // Show success confirmation
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(
-                'Patient ${formContainer.vorname.value} ${formContainer.nachname.value} wurde erfolgreich angelegt',
-              ),
-              duration: const Duration(seconds: 3),
-            ),
-          );
+      final patient = await switch (createPatient) {
+        true => repo.createPatient(formContainer.toFormDto()),
+        false => repo.updatePatient(widget.patient!.id, formContainer.toFormDto()),
+      };
 
-          // Reset form state
-          formContainer.formKey.currentState!.reset();
+      if (mounted) {
+        final snackbarText = createPatient
+            ? 'Patient ${formContainer.vorname.value} ${formContainer.nachname.value} wurde erfolgreich angelegt'
+            : 'Patient ${formContainer.vorname.value} ${formContainer.nachname.value} wurde erfolgreich aktualisiert';
 
-          // Handle redirect logic
-          if (widget.redirectTo != null) {
-            // Replace {patientId} placeholder with actual patient ID
-            final redirectUrl = widget.redirectTo!.replaceAll('{patientId}', createdPatient.id);
-            context.go(redirectUrl);
-          } else {
-            // Default: navigate to patient detail page
-            context.go('/patienten/${createdPatient.id}');
-          }
-        }
-      } else {
-        await repo.updatePatient(
-          widget.patient!.id,
-          formContainer.toFormDto(),
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(snackbarText),
+            duration: const Duration(seconds: 3),
+          ),
         );
 
-        if (mounted) {
-          // Show success confirmation for update
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(
-                'Patient ${formContainer.vorname.value} ${formContainer.nachname.value} wurde erfolgreich aktualisiert',
-              ),
-              duration: const Duration(seconds: 3),
-            ),
-          );
+        // Reset form state
+        formContainer.formKey.currentState!.reset();
+
+        // Invalidate patient list to refresh data
+        ref.invalidate(patientenProvider);
+
+        // Handle redirect logic
+        if (widget.redirectTo != null) {
+          final redirectUrl = widget.redirectTo!.replaceAll('{patientId}', patient.id);
+          context.go(redirectUrl);
+        } else {
+          context.go('/patienten/${patient.id}');
         }
       }
-
-      ref.invalidate(patientenProvider);
     } on Exception catch (e) {
       if (mounted) {
         // Show error message

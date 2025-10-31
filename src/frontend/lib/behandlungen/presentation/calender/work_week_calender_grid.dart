@@ -56,7 +56,9 @@ class _WorkWeekCalenderGridPainter extends CustomPainter {
 
     final yDisabledStart = (size.height / hours) * workingHoursEndHour;
     canvas.drawRect(
-        Rect.fromLTWH(0, yDisabledStart, size.width, size.height - yDisabledStart), disabledPaint);
+      Rect.fromLTWH(0, yDisabledStart, size.width, size.height - yDisabledStart),
+      disabledPaint,
+    );
 
     final linePaint = Paint()..color = color;
 

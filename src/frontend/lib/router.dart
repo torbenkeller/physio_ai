@@ -5,6 +5,7 @@ import 'package:physio_ai/behandlungen/presentation/behandlungen_page.dart';
 import 'package:physio_ai/home_scaffold.dart';
 import 'package:physio_ai/patienten/presentation/create_patient_page.dart';
 import 'package:physio_ai/patienten/presentation/patient_detail_page.dart';
+import 'package:physio_ai/patienten/presentation/patient_edit_page.dart';
 import 'package:physio_ai/patienten/presentation/patienten_page.dart';
 import 'package:physio_ai/profile/presentation/profile_page.dart';
 import 'package:physio_ai/rezepte/presentation/create_rezept_page.dart';
@@ -60,6 +61,15 @@ final _mobileRouterConfig = RoutingConfig(
                     fullscreenDialog: true,
                     child: PatientDetailPage(id: state.pathParameters['id']!),
                   ),
+                  routes: [
+                    GoRoute(
+                      path: 'edit',
+                      pageBuilder: (context, state) => MaterialPage(
+                        fullscreenDialog: true,
+                        child: PatientEditPage(id: state.pathParameters['id']!),
+                      ),
+                    ),
+                  ],
                 ),
               ],
             ),
@@ -171,10 +181,20 @@ final _desktopRouterConfig = RoutingConfig(
                 child: SplittedPatientenPage(
                   selectedPatientId: state.pathParameters['id']!,
                   rightPane: PatientDetailPage(id: state.pathParameters['id']!),
-                  isContextCreate: true,
+                  isContextCreate: false,
                 ),
               ),
               routes: [
+                GoRoute(
+                  path: 'edit',
+                  pageBuilder: (context, state) => NoTransitionPage(
+                    child: SplittedPatientenPage(
+                      selectedPatientId: state.pathParameters['id']!,
+                      rightPane: PatientEditPage(id: state.pathParameters['id']!),
+                      isContextCreate: true,
+                    ),
+                  ),
+                ),
                 GoRoute(
                   path: '/rezepte',
                   redirect: (context, state) {

@@ -7,8 +7,8 @@ class FormFieldContainer<T> {
   FormFieldContainer({
     required this.initialValue,
     List<Validator<T>> validators = const [],
-  })  : key = GlobalKey<FormFieldState<T>>(),
-        _validators = validators.lock;
+  }) : key = GlobalKey<FormFieldState<T>>(),
+       _validators = validators.lock;
 
   final T initialValue;
   final GlobalKey<FormFieldState<T>> key;

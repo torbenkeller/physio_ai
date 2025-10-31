@@ -6,7 +6,7 @@ part of '../rezept_repository.dart';
 // RetrofitGenerator
 // **************************************************************************
 
-// ignore_for_file: unnecessary_brace_in_string_interps,no_leading_underscores_for_local_identifiers,unused_element,unnecessary_string_interpolations
+// ignore_for_file: unnecessary_brace_in_string_interps,no_leading_underscores_for_local_identifiers,unused_element,unnecessary_string_interpolations,unused_element_parameter
 
 class _RezeptRepository implements RezeptRepository {
   _RezeptRepository(this._dio, {this.baseUrl, this.errorLogger}) {
@@ -132,11 +132,11 @@ class _RezeptRepository implements RezeptRepository {
     _data.files.addAll(file.map((i) => MapEntry('file', i)));
     final _options = _setStreamType<RezeptEinlesenResponse>(
       Options(
-        method: 'POST',
-        headers: _headers,
-        extra: _extra,
-        contentType: 'multipart/form-data',
-      )
+            method: 'POST',
+            headers: _headers,
+            extra: _extra,
+            contentType: 'multipart/form-data',
+          )
           .compose(
             _dio.options,
             '/createFromImage',

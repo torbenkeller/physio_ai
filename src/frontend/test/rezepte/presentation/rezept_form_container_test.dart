@@ -95,12 +95,13 @@ void main() {
     });
 
     test('removePosition removes the position at the given index', () {
-      final container = RezeptFormContainer.fromRezept(
-        rezept: null,
-        initialBehandlungsart: testBehandlungsart,
-      )
-        ..addPosition()
-        ..removePosition(0);
+      final container =
+          RezeptFormContainer.fromRezept(
+              rezept: null,
+              initialBehandlungsart: testBehandlungsart,
+            )
+            ..addPosition()
+            ..removePosition(0);
 
       expect(container.positionen.length, equals(1));
       expect(container.positionen[0].anzahl.initialValue, equals('1'));
@@ -166,8 +167,9 @@ void main() {
       expect(container.toFormDto, throwsException);
     });
 
-    testWidgets('toFormDto returns updated field values when form fields are changed',
-        (WidgetTester tester) async {
+    testWidgets('toFormDto returns updated field values when form fields are changed', (
+      WidgetTester tester,
+    ) async {
       final rezept = createTestRezept();
       final container = RezeptFormContainer.fromRezept(
         rezept: rezept,
@@ -234,8 +236,9 @@ void main() {
       expect(dto.positionen[0].anzahl, equals(3));
     });
 
-    testWidgets('price calculation updates when position fields change',
-        (WidgetTester tester) async {
+    testWidgets('price calculation updates when position fields change', (
+      WidgetTester tester,
+    ) async {
       final container = RezeptFormContainer.fromRezept(
         rezept: null,
         initialBehandlungsart: testBehandlungsart,

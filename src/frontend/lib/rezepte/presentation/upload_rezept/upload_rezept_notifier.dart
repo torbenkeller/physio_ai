@@ -19,8 +19,8 @@ final imagePickerProvider = Provider((ref) => ImagePicker());
 // Provider for the notifier
 final uploadRezeptNotifierProvider =
     NotifierProvider.autoDispose<UploadRezeptNotifier, UploadRezeptState>(
-  UploadRezeptNotifier.new,
-);
+      UploadRezeptNotifier.new,
+    );
 
 // State class for the upload process
 @freezed

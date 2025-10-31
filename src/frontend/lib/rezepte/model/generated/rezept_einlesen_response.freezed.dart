@@ -15,59 +15,47 @@ T _$identity<T>(T value) => value;
 
 /// @nodoc
 mixin _$RezeptEinlesenResponse {
-  EingelesenerPatient get patient;
-  EingelesenesRezept get rezept;
-  Patient? get existingPatient;
 
-  /// Create a copy of RezeptEinlesenResponse
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  @pragma('vm:prefer-inline')
-  $RezeptEinlesenResponseCopyWith<RezeptEinlesenResponse> get copyWith =>
-      _$RezeptEinlesenResponseCopyWithImpl<RezeptEinlesenResponse>(
-          this as RezeptEinlesenResponse, _$identity);
+ EingelesenerPatient get patient; EingelesenesRezept get rezept; Patient? get existingPatient;
+/// Create a copy of RezeptEinlesenResponse
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+$RezeptEinlesenResponseCopyWith<RezeptEinlesenResponse> get copyWith => _$RezeptEinlesenResponseCopyWithImpl<RezeptEinlesenResponse>(this as RezeptEinlesenResponse, _$identity);
 
   /// Serializes this RezeptEinlesenResponse to a JSON map.
   Map<String, dynamic> toJson();
 
-  @override
-  bool operator ==(Object other) {
-    return identical(this, other) ||
-        (other.runtimeType == runtimeType &&
-            other is RezeptEinlesenResponse &&
-            (identical(other.patient, patient) || other.patient == patient) &&
-            (identical(other.rezept, rezept) || other.rezept == rezept) &&
-            (identical(other.existingPatient, existingPatient) ||
-                other.existingPatient == existingPatient));
-  }
 
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  @override
-  int get hashCode =>
-      Object.hash(runtimeType, patient, rezept, existingPatient);
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is RezeptEinlesenResponse&&(identical(other.patient, patient) || other.patient == patient)&&(identical(other.rezept, rezept) || other.rezept == rezept)&&(identical(other.existingPatient, existingPatient) || other.existingPatient == existingPatient));
+}
 
-  @override
-  String toString() {
-    return 'RezeptEinlesenResponse(patient: $patient, rezept: $rezept, existingPatient: $existingPatient)';
-  }
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode => Object.hash(runtimeType,patient,rezept,existingPatient);
+
+@override
+String toString() {
+  return 'RezeptEinlesenResponse(patient: $patient, rezept: $rezept, existingPatient: $existingPatient)';
+}
+
+
 }
 
 /// @nodoc
-abstract mixin class $RezeptEinlesenResponseCopyWith<$Res> {
-  factory $RezeptEinlesenResponseCopyWith(RezeptEinlesenResponse value,
-          $Res Function(RezeptEinlesenResponse) _then) =
-      _$RezeptEinlesenResponseCopyWithImpl;
-  @useResult
-  $Res call(
-      {EingelesenerPatient patient,
-      EingelesenesRezept rezept,
-      Patient? existingPatient});
+abstract mixin class $RezeptEinlesenResponseCopyWith<$Res>  {
+  factory $RezeptEinlesenResponseCopyWith(RezeptEinlesenResponse value, $Res Function(RezeptEinlesenResponse) _then) = _$RezeptEinlesenResponseCopyWithImpl;
+@useResult
+$Res call({
+ EingelesenerPatient patient, EingelesenesRezept rezept, Patient? existingPatient
+});
 
-  $EingelesenerPatientCopyWith<$Res> get patient;
-  $EingelesenesRezeptCopyWith<$Res> get rezept;
-  $PatientCopyWith<$Res>? get existingPatient;
+
+$EingelesenerPatientCopyWith<$Res> get patient;$EingelesenesRezeptCopyWith<$Res> get rezept;$PatientCopyWith<$Res>? get existingPatient;
+
 }
-
 /// @nodoc
 class _$RezeptEinlesenResponseCopyWithImpl<$Res>
     implements $RezeptEinlesenResponseCopyWith<$Res> {
@@ -76,141 +64,101 @@ class _$RezeptEinlesenResponseCopyWithImpl<$Res>
   final RezeptEinlesenResponse _self;
   final $Res Function(RezeptEinlesenResponse) _then;
 
-  /// Create a copy of RezeptEinlesenResponse
-  /// with the given fields replaced by the non-null parameter values.
-  @pragma('vm:prefer-inline')
-  @override
-  $Res call({
-    Object? patient = null,
-    Object? rezept = null,
-    Object? existingPatient = freezed,
-  }) {
-    return _then(_self.copyWith(
-      patient: null == patient
-          ? _self.patient
-          : patient // ignore: cast_nullable_to_non_nullable
-              as EingelesenerPatient,
-      rezept: null == rezept
-          ? _self.rezept
-          : rezept // ignore: cast_nullable_to_non_nullable
-              as EingelesenesRezept,
-      existingPatient: freezed == existingPatient
-          ? _self.existingPatient
-          : existingPatient // ignore: cast_nullable_to_non_nullable
-              as Patient?,
-    ));
-  }
-
-  /// Create a copy of RezeptEinlesenResponse
-  /// with the given fields replaced by the non-null parameter values.
-  @override
-  @pragma('vm:prefer-inline')
-  $EingelesenerPatientCopyWith<$Res> get patient {
-    return $EingelesenerPatientCopyWith<$Res>(_self.patient, (value) {
-      return _then(_self.copyWith(patient: value));
-    });
-  }
-
-  /// Create a copy of RezeptEinlesenResponse
-  /// with the given fields replaced by the non-null parameter values.
-  @override
-  @pragma('vm:prefer-inline')
-  $EingelesenesRezeptCopyWith<$Res> get rezept {
-    return $EingelesenesRezeptCopyWith<$Res>(_self.rezept, (value) {
-      return _then(_self.copyWith(rezept: value));
-    });
-  }
-
-  /// Create a copy of RezeptEinlesenResponse
-  /// with the given fields replaced by the non-null parameter values.
-  @override
-  @pragma('vm:prefer-inline')
-  $PatientCopyWith<$Res>? get existingPatient {
-    if (_self.existingPatient == null) {
-      return null;
-    }
-
-    return $PatientCopyWith<$Res>(_self.existingPatient!, (value) {
-      return _then(_self.copyWith(existingPatient: value));
-    });
-  }
+/// Create a copy of RezeptEinlesenResponse
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') @override $Res call({Object? patient = null,Object? rezept = null,Object? existingPatient = freezed,}) {
+  return _then(_self.copyWith(
+patient: null == patient ? _self.patient : patient // ignore: cast_nullable_to_non_nullable
+as EingelesenerPatient,rezept: null == rezept ? _self.rezept : rezept // ignore: cast_nullable_to_non_nullable
+as EingelesenesRezept,existingPatient: freezed == existingPatient ? _self.existingPatient : existingPatient // ignore: cast_nullable_to_non_nullable
+as Patient?,
+  ));
 }
+/// Create a copy of RezeptEinlesenResponse
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$EingelesenerPatientCopyWith<$Res> get patient {
+  
+  return $EingelesenerPatientCopyWith<$Res>(_self.patient, (value) {
+    return _then(_self.copyWith(patient: value));
+  });
+}/// Create a copy of RezeptEinlesenResponse
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$EingelesenesRezeptCopyWith<$Res> get rezept {
+  
+  return $EingelesenesRezeptCopyWith<$Res>(_self.rezept, (value) {
+    return _then(_self.copyWith(rezept: value));
+  });
+}/// Create a copy of RezeptEinlesenResponse
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$PatientCopyWith<$Res>? get existingPatient {
+    if (_self.existingPatient == null) {
+    return null;
+  }
+
+  return $PatientCopyWith<$Res>(_self.existingPatient!, (value) {
+    return _then(_self.copyWith(existingPatient: value));
+  });
+}
+}
+
 
 /// @nodoc
 @JsonSerializable()
+
 class _RezeptEinlesenResponse extends RezeptEinlesenResponse {
-  const _RezeptEinlesenResponse(
-      {required this.patient, required this.rezept, this.existingPatient})
-      : super._();
-  factory _RezeptEinlesenResponse.fromJson(Map<String, dynamic> json) =>
-      _$RezeptEinlesenResponseFromJson(json);
+  const _RezeptEinlesenResponse({required this.patient, required this.rezept, this.existingPatient}): super._();
+  factory _RezeptEinlesenResponse.fromJson(Map<String, dynamic> json) => _$RezeptEinlesenResponseFromJson(json);
 
-  @override
-  final EingelesenerPatient patient;
-  @override
-  final EingelesenesRezept rezept;
-  @override
-  final Patient? existingPatient;
+@override final  EingelesenerPatient patient;
+@override final  EingelesenesRezept rezept;
+@override final  Patient? existingPatient;
 
-  /// Create a copy of RezeptEinlesenResponse
-  /// with the given fields replaced by the non-null parameter values.
-  @override
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  @pragma('vm:prefer-inline')
-  _$RezeptEinlesenResponseCopyWith<_RezeptEinlesenResponse> get copyWith =>
-      __$RezeptEinlesenResponseCopyWithImpl<_RezeptEinlesenResponse>(
-          this, _$identity);
+/// Create a copy of RezeptEinlesenResponse
+/// with the given fields replaced by the non-null parameter values.
+@override @JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+_$RezeptEinlesenResponseCopyWith<_RezeptEinlesenResponse> get copyWith => __$RezeptEinlesenResponseCopyWithImpl<_RezeptEinlesenResponse>(this, _$identity);
 
-  @override
-  Map<String, dynamic> toJson() {
-    return _$RezeptEinlesenResponseToJson(
-      this,
-    );
-  }
+@override
+Map<String, dynamic> toJson() {
+  return _$RezeptEinlesenResponseToJson(this, );
+}
 
-  @override
-  bool operator ==(Object other) {
-    return identical(this, other) ||
-        (other.runtimeType == runtimeType &&
-            other is _RezeptEinlesenResponse &&
-            (identical(other.patient, patient) || other.patient == patient) &&
-            (identical(other.rezept, rezept) || other.rezept == rezept) &&
-            (identical(other.existingPatient, existingPatient) ||
-                other.existingPatient == existingPatient));
-  }
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _RezeptEinlesenResponse&&(identical(other.patient, patient) || other.patient == patient)&&(identical(other.rezept, rezept) || other.rezept == rezept)&&(identical(other.existingPatient, existingPatient) || other.existingPatient == existingPatient));
+}
 
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  @override
-  int get hashCode =>
-      Object.hash(runtimeType, patient, rezept, existingPatient);
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode => Object.hash(runtimeType,patient,rezept,existingPatient);
 
-  @override
-  String toString() {
-    return 'RezeptEinlesenResponse(patient: $patient, rezept: $rezept, existingPatient: $existingPatient)';
-  }
+@override
+String toString() {
+  return 'RezeptEinlesenResponse(patient: $patient, rezept: $rezept, existingPatient: $existingPatient)';
+}
+
+
 }
 
 /// @nodoc
-abstract mixin class _$RezeptEinlesenResponseCopyWith<$Res>
-    implements $RezeptEinlesenResponseCopyWith<$Res> {
-  factory _$RezeptEinlesenResponseCopyWith(_RezeptEinlesenResponse value,
-          $Res Function(_RezeptEinlesenResponse) _then) =
-      __$RezeptEinlesenResponseCopyWithImpl;
-  @override
-  @useResult
-  $Res call(
-      {EingelesenerPatient patient,
-      EingelesenesRezept rezept,
-      Patient? existingPatient});
+abstract mixin class _$RezeptEinlesenResponseCopyWith<$Res> implements $RezeptEinlesenResponseCopyWith<$Res> {
+  factory _$RezeptEinlesenResponseCopyWith(_RezeptEinlesenResponse value, $Res Function(_RezeptEinlesenResponse) _then) = __$RezeptEinlesenResponseCopyWithImpl;
+@override @useResult
+$Res call({
+ EingelesenerPatient patient, EingelesenesRezept rezept, Patient? existingPatient
+});
 
-  @override
-  $EingelesenerPatientCopyWith<$Res> get patient;
-  @override
-  $EingelesenesRezeptCopyWith<$Res> get rezept;
-  @override
-  $PatientCopyWith<$Res>? get existingPatient;
+
+@override $EingelesenerPatientCopyWith<$Res> get patient;@override $EingelesenesRezeptCopyWith<$Res> get rezept;@override $PatientCopyWith<$Res>? get existingPatient;
+
 }
-
 /// @nodoc
 class __$RezeptEinlesenResponseCopyWithImpl<$Res>
     implements _$RezeptEinlesenResponseCopyWith<$Res> {
@@ -219,135 +167,94 @@ class __$RezeptEinlesenResponseCopyWithImpl<$Res>
   final _RezeptEinlesenResponse _self;
   final $Res Function(_RezeptEinlesenResponse) _then;
 
-  /// Create a copy of RezeptEinlesenResponse
-  /// with the given fields replaced by the non-null parameter values.
-  @override
-  @pragma('vm:prefer-inline')
-  $Res call({
-    Object? patient = null,
-    Object? rezept = null,
-    Object? existingPatient = freezed,
-  }) {
-    return _then(_RezeptEinlesenResponse(
-      patient: null == patient
-          ? _self.patient
-          : patient // ignore: cast_nullable_to_non_nullable
-              as EingelesenerPatient,
-      rezept: null == rezept
-          ? _self.rezept
-          : rezept // ignore: cast_nullable_to_non_nullable
-              as EingelesenesRezept,
-      existingPatient: freezed == existingPatient
-          ? _self.existingPatient
-          : existingPatient // ignore: cast_nullable_to_non_nullable
-              as Patient?,
-    ));
-  }
-
-  /// Create a copy of RezeptEinlesenResponse
-  /// with the given fields replaced by the non-null parameter values.
-  @override
-  @pragma('vm:prefer-inline')
-  $EingelesenerPatientCopyWith<$Res> get patient {
-    return $EingelesenerPatientCopyWith<$Res>(_self.patient, (value) {
-      return _then(_self.copyWith(patient: value));
-    });
-  }
-
-  /// Create a copy of RezeptEinlesenResponse
-  /// with the given fields replaced by the non-null parameter values.
-  @override
-  @pragma('vm:prefer-inline')
-  $EingelesenesRezeptCopyWith<$Res> get rezept {
-    return $EingelesenesRezeptCopyWith<$Res>(_self.rezept, (value) {
-      return _then(_self.copyWith(rezept: value));
-    });
-  }
-
-  /// Create a copy of RezeptEinlesenResponse
-  /// with the given fields replaced by the non-null parameter values.
-  @override
-  @pragma('vm:prefer-inline')
-  $PatientCopyWith<$Res>? get existingPatient {
-    if (_self.existingPatient == null) {
-      return null;
-    }
-
-    return $PatientCopyWith<$Res>(_self.existingPatient!, (value) {
-      return _then(_self.copyWith(existingPatient: value));
-    });
-  }
+/// Create a copy of RezeptEinlesenResponse
+/// with the given fields replaced by the non-null parameter values.
+@override @pragma('vm:prefer-inline') $Res call({Object? patient = null,Object? rezept = null,Object? existingPatient = freezed,}) {
+  return _then(_RezeptEinlesenResponse(
+patient: null == patient ? _self.patient : patient // ignore: cast_nullable_to_non_nullable
+as EingelesenerPatient,rezept: null == rezept ? _self.rezept : rezept // ignore: cast_nullable_to_non_nullable
+as EingelesenesRezept,existingPatient: freezed == existingPatient ? _self.existingPatient : existingPatient // ignore: cast_nullable_to_non_nullable
+as Patient?,
+  ));
 }
+
+/// Create a copy of RezeptEinlesenResponse
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$EingelesenerPatientCopyWith<$Res> get patient {
+  
+  return $EingelesenerPatientCopyWith<$Res>(_self.patient, (value) {
+    return _then(_self.copyWith(patient: value));
+  });
+}/// Create a copy of RezeptEinlesenResponse
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$EingelesenesRezeptCopyWith<$Res> get rezept {
+  
+  return $EingelesenesRezeptCopyWith<$Res>(_self.rezept, (value) {
+    return _then(_self.copyWith(rezept: value));
+  });
+}/// Create a copy of RezeptEinlesenResponse
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$PatientCopyWith<$Res>? get existingPatient {
+    if (_self.existingPatient == null) {
+    return null;
+  }
+
+  return $PatientCopyWith<$Res>(_self.existingPatient!, (value) {
+    return _then(_self.copyWith(existingPatient: value));
+  });
+}
+}
+
 
 /// @nodoc
 mixin _$EingelesenerPatient {
-  String get vorname;
-  String get nachname;
-  String get strasse;
-  String get hausnummer;
-  String get postleitzahl;
-  String get stadt;
-  DateTime get geburtstag;
-  String? get titel;
 
-  /// Create a copy of EingelesenerPatient
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  @pragma('vm:prefer-inline')
-  $EingelesenerPatientCopyWith<EingelesenerPatient> get copyWith =>
-      _$EingelesenerPatientCopyWithImpl<EingelesenerPatient>(
-          this as EingelesenerPatient, _$identity);
+ String get vorname; String get nachname; String get strasse; String get hausnummer; String get postleitzahl; String get stadt; DateTime get geburtstag; String? get titel;
+/// Create a copy of EingelesenerPatient
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+$EingelesenerPatientCopyWith<EingelesenerPatient> get copyWith => _$EingelesenerPatientCopyWithImpl<EingelesenerPatient>(this as EingelesenerPatient, _$identity);
 
   /// Serializes this EingelesenerPatient to a JSON map.
   Map<String, dynamic> toJson();
 
-  @override
-  bool operator ==(Object other) {
-    return identical(this, other) ||
-        (other.runtimeType == runtimeType &&
-            other is EingelesenerPatient &&
-            (identical(other.vorname, vorname) || other.vorname == vorname) &&
-            (identical(other.nachname, nachname) ||
-                other.nachname == nachname) &&
-            (identical(other.strasse, strasse) || other.strasse == strasse) &&
-            (identical(other.hausnummer, hausnummer) ||
-                other.hausnummer == hausnummer) &&
-            (identical(other.postleitzahl, postleitzahl) ||
-                other.postleitzahl == postleitzahl) &&
-            (identical(other.stadt, stadt) || other.stadt == stadt) &&
-            (identical(other.geburtstag, geburtstag) ||
-                other.geburtstag == geburtstag) &&
-            (identical(other.titel, titel) || other.titel == titel));
-  }
 
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  @override
-  int get hashCode => Object.hash(runtimeType, vorname, nachname, strasse,
-      hausnummer, postleitzahl, stadt, geburtstag, titel);
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is EingelesenerPatient&&(identical(other.vorname, vorname) || other.vorname == vorname)&&(identical(other.nachname, nachname) || other.nachname == nachname)&&(identical(other.strasse, strasse) || other.strasse == strasse)&&(identical(other.hausnummer, hausnummer) || other.hausnummer == hausnummer)&&(identical(other.postleitzahl, postleitzahl) || other.postleitzahl == postleitzahl)&&(identical(other.stadt, stadt) || other.stadt == stadt)&&(identical(other.geburtstag, geburtstag) || other.geburtstag == geburtstag)&&(identical(other.titel, titel) || other.titel == titel));
+}
 
-  @override
-  String toString() {
-    return 'EingelesenerPatient(vorname: $vorname, nachname: $nachname, strasse: $strasse, hausnummer: $hausnummer, postleitzahl: $postleitzahl, stadt: $stadt, geburtstag: $geburtstag, titel: $titel)';
-  }
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode => Object.hash(runtimeType,vorname,nachname,strasse,hausnummer,postleitzahl,stadt,geburtstag,titel);
+
+@override
+String toString() {
+  return 'EingelesenerPatient(vorname: $vorname, nachname: $nachname, strasse: $strasse, hausnummer: $hausnummer, postleitzahl: $postleitzahl, stadt: $stadt, geburtstag: $geburtstag, titel: $titel)';
+}
+
+
 }
 
 /// @nodoc
-abstract mixin class $EingelesenerPatientCopyWith<$Res> {
-  factory $EingelesenerPatientCopyWith(
-          EingelesenerPatient value, $Res Function(EingelesenerPatient) _then) =
-      _$EingelesenerPatientCopyWithImpl;
-  @useResult
-  $Res call(
-      {String vorname,
-      String nachname,
-      String strasse,
-      String hausnummer,
-      String postleitzahl,
-      String stadt,
-      DateTime geburtstag,
-      String? titel});
-}
+abstract mixin class $EingelesenerPatientCopyWith<$Res>  {
+  factory $EingelesenerPatientCopyWith(EingelesenerPatient value, $Res Function(EingelesenerPatient) _then) = _$EingelesenerPatientCopyWithImpl;
+@useResult
+$Res call({
+ String vorname, String nachname, String strasse, String hausnummer, String postleitzahl, String stadt, DateTime geburtstag, String? titel
+});
 
+
+
+
+}
 /// @nodoc
 class _$EingelesenerPatientCopyWithImpl<$Res>
     implements $EingelesenerPatientCopyWith<$Res> {
@@ -356,155 +263,81 @@ class _$EingelesenerPatientCopyWithImpl<$Res>
   final EingelesenerPatient _self;
   final $Res Function(EingelesenerPatient) _then;
 
-  /// Create a copy of EingelesenerPatient
-  /// with the given fields replaced by the non-null parameter values.
-  @pragma('vm:prefer-inline')
-  @override
-  $Res call({
-    Object? vorname = null,
-    Object? nachname = null,
-    Object? strasse = null,
-    Object? hausnummer = null,
-    Object? postleitzahl = null,
-    Object? stadt = null,
-    Object? geburtstag = null,
-    Object? titel = freezed,
-  }) {
-    return _then(_self.copyWith(
-      vorname: null == vorname
-          ? _self.vorname
-          : vorname // ignore: cast_nullable_to_non_nullable
-              as String,
-      nachname: null == nachname
-          ? _self.nachname
-          : nachname // ignore: cast_nullable_to_non_nullable
-              as String,
-      strasse: null == strasse
-          ? _self.strasse
-          : strasse // ignore: cast_nullable_to_non_nullable
-              as String,
-      hausnummer: null == hausnummer
-          ? _self.hausnummer
-          : hausnummer // ignore: cast_nullable_to_non_nullable
-              as String,
-      postleitzahl: null == postleitzahl
-          ? _self.postleitzahl
-          : postleitzahl // ignore: cast_nullable_to_non_nullable
-              as String,
-      stadt: null == stadt
-          ? _self.stadt
-          : stadt // ignore: cast_nullable_to_non_nullable
-              as String,
-      geburtstag: null == geburtstag
-          ? _self.geburtstag
-          : geburtstag // ignore: cast_nullable_to_non_nullable
-              as DateTime,
-      titel: freezed == titel
-          ? _self.titel
-          : titel // ignore: cast_nullable_to_non_nullable
-              as String?,
-    ));
-  }
+/// Create a copy of EingelesenerPatient
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') @override $Res call({Object? vorname = null,Object? nachname = null,Object? strasse = null,Object? hausnummer = null,Object? postleitzahl = null,Object? stadt = null,Object? geburtstag = null,Object? titel = freezed,}) {
+  return _then(_self.copyWith(
+vorname: null == vorname ? _self.vorname : vorname // ignore: cast_nullable_to_non_nullable
+as String,nachname: null == nachname ? _self.nachname : nachname // ignore: cast_nullable_to_non_nullable
+as String,strasse: null == strasse ? _self.strasse : strasse // ignore: cast_nullable_to_non_nullable
+as String,hausnummer: null == hausnummer ? _self.hausnummer : hausnummer // ignore: cast_nullable_to_non_nullable
+as String,postleitzahl: null == postleitzahl ? _self.postleitzahl : postleitzahl // ignore: cast_nullable_to_non_nullable
+as String,stadt: null == stadt ? _self.stadt : stadt // ignore: cast_nullable_to_non_nullable
+as String,geburtstag: null == geburtstag ? _self.geburtstag : geburtstag // ignore: cast_nullable_to_non_nullable
+as DateTime,titel: freezed == titel ? _self.titel : titel // ignore: cast_nullable_to_non_nullable
+as String?,
+  ));
 }
+
+}
+
 
 /// @nodoc
 @JsonSerializable()
+
 class _EingelesenerPatient extends EingelesenerPatient {
-  const _EingelesenerPatient(
-      {required this.vorname,
-      required this.nachname,
-      required this.strasse,
-      required this.hausnummer,
-      required this.postleitzahl,
-      required this.stadt,
-      required this.geburtstag,
-      this.titel})
-      : super._();
-  factory _EingelesenerPatient.fromJson(Map<String, dynamic> json) =>
-      _$EingelesenerPatientFromJson(json);
+  const _EingelesenerPatient({required this.vorname, required this.nachname, required this.strasse, required this.hausnummer, required this.postleitzahl, required this.stadt, required this.geburtstag, this.titel}): super._();
+  factory _EingelesenerPatient.fromJson(Map<String, dynamic> json) => _$EingelesenerPatientFromJson(json);
 
-  @override
-  final String vorname;
-  @override
-  final String nachname;
-  @override
-  final String strasse;
-  @override
-  final String hausnummer;
-  @override
-  final String postleitzahl;
-  @override
-  final String stadt;
-  @override
-  final DateTime geburtstag;
-  @override
-  final String? titel;
+@override final  String vorname;
+@override final  String nachname;
+@override final  String strasse;
+@override final  String hausnummer;
+@override final  String postleitzahl;
+@override final  String stadt;
+@override final  DateTime geburtstag;
+@override final  String? titel;
 
-  /// Create a copy of EingelesenerPatient
-  /// with the given fields replaced by the non-null parameter values.
-  @override
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  @pragma('vm:prefer-inline')
-  _$EingelesenerPatientCopyWith<_EingelesenerPatient> get copyWith =>
-      __$EingelesenerPatientCopyWithImpl<_EingelesenerPatient>(
-          this, _$identity);
+/// Create a copy of EingelesenerPatient
+/// with the given fields replaced by the non-null parameter values.
+@override @JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+_$EingelesenerPatientCopyWith<_EingelesenerPatient> get copyWith => __$EingelesenerPatientCopyWithImpl<_EingelesenerPatient>(this, _$identity);
 
-  @override
-  Map<String, dynamic> toJson() {
-    return _$EingelesenerPatientToJson(
-      this,
-    );
-  }
+@override
+Map<String, dynamic> toJson() {
+  return _$EingelesenerPatientToJson(this, );
+}
 
-  @override
-  bool operator ==(Object other) {
-    return identical(this, other) ||
-        (other.runtimeType == runtimeType &&
-            other is _EingelesenerPatient &&
-            (identical(other.vorname, vorname) || other.vorname == vorname) &&
-            (identical(other.nachname, nachname) ||
-                other.nachname == nachname) &&
-            (identical(other.strasse, strasse) || other.strasse == strasse) &&
-            (identical(other.hausnummer, hausnummer) ||
-                other.hausnummer == hausnummer) &&
-            (identical(other.postleitzahl, postleitzahl) ||
-                other.postleitzahl == postleitzahl) &&
-            (identical(other.stadt, stadt) || other.stadt == stadt) &&
-            (identical(other.geburtstag, geburtstag) ||
-                other.geburtstag == geburtstag) &&
-            (identical(other.titel, titel) || other.titel == titel));
-  }
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _EingelesenerPatient&&(identical(other.vorname, vorname) || other.vorname == vorname)&&(identical(other.nachname, nachname) || other.nachname == nachname)&&(identical(other.strasse, strasse) || other.strasse == strasse)&&(identical(other.hausnummer, hausnummer) || other.hausnummer == hausnummer)&&(identical(other.postleitzahl, postleitzahl) || other.postleitzahl == postleitzahl)&&(identical(other.stadt, stadt) || other.stadt == stadt)&&(identical(other.geburtstag, geburtstag) || other.geburtstag == geburtstag)&&(identical(other.titel, titel) || other.titel == titel));
+}
 
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  @override
-  int get hashCode => Object.hash(runtimeType, vorname, nachname, strasse,
-      hausnummer, postleitzahl, stadt, geburtstag, titel);
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode => Object.hash(runtimeType,vorname,nachname,strasse,hausnummer,postleitzahl,stadt,geburtstag,titel);
 
-  @override
-  String toString() {
-    return 'EingelesenerPatient(vorname: $vorname, nachname: $nachname, strasse: $strasse, hausnummer: $hausnummer, postleitzahl: $postleitzahl, stadt: $stadt, geburtstag: $geburtstag, titel: $titel)';
-  }
+@override
+String toString() {
+  return 'EingelesenerPatient(vorname: $vorname, nachname: $nachname, strasse: $strasse, hausnummer: $hausnummer, postleitzahl: $postleitzahl, stadt: $stadt, geburtstag: $geburtstag, titel: $titel)';
+}
+
+
 }
 
 /// @nodoc
-abstract mixin class _$EingelesenerPatientCopyWith<$Res>
-    implements $EingelesenerPatientCopyWith<$Res> {
-  factory _$EingelesenerPatientCopyWith(_EingelesenerPatient value,
-          $Res Function(_EingelesenerPatient) _then) =
-      __$EingelesenerPatientCopyWithImpl;
-  @override
-  @useResult
-  $Res call(
-      {String vorname,
-      String nachname,
-      String strasse,
-      String hausnummer,
-      String postleitzahl,
-      String stadt,
-      DateTime geburtstag,
-      String? titel});
-}
+abstract mixin class _$EingelesenerPatientCopyWith<$Res> implements $EingelesenerPatientCopyWith<$Res> {
+  factory _$EingelesenerPatientCopyWith(_EingelesenerPatient value, $Res Function(_EingelesenerPatient) _then) = __$EingelesenerPatientCopyWithImpl;
+@override @useResult
+$Res call({
+ String vorname, String nachname, String strasse, String hausnummer, String postleitzahl, String stadt, DateTime geburtstag, String? titel
+});
 
+
+
+
+}
 /// @nodoc
 class __$EingelesenerPatientCopyWithImpl<$Res>
     implements _$EingelesenerPatientCopyWith<$Res> {
@@ -513,105 +346,69 @@ class __$EingelesenerPatientCopyWithImpl<$Res>
   final _EingelesenerPatient _self;
   final $Res Function(_EingelesenerPatient) _then;
 
-  /// Create a copy of EingelesenerPatient
-  /// with the given fields replaced by the non-null parameter values.
-  @override
-  @pragma('vm:prefer-inline')
-  $Res call({
-    Object? vorname = null,
-    Object? nachname = null,
-    Object? strasse = null,
-    Object? hausnummer = null,
-    Object? postleitzahl = null,
-    Object? stadt = null,
-    Object? geburtstag = null,
-    Object? titel = freezed,
-  }) {
-    return _then(_EingelesenerPatient(
-      vorname: null == vorname
-          ? _self.vorname
-          : vorname // ignore: cast_nullable_to_non_nullable
-              as String,
-      nachname: null == nachname
-          ? _self.nachname
-          : nachname // ignore: cast_nullable_to_non_nullable
-              as String,
-      strasse: null == strasse
-          ? _self.strasse
-          : strasse // ignore: cast_nullable_to_non_nullable
-              as String,
-      hausnummer: null == hausnummer
-          ? _self.hausnummer
-          : hausnummer // ignore: cast_nullable_to_non_nullable
-              as String,
-      postleitzahl: null == postleitzahl
-          ? _self.postleitzahl
-          : postleitzahl // ignore: cast_nullable_to_non_nullable
-              as String,
-      stadt: null == stadt
-          ? _self.stadt
-          : stadt // ignore: cast_nullable_to_non_nullable
-              as String,
-      geburtstag: null == geburtstag
-          ? _self.geburtstag
-          : geburtstag // ignore: cast_nullable_to_non_nullable
-              as DateTime,
-      titel: freezed == titel
-          ? _self.titel
-          : titel // ignore: cast_nullable_to_non_nullable
-              as String?,
-    ));
-  }
+/// Create a copy of EingelesenerPatient
+/// with the given fields replaced by the non-null parameter values.
+@override @pragma('vm:prefer-inline') $Res call({Object? vorname = null,Object? nachname = null,Object? strasse = null,Object? hausnummer = null,Object? postleitzahl = null,Object? stadt = null,Object? geburtstag = null,Object? titel = freezed,}) {
+  return _then(_EingelesenerPatient(
+vorname: null == vorname ? _self.vorname : vorname // ignore: cast_nullable_to_non_nullable
+as String,nachname: null == nachname ? _self.nachname : nachname // ignore: cast_nullable_to_non_nullable
+as String,strasse: null == strasse ? _self.strasse : strasse // ignore: cast_nullable_to_non_nullable
+as String,hausnummer: null == hausnummer ? _self.hausnummer : hausnummer // ignore: cast_nullable_to_non_nullable
+as String,postleitzahl: null == postleitzahl ? _self.postleitzahl : postleitzahl // ignore: cast_nullable_to_non_nullable
+as String,stadt: null == stadt ? _self.stadt : stadt // ignore: cast_nullable_to_non_nullable
+as String,geburtstag: null == geburtstag ? _self.geburtstag : geburtstag // ignore: cast_nullable_to_non_nullable
+as DateTime,titel: freezed == titel ? _self.titel : titel // ignore: cast_nullable_to_non_nullable
+as String?,
+  ));
 }
+
+
+}
+
 
 /// @nodoc
 mixin _$EingelesenesRezept {
-  DateTime get ausgestelltAm;
-  List<EingelesenesRezeptPos> get rezeptpositionen;
 
-  /// Create a copy of EingelesenesRezept
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  @pragma('vm:prefer-inline')
-  $EingelesenesRezeptCopyWith<EingelesenesRezept> get copyWith =>
-      _$EingelesenesRezeptCopyWithImpl<EingelesenesRezept>(
-          this as EingelesenesRezept, _$identity);
+ DateTime get ausgestelltAm; List<EingelesenesRezeptPos> get rezeptpositionen;
+/// Create a copy of EingelesenesRezept
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+$EingelesenesRezeptCopyWith<EingelesenesRezept> get copyWith => _$EingelesenesRezeptCopyWithImpl<EingelesenesRezept>(this as EingelesenesRezept, _$identity);
 
   /// Serializes this EingelesenesRezept to a JSON map.
   Map<String, dynamic> toJson();
 
-  @override
-  bool operator ==(Object other) {
-    return identical(this, other) ||
-        (other.runtimeType == runtimeType &&
-            other is EingelesenesRezept &&
-            (identical(other.ausgestelltAm, ausgestelltAm) ||
-                other.ausgestelltAm == ausgestelltAm) &&
-            const DeepCollectionEquality()
-                .equals(other.rezeptpositionen, rezeptpositionen));
-  }
 
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  @override
-  int get hashCode => Object.hash(runtimeType, ausgestelltAm,
-      const DeepCollectionEquality().hash(rezeptpositionen));
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is EingelesenesRezept&&(identical(other.ausgestelltAm, ausgestelltAm) || other.ausgestelltAm == ausgestelltAm)&&const DeepCollectionEquality().equals(other.rezeptpositionen, rezeptpositionen));
+}
 
-  @override
-  String toString() {
-    return 'EingelesenesRezept(ausgestelltAm: $ausgestelltAm, rezeptpositionen: $rezeptpositionen)';
-  }
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode => Object.hash(runtimeType,ausgestelltAm,const DeepCollectionEquality().hash(rezeptpositionen));
+
+@override
+String toString() {
+  return 'EingelesenesRezept(ausgestelltAm: $ausgestelltAm, rezeptpositionen: $rezeptpositionen)';
+}
+
+
 }
 
 /// @nodoc
-abstract mixin class $EingelesenesRezeptCopyWith<$Res> {
-  factory $EingelesenesRezeptCopyWith(
-          EingelesenesRezept value, $Res Function(EingelesenesRezept) _then) =
-      _$EingelesenesRezeptCopyWithImpl;
-  @useResult
-  $Res call(
-      {DateTime ausgestelltAm, List<EingelesenesRezeptPos> rezeptpositionen});
-}
+abstract mixin class $EingelesenesRezeptCopyWith<$Res>  {
+  factory $EingelesenesRezeptCopyWith(EingelesenesRezept value, $Res Function(EingelesenesRezept) _then) = _$EingelesenesRezeptCopyWithImpl;
+@useResult
+$Res call({
+ DateTime ausgestelltAm, List<EingelesenesRezeptPos> rezeptpositionen
+});
 
+
+
+
+}
 /// @nodoc
 class _$EingelesenesRezeptCopyWithImpl<$Res>
     implements $EingelesenesRezeptCopyWith<$Res> {
@@ -620,98 +417,75 @@ class _$EingelesenesRezeptCopyWithImpl<$Res>
   final EingelesenesRezept _self;
   final $Res Function(EingelesenesRezept) _then;
 
-  /// Create a copy of EingelesenesRezept
-  /// with the given fields replaced by the non-null parameter values.
-  @pragma('vm:prefer-inline')
-  @override
-  $Res call({
-    Object? ausgestelltAm = null,
-    Object? rezeptpositionen = null,
-  }) {
-    return _then(_self.copyWith(
-      ausgestelltAm: null == ausgestelltAm
-          ? _self.ausgestelltAm
-          : ausgestelltAm // ignore: cast_nullable_to_non_nullable
-              as DateTime,
-      rezeptpositionen: null == rezeptpositionen
-          ? _self.rezeptpositionen
-          : rezeptpositionen // ignore: cast_nullable_to_non_nullable
-              as List<EingelesenesRezeptPos>,
-    ));
-  }
+/// Create a copy of EingelesenesRezept
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') @override $Res call({Object? ausgestelltAm = null,Object? rezeptpositionen = null,}) {
+  return _then(_self.copyWith(
+ausgestelltAm: null == ausgestelltAm ? _self.ausgestelltAm : ausgestelltAm // ignore: cast_nullable_to_non_nullable
+as DateTime,rezeptpositionen: null == rezeptpositionen ? _self.rezeptpositionen : rezeptpositionen // ignore: cast_nullable_to_non_nullable
+as List<EingelesenesRezeptPos>,
+  ));
 }
+
+}
+
 
 /// @nodoc
 @JsonSerializable()
+
 class _EingelesenesRezept extends EingelesenesRezept {
-  const _EingelesenesRezept(
-      {required this.ausgestelltAm,
-      required final List<EingelesenesRezeptPos> rezeptpositionen})
-      : _rezeptpositionen = rezeptpositionen,
-        super._();
-  factory _EingelesenesRezept.fromJson(Map<String, dynamic> json) =>
-      _$EingelesenesRezeptFromJson(json);
+  const _EingelesenesRezept({required this.ausgestelltAm, required final  List<EingelesenesRezeptPos> rezeptpositionen}): _rezeptpositionen = rezeptpositionen,super._();
+  factory _EingelesenesRezept.fromJson(Map<String, dynamic> json) => _$EingelesenesRezeptFromJson(json);
 
-  @override
-  final DateTime ausgestelltAm;
-  final List<EingelesenesRezeptPos> _rezeptpositionen;
-  @override
-  List<EingelesenesRezeptPos> get rezeptpositionen {
-    if (_rezeptpositionen is EqualUnmodifiableListView)
-      return _rezeptpositionen;
-    // ignore: implicit_dynamic_type
-    return EqualUnmodifiableListView(_rezeptpositionen);
-  }
+@override final  DateTime ausgestelltAm;
+ final  List<EingelesenesRezeptPos> _rezeptpositionen;
+@override List<EingelesenesRezeptPos> get rezeptpositionen {
+  if (_rezeptpositionen is EqualUnmodifiableListView) return _rezeptpositionen;
+  // ignore: implicit_dynamic_type
+  return EqualUnmodifiableListView(_rezeptpositionen);
+}
 
-  /// Create a copy of EingelesenesRezept
-  /// with the given fields replaced by the non-null parameter values.
-  @override
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  @pragma('vm:prefer-inline')
-  _$EingelesenesRezeptCopyWith<_EingelesenesRezept> get copyWith =>
-      __$EingelesenesRezeptCopyWithImpl<_EingelesenesRezept>(this, _$identity);
 
-  @override
-  Map<String, dynamic> toJson() {
-    return _$EingelesenesRezeptToJson(
-      this,
-    );
-  }
+/// Create a copy of EingelesenesRezept
+/// with the given fields replaced by the non-null parameter values.
+@override @JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+_$EingelesenesRezeptCopyWith<_EingelesenesRezept> get copyWith => __$EingelesenesRezeptCopyWithImpl<_EingelesenesRezept>(this, _$identity);
 
-  @override
-  bool operator ==(Object other) {
-    return identical(this, other) ||
-        (other.runtimeType == runtimeType &&
-            other is _EingelesenesRezept &&
-            (identical(other.ausgestelltAm, ausgestelltAm) ||
-                other.ausgestelltAm == ausgestelltAm) &&
-            const DeepCollectionEquality()
-                .equals(other._rezeptpositionen, _rezeptpositionen));
-  }
+@override
+Map<String, dynamic> toJson() {
+  return _$EingelesenesRezeptToJson(this, );
+}
 
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  @override
-  int get hashCode => Object.hash(runtimeType, ausgestelltAm,
-      const DeepCollectionEquality().hash(_rezeptpositionen));
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _EingelesenesRezept&&(identical(other.ausgestelltAm, ausgestelltAm) || other.ausgestelltAm == ausgestelltAm)&&const DeepCollectionEquality().equals(other._rezeptpositionen, _rezeptpositionen));
+}
 
-  @override
-  String toString() {
-    return 'EingelesenesRezept(ausgestelltAm: $ausgestelltAm, rezeptpositionen: $rezeptpositionen)';
-  }
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode => Object.hash(runtimeType,ausgestelltAm,const DeepCollectionEquality().hash(_rezeptpositionen));
+
+@override
+String toString() {
+  return 'EingelesenesRezept(ausgestelltAm: $ausgestelltAm, rezeptpositionen: $rezeptpositionen)';
+}
+
+
 }
 
 /// @nodoc
-abstract mixin class _$EingelesenesRezeptCopyWith<$Res>
-    implements $EingelesenesRezeptCopyWith<$Res> {
-  factory _$EingelesenesRezeptCopyWith(
-          _EingelesenesRezept value, $Res Function(_EingelesenesRezept) _then) =
-      __$EingelesenesRezeptCopyWithImpl;
-  @override
-  @useResult
-  $Res call(
-      {DateTime ausgestelltAm, List<EingelesenesRezeptPos> rezeptpositionen});
-}
+abstract mixin class _$EingelesenesRezeptCopyWith<$Res> implements $EingelesenesRezeptCopyWith<$Res> {
+  factory _$EingelesenesRezeptCopyWith(_EingelesenesRezept value, $Res Function(_EingelesenesRezept) _then) = __$EingelesenesRezeptCopyWithImpl;
+@override @useResult
+$Res call({
+ DateTime ausgestelltAm, List<EingelesenesRezeptPos> rezeptpositionen
+});
 
+
+
+
+}
 /// @nodoc
 class __$EingelesenesRezeptCopyWithImpl<$Res>
     implements _$EingelesenesRezeptCopyWith<$Res> {
@@ -720,74 +494,63 @@ class __$EingelesenesRezeptCopyWithImpl<$Res>
   final _EingelesenesRezept _self;
   final $Res Function(_EingelesenesRezept) _then;
 
-  /// Create a copy of EingelesenesRezept
-  /// with the given fields replaced by the non-null parameter values.
-  @override
-  @pragma('vm:prefer-inline')
-  $Res call({
-    Object? ausgestelltAm = null,
-    Object? rezeptpositionen = null,
-  }) {
-    return _then(_EingelesenesRezept(
-      ausgestelltAm: null == ausgestelltAm
-          ? _self.ausgestelltAm
-          : ausgestelltAm // ignore: cast_nullable_to_non_nullable
-              as DateTime,
-      rezeptpositionen: null == rezeptpositionen
-          ? _self._rezeptpositionen
-          : rezeptpositionen // ignore: cast_nullable_to_non_nullable
-              as List<EingelesenesRezeptPos>,
-    ));
-  }
+/// Create a copy of EingelesenesRezept
+/// with the given fields replaced by the non-null parameter values.
+@override @pragma('vm:prefer-inline') $Res call({Object? ausgestelltAm = null,Object? rezeptpositionen = null,}) {
+  return _then(_EingelesenesRezept(
+ausgestelltAm: null == ausgestelltAm ? _self.ausgestelltAm : ausgestelltAm // ignore: cast_nullable_to_non_nullable
+as DateTime,rezeptpositionen: null == rezeptpositionen ? _self._rezeptpositionen : rezeptpositionen // ignore: cast_nullable_to_non_nullable
+as List<EingelesenesRezeptPos>,
+  ));
 }
+
+
+}
+
 
 /// @nodoc
 mixin _$EingelesenesRezeptPos {
-  int get anzahl;
-  Behandlungsart get behandlungsart;
 
-  /// Create a copy of EingelesenesRezeptPos
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  @pragma('vm:prefer-inline')
-  $EingelesenesRezeptPosCopyWith<EingelesenesRezeptPos> get copyWith =>
-      _$EingelesenesRezeptPosCopyWithImpl<EingelesenesRezeptPos>(
-          this as EingelesenesRezeptPos, _$identity);
+ int get anzahl; Behandlungsart get behandlungsart;
+/// Create a copy of EingelesenesRezeptPos
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+$EingelesenesRezeptPosCopyWith<EingelesenesRezeptPos> get copyWith => _$EingelesenesRezeptPosCopyWithImpl<EingelesenesRezeptPos>(this as EingelesenesRezeptPos, _$identity);
 
   /// Serializes this EingelesenesRezeptPos to a JSON map.
   Map<String, dynamic> toJson();
 
-  @override
-  bool operator ==(Object other) {
-    return identical(this, other) ||
-        (other.runtimeType == runtimeType &&
-            other is EingelesenesRezeptPos &&
-            (identical(other.anzahl, anzahl) || other.anzahl == anzahl) &&
-            (identical(other.behandlungsart, behandlungsart) ||
-                other.behandlungsart == behandlungsart));
-  }
 
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  @override
-  int get hashCode => Object.hash(runtimeType, anzahl, behandlungsart);
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is EingelesenesRezeptPos&&(identical(other.anzahl, anzahl) || other.anzahl == anzahl)&&(identical(other.behandlungsart, behandlungsart) || other.behandlungsart == behandlungsart));
+}
 
-  @override
-  String toString() {
-    return 'EingelesenesRezeptPos(anzahl: $anzahl, behandlungsart: $behandlungsart)';
-  }
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode => Object.hash(runtimeType,anzahl,behandlungsart);
+
+@override
+String toString() {
+  return 'EingelesenesRezeptPos(anzahl: $anzahl, behandlungsart: $behandlungsart)';
+}
+
+
 }
 
 /// @nodoc
-abstract mixin class $EingelesenesRezeptPosCopyWith<$Res> {
-  factory $EingelesenesRezeptPosCopyWith(EingelesenesRezeptPos value,
-          $Res Function(EingelesenesRezeptPos) _then) =
-      _$EingelesenesRezeptPosCopyWithImpl;
-  @useResult
-  $Res call({int anzahl, Behandlungsart behandlungsart});
+abstract mixin class $EingelesenesRezeptPosCopyWith<$Res>  {
+  factory $EingelesenesRezeptPosCopyWith(EingelesenesRezeptPos value, $Res Function(EingelesenesRezeptPos) _then) = _$EingelesenesRezeptPosCopyWithImpl;
+@useResult
+$Res call({
+ int anzahl, Behandlungsart behandlungsart
+});
 
-  $BehandlungsartCopyWith<$Res> get behandlungsart;
+
+$BehandlungsartCopyWith<$Res> get behandlungsart;
+
 }
-
 /// @nodoc
 class _$EingelesenesRezeptPosCopyWithImpl<$Res>
     implements $EingelesenesRezeptPosCopyWith<$Res> {
@@ -796,101 +559,78 @@ class _$EingelesenesRezeptPosCopyWithImpl<$Res>
   final EingelesenesRezeptPos _self;
   final $Res Function(EingelesenesRezeptPos) _then;
 
-  /// Create a copy of EingelesenesRezeptPos
-  /// with the given fields replaced by the non-null parameter values.
-  @pragma('vm:prefer-inline')
-  @override
-  $Res call({
-    Object? anzahl = null,
-    Object? behandlungsart = null,
-  }) {
-    return _then(_self.copyWith(
-      anzahl: null == anzahl
-          ? _self.anzahl
-          : anzahl // ignore: cast_nullable_to_non_nullable
-              as int,
-      behandlungsart: null == behandlungsart
-          ? _self.behandlungsart
-          : behandlungsart // ignore: cast_nullable_to_non_nullable
-              as Behandlungsart,
-    ));
-  }
-
-  /// Create a copy of EingelesenesRezeptPos
-  /// with the given fields replaced by the non-null parameter values.
-  @override
-  @pragma('vm:prefer-inline')
-  $BehandlungsartCopyWith<$Res> get behandlungsart {
-    return $BehandlungsartCopyWith<$Res>(_self.behandlungsart, (value) {
-      return _then(_self.copyWith(behandlungsart: value));
-    });
-  }
+/// Create a copy of EingelesenesRezeptPos
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') @override $Res call({Object? anzahl = null,Object? behandlungsart = null,}) {
+  return _then(_self.copyWith(
+anzahl: null == anzahl ? _self.anzahl : anzahl // ignore: cast_nullable_to_non_nullable
+as int,behandlungsart: null == behandlungsart ? _self.behandlungsart : behandlungsart // ignore: cast_nullable_to_non_nullable
+as Behandlungsart,
+  ));
 }
+/// Create a copy of EingelesenesRezeptPos
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$BehandlungsartCopyWith<$Res> get behandlungsart {
+  
+  return $BehandlungsartCopyWith<$Res>(_self.behandlungsart, (value) {
+    return _then(_self.copyWith(behandlungsart: value));
+  });
+}
+}
+
 
 /// @nodoc
 @JsonSerializable()
+
 class _EingelesenesRezeptPos extends EingelesenesRezeptPos {
-  const _EingelesenesRezeptPos(
-      {required this.anzahl, required this.behandlungsart})
-      : super._();
-  factory _EingelesenesRezeptPos.fromJson(Map<String, dynamic> json) =>
-      _$EingelesenesRezeptPosFromJson(json);
+  const _EingelesenesRezeptPos({required this.anzahl, required this.behandlungsart}): super._();
+  factory _EingelesenesRezeptPos.fromJson(Map<String, dynamic> json) => _$EingelesenesRezeptPosFromJson(json);
 
-  @override
-  final int anzahl;
-  @override
-  final Behandlungsart behandlungsart;
+@override final  int anzahl;
+@override final  Behandlungsart behandlungsart;
 
-  /// Create a copy of EingelesenesRezeptPos
-  /// with the given fields replaced by the non-null parameter values.
-  @override
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  @pragma('vm:prefer-inline')
-  _$EingelesenesRezeptPosCopyWith<_EingelesenesRezeptPos> get copyWith =>
-      __$EingelesenesRezeptPosCopyWithImpl<_EingelesenesRezeptPos>(
-          this, _$identity);
+/// Create a copy of EingelesenesRezeptPos
+/// with the given fields replaced by the non-null parameter values.
+@override @JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+_$EingelesenesRezeptPosCopyWith<_EingelesenesRezeptPos> get copyWith => __$EingelesenesRezeptPosCopyWithImpl<_EingelesenesRezeptPos>(this, _$identity);
 
-  @override
-  Map<String, dynamic> toJson() {
-    return _$EingelesenesRezeptPosToJson(
-      this,
-    );
-  }
+@override
+Map<String, dynamic> toJson() {
+  return _$EingelesenesRezeptPosToJson(this, );
+}
 
-  @override
-  bool operator ==(Object other) {
-    return identical(this, other) ||
-        (other.runtimeType == runtimeType &&
-            other is _EingelesenesRezeptPos &&
-            (identical(other.anzahl, anzahl) || other.anzahl == anzahl) &&
-            (identical(other.behandlungsart, behandlungsart) ||
-                other.behandlungsart == behandlungsart));
-  }
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _EingelesenesRezeptPos&&(identical(other.anzahl, anzahl) || other.anzahl == anzahl)&&(identical(other.behandlungsart, behandlungsart) || other.behandlungsart == behandlungsart));
+}
 
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  @override
-  int get hashCode => Object.hash(runtimeType, anzahl, behandlungsart);
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode => Object.hash(runtimeType,anzahl,behandlungsart);
 
-  @override
-  String toString() {
-    return 'EingelesenesRezeptPos(anzahl: $anzahl, behandlungsart: $behandlungsart)';
-  }
+@override
+String toString() {
+  return 'EingelesenesRezeptPos(anzahl: $anzahl, behandlungsart: $behandlungsart)';
+}
+
+
 }
 
 /// @nodoc
-abstract mixin class _$EingelesenesRezeptPosCopyWith<$Res>
-    implements $EingelesenesRezeptPosCopyWith<$Res> {
-  factory _$EingelesenesRezeptPosCopyWith(_EingelesenesRezeptPos value,
-          $Res Function(_EingelesenesRezeptPos) _then) =
-      __$EingelesenesRezeptPosCopyWithImpl;
-  @override
-  @useResult
-  $Res call({int anzahl, Behandlungsart behandlungsart});
+abstract mixin class _$EingelesenesRezeptPosCopyWith<$Res> implements $EingelesenesRezeptPosCopyWith<$Res> {
+  factory _$EingelesenesRezeptPosCopyWith(_EingelesenesRezeptPos value, $Res Function(_EingelesenesRezeptPos) _then) = __$EingelesenesRezeptPosCopyWithImpl;
+@override @useResult
+$Res call({
+ int anzahl, Behandlungsart behandlungsart
+});
 
-  @override
-  $BehandlungsartCopyWith<$Res> get behandlungsart;
+
+@override $BehandlungsartCopyWith<$Res> get behandlungsart;
+
 }
-
 /// @nodoc
 class __$EingelesenesRezeptPosCopyWithImpl<$Res>
     implements _$EingelesenesRezeptPosCopyWith<$Res> {
@@ -899,35 +639,26 @@ class __$EingelesenesRezeptPosCopyWithImpl<$Res>
   final _EingelesenesRezeptPos _self;
   final $Res Function(_EingelesenesRezeptPos) _then;
 
-  /// Create a copy of EingelesenesRezeptPos
-  /// with the given fields replaced by the non-null parameter values.
-  @override
-  @pragma('vm:prefer-inline')
-  $Res call({
-    Object? anzahl = null,
-    Object? behandlungsart = null,
-  }) {
-    return _then(_EingelesenesRezeptPos(
-      anzahl: null == anzahl
-          ? _self.anzahl
-          : anzahl // ignore: cast_nullable_to_non_nullable
-              as int,
-      behandlungsart: null == behandlungsart
-          ? _self.behandlungsart
-          : behandlungsart // ignore: cast_nullable_to_non_nullable
-              as Behandlungsart,
-    ));
-  }
+/// Create a copy of EingelesenesRezeptPos
+/// with the given fields replaced by the non-null parameter values.
+@override @pragma('vm:prefer-inline') $Res call({Object? anzahl = null,Object? behandlungsart = null,}) {
+  return _then(_EingelesenesRezeptPos(
+anzahl: null == anzahl ? _self.anzahl : anzahl // ignore: cast_nullable_to_non_nullable
+as int,behandlungsart: null == behandlungsart ? _self.behandlungsart : behandlungsart // ignore: cast_nullable_to_non_nullable
+as Behandlungsart,
+  ));
+}
 
-  /// Create a copy of EingelesenesRezeptPos
-  /// with the given fields replaced by the non-null parameter values.
-  @override
-  @pragma('vm:prefer-inline')
-  $BehandlungsartCopyWith<$Res> get behandlungsart {
-    return $BehandlungsartCopyWith<$Res>(_self.behandlungsart, (value) {
-      return _then(_self.copyWith(behandlungsart: value));
-    });
-  }
+/// Create a copy of EingelesenesRezeptPos
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$BehandlungsartCopyWith<$Res> get behandlungsart {
+  
+  return $BehandlungsartCopyWith<$Res>(_self.behandlungsart, (value) {
+    return _then(_self.copyWith(behandlungsart: value));
+  });
+}
 }
 
 // dart format on

@@ -64,6 +64,15 @@ class PatientDetailContent extends ConsumerWidget {
     return Scaffold(
       appBar: AppBar(
         title: Text(patient.fullName),
+        actions: [
+          IconButton(
+            onPressed: () {
+              context.go('/patienten/${patient.id}/edit');
+            },
+            icon: const Icon(Icons.edit),
+            tooltip: 'Patient bearbeiten',
+          ),
+        ],
       ),
       body: Column(
         children: [

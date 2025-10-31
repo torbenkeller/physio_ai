@@ -6,7 +6,7 @@ part of '../patient_repository.dart';
 // RetrofitGenerator
 // **************************************************************************
 
-// ignore_for_file: unnecessary_brace_in_string_interps,no_leading_underscores_for_local_identifiers,unused_element,unnecessary_string_interpolations
+// ignore_for_file: unnecessary_brace_in_string_interps,no_leading_underscores_for_local_identifiers,unused_element,unnecessary_string_interpolations,unused_element_parameter
 
 class _PatientRepository implements PatientRepository {
   _PatientRepository(this._dio, {this.baseUrl, this.errorLogger}) {
@@ -95,12 +95,12 @@ class _PatientRepository implements PatientRepository {
   }
 
   @override
-  Future<void> updatePatient(String id, PatientFormDto formDto) async {
+  Future<Patient> updatePatient(String id, PatientFormDto formDto) async {
     final _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{};
     final _headers = <String, dynamic>{};
     final _data = formDto;
-    final _options = _setStreamType<void>(
+    final _options = _setStreamType<Patient>(
       Options(method: 'PATCH', headers: _headers, extra: _extra)
           .compose(
             _dio.options,
@@ -110,7 +110,15 @@ class _PatientRepository implements PatientRepository {
           )
           .copyWith(baseUrl: _combineBaseUrls(_dio.options.baseUrl, baseUrl)),
     );
-    await _dio.fetch<void>(_options);
+    final _result = await _dio.fetch<Map<String, dynamic>>(_options);
+    late Patient _value;
+    try {
+      _value = Patient.fromJson(_result.data!);
+    } on Object catch (e, s) {
+      errorLogger?.logError(e, s, _options);
+      rethrow;
+    }
+    return _value;
   }
 
   RequestOptions _setStreamType<T>(RequestOptions requestOptions) {

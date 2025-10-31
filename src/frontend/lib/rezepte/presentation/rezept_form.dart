@@ -11,8 +11,10 @@ import 'package:physio_ai/rezepte/model/rezept.dart';
 import 'package:physio_ai/rezepte/presentation/rezept_form_container.dart';
 import 'package:physio_ai/rezepte/presentation/rezepte_page.dart';
 
-final rezeptFormContainerProvider =
-    Provider.family.autoDispose<RezeptFormContainer, Rezept?>((ref, rezept) {
+final rezeptFormContainerProvider = Provider.family.autoDispose<RezeptFormContainer, Rezept?>((
+  ref,
+  rezept,
+) {
   final behandlungsarten = ref.watch(behandlungsartenProvider).value!;
 
   final initialBehandlungsart = behandlungsarten.sort((a, b) => a.name.compareTo(b.name)).first;
@@ -317,13 +319,14 @@ class _RezeptFormState extends ConsumerState<RezeptForm> {
                 menuChildren:
                     (ref.watch(behandlungsartenProvider).value ?? IList<Behandlungsart>(const []))
                         .map((behandlungsart) {
-                  return MenuItemButton(
-                    onPressed: () {
-                      state.didChange(behandlungsart);
-                    },
-                    child: Text(behandlungsart.name),
-                  );
-                }).toList(),
+                          return MenuItemButton(
+                            onPressed: () {
+                              state.didChange(behandlungsart);
+                            },
+                            child: Text(behandlungsart.name),
+                          );
+                        })
+                        .toList(),
               );
             },
           ),

@@ -30,6 +30,7 @@ class PatientenServiceImplTest {
             telFestnetz = "0987654321",
             email = "max@example.com",
             geburtstag = LocalDate.of(1990, 1, 1),
+            behandlungenProRezept = null,
         )
 
         every { patientenRepository.save(any()) } returns expectedPatient
@@ -47,6 +48,7 @@ class PatientenServiceImplTest {
             telFestnetz = "0987654321",
             email = "max@example.com",
             geburtstag = LocalDate.of(1990, 1, 1),
+            behandlungenProRezept = null,
         )
 
         // Then - patient should be created successfully
@@ -73,6 +75,7 @@ class PatientenServiceImplTest {
                 telFestnetz = null,
                 email = null,
                 geburtstag = null,
+                behandlungenProRezept = null,
             )
         }
     }
@@ -94,6 +97,7 @@ class PatientenServiceImplTest {
                 telFestnetz = null,
                 email = null,
                 geburtstag = null,
+                behandlungenProRezept = null,
             )
         }
     }
@@ -115,6 +119,7 @@ class PatientenServiceImplTest {
                 telFestnetz = null,
                 email = null,
                 geburtstag = null,
+                behandlungenProRezept = null,
             )
         }
     }
@@ -136,6 +141,7 @@ class PatientenServiceImplTest {
                 telFestnetz = null,
                 email = null,
                 geburtstag = null,
+                behandlungenProRezept = null,
             )
         }
     }
@@ -157,6 +163,7 @@ class PatientenServiceImplTest {
                 telFestnetz = null,
                 email = null,
                 geburtstag = null,
+                behandlungenProRezept = null,
             )
         }
     }

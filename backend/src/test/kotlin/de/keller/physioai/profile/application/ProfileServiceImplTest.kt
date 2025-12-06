@@ -50,6 +50,7 @@ class ProfileServiceImplTest {
                 praxisName = "Privatpraxis Carsten Huffmeyer",
                 inhaberName = "Carsten Huffmeyer",
                 profilePictureUrl = null,
+                defaultBehandlungenProRezept = 8,
             )
 
             // Assert
@@ -77,6 +78,7 @@ class ProfileServiceImplTest {
                     praxisName = "Updated Practice Name",
                     inhaberName = "Updated Owner Name",
                     profilePictureUrl = null,
+                    defaultBehandlungenProRezept = 8,
                 )
             }
 
@@ -93,6 +95,7 @@ class ProfileServiceImplTest {
                 praxisName = "Old Practice Name",
                 inhaberName = "Old Owner Name",
                 profilePictureUrl = null,
+                defaultBehandlungenProRezept = 8,
                 version = 0,
             )
 
@@ -107,6 +110,7 @@ class ProfileServiceImplTest {
                 praxisName = "Privatpraxis Carsten Huffmeyer",
                 inhaberName = "Carsten Huffmeyer",
                 profilePictureUrl = "http://example.com/new-photo.jpg",
+                defaultBehandlungenProRezept = 8,
             )
 
             // Assert
@@ -129,6 +133,7 @@ class ProfileServiceImplTest {
                 praxisName = "Privatpraxis Carsten Huffmeyer",
                 inhaberName = "Carsten Huffmeyer",
                 profilePictureUrl = "http://example.com/old-photo.jpg",
+                defaultBehandlungenProRezept = 8,
                 version = 0,
             )
 
@@ -143,6 +148,7 @@ class ProfileServiceImplTest {
                 praxisName = "Neuer Praxisname",
                 inhaberName = "Carsten Huffmeyer Jr.",
                 profilePictureUrl = null,
+                defaultBehandlungenProRezept = 8,
             )
 
             // Assert

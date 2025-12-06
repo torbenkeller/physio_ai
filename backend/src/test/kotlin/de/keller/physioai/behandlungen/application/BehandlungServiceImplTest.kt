@@ -313,4 +313,141 @@ class BehandlungServiceImplTest {
             verify(exactly = 0) { behandlungenRepository.delete(any()) }
         }
     }
+
+    @Nested
+    inner class CheckConflicts {
+        private fun createTestPatient(
+            id: PatientId,
+            vorname: String,
+            nachname: String,
+        ) = de.keller.physioai.behandlungen.TestPatient(
+            id = id,
+            titel = null,
+            vorname = vorname,
+            nachname = nachname,
+            strasse = null,
+            hausnummer = null,
+            plz = null,
+            stadt = null,
+            telMobil = null,
+            telFestnetz = null,
+            email = null,
+            geburtstag = null,
+            behandlungenProRezept = null,
+        )
+
+        @Test
+        fun `should return no conflicts when no overlapping behandlungen exist`() {
+            // Arrange
+            val slot = BehandlungenService.TimeSlotCheck(
+                startZeit = LocalDateTime.of(2024, 1, 15, 10, 0),
+                endZeit = LocalDateTime.of(2024, 1, 15, 11, 30),
+            )
+
+            every {
+                behandlungenRepository.findOverlapping(slot.startZeit, slot.endZeit)
+            } returns emptyList()
+
+            // Act
+            val results = behandlungenService.checkConflicts(listOf(slot))
+
+            // Assert
+            assertEquals(1, results.size)
+            assertEquals(0, results[0].slotIndex)
+            assertEquals(false, results[0].hasConflict)
+            assertEquals(0, results[0].conflictingBehandlungen.size)
+
+            verify { behandlungenRepository.findOverlapping(slot.startZeit, slot.endZeit) }
+        }
+
+        @Test
+        fun `should return conflict when overlapping behandlung exists`() {
+            // Arrange
+            val slot = BehandlungenService.TimeSlotCheck(
+                startZeit = LocalDateTime.of(2024, 1, 15, 10, 0),
+                endZeit = LocalDateTime.of(2024, 1, 15, 11, 30),
+            )
+
+            val conflictingPatientId = PatientId(UUID.randomUUID())
+            val conflictingBehandlung = BehandlungAggregate(
+                id = BehandlungId(UUID.randomUUID()),
+                patientId = conflictingPatientId,
+                startZeit = LocalDateTime.of(2024, 1, 15, 10, 30),
+                endZeit = LocalDateTime.of(2024, 1, 15, 12, 0),
+                rezeptId = null,
+                version = 0,
+            )
+
+            every {
+                behandlungenRepository.findOverlapping(slot.startZeit, slot.endZeit)
+            } returns listOf(conflictingBehandlung)
+
+            every {
+                patientenRepository.findAllByIdIn(setOf(conflictingPatientId))
+            } returns listOf(createTestPatient(conflictingPatientId, "Max", "Mustermann"))
+
+            // Act
+            val results = behandlungenService.checkConflicts(listOf(slot))
+
+            // Assert
+            assertEquals(1, results.size)
+            assertEquals(0, results[0].slotIndex)
+            assertEquals(true, results[0].hasConflict)
+            assertEquals(1, results[0].conflictingBehandlungen.size)
+            assertEquals("Max Mustermann", results[0].conflictingBehandlungen[0].patientName)
+
+            verify { behandlungenRepository.findOverlapping(slot.startZeit, slot.endZeit) }
+            verify { patientenRepository.findAllByIdIn(setOf(conflictingPatientId)) }
+        }
+
+        @Test
+        fun `should check multiple slots and return correct conflicts for each`() {
+            // Arrange
+            val slot1 = BehandlungenService.TimeSlotCheck(
+                startZeit = LocalDateTime.of(2024, 1, 15, 10, 0),
+                endZeit = LocalDateTime.of(2024, 1, 15, 11, 30),
+            )
+            val slot2 = BehandlungenService.TimeSlotCheck(
+                startZeit = LocalDateTime.of(2024, 1, 16, 14, 0),
+                endZeit = LocalDateTime.of(2024, 1, 16, 15, 30),
+            )
+
+            val conflictingPatientId = PatientId(UUID.randomUUID())
+            val conflictingBehandlung = BehandlungAggregate(
+                id = BehandlungId(UUID.randomUUID()),
+                patientId = conflictingPatientId,
+                startZeit = LocalDateTime.of(2024, 1, 15, 10, 30),
+                endZeit = LocalDateTime.of(2024, 1, 15, 12, 0),
+                rezeptId = null,
+                version = 0,
+            )
+
+            // Slot 1 has conflict, slot 2 does not
+            every {
+                behandlungenRepository.findOverlapping(slot1.startZeit, slot1.endZeit)
+            } returns listOf(conflictingBehandlung)
+
+            every {
+                behandlungenRepository.findOverlapping(slot2.startZeit, slot2.endZeit)
+            } returns emptyList()
+
+            every {
+                patientenRepository.findAllByIdIn(setOf(conflictingPatientId))
+            } returns listOf(createTestPatient(conflictingPatientId, "Anna", "Schmidt"))
+
+            // Act
+            val results = behandlungenService.checkConflicts(listOf(slot1, slot2))
+
+            // Assert
+            assertEquals(2, results.size)
+
+            assertEquals(0, results[0].slotIndex)
+            assertEquals(true, results[0].hasConflict)
+            assertEquals(1, results[0].conflictingBehandlungen.size)
+
+            assertEquals(1, results[1].slotIndex)
+            assertEquals(false, results[1].hasConflict)
+            assertEquals(0, results[1].conflictingBehandlungen.size)
+        }
+    }
 }

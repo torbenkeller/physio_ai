@@ -49,6 +49,7 @@ class PatientenControllerTest {
                 telFestnetz = "0987654321",
                 email = "max@example.com",
                 geburtstag = LocalDate.of(1990, 1, 1),
+                behandlungenProRezept = null,
             ).copy(id = patientId)
 
         every {
@@ -64,6 +65,7 @@ class PatientenControllerTest {
                 telFestnetz = "0987654321",
                 email = "max@example.com",
                 geburtstag = LocalDate.of(1990, 1, 1),
+                behandlungenProRezept = null,
             )
         } returns expectedPatient
 
@@ -107,6 +109,7 @@ class PatientenControllerTest {
                 telFestnetz = "0987654321",
                 email = "max@example.com",
                 geburtstag = LocalDate.of(1990, 1, 1),
+                behandlungenProRezept = null,
             )
         }
     }
@@ -127,6 +130,7 @@ class PatientenControllerTest {
                 telFestnetz = null,
                 email = null,
                 geburtstag = null,
+                behandlungenProRezept = null,
             )
         } throws IllegalArgumentException("Vorname darf nicht leer sein")
 
@@ -158,6 +162,7 @@ class PatientenControllerTest {
                 telFestnetz = null,
                 email = null,
                 geburtstag = null,
+                behandlungenProRezept = null,
             )
         }
     }
@@ -178,6 +183,7 @@ class PatientenControllerTest {
                 telFestnetz = null,
                 email = null,
                 geburtstag = null,
+                behandlungenProRezept = null,
             )
         } throws IllegalArgumentException("Nachname darf nicht leer sein")
 
@@ -209,6 +215,7 @@ class PatientenControllerTest {
                 telFestnetz = null,
                 email = null,
                 geburtstag = null,
+                behandlungenProRezept = null,
             )
         }
     }
@@ -229,6 +236,7 @@ class PatientenControllerTest {
                 telFestnetz = null,
                 email = null,
                 geburtstag = null,
+                behandlungenProRezept = null,
             )
         } throws IllegalArgumentException("Vorname darf nicht leer sein")
 
@@ -260,6 +268,7 @@ class PatientenControllerTest {
                 telFestnetz = null,
                 email = null,
                 geburtstag = null,
+                behandlungenProRezept = null,
             )
         }
     }
@@ -280,6 +289,7 @@ class PatientenControllerTest {
                 telFestnetz = null,
                 email = null,
                 geburtstag = null,
+                behandlungenProRezept = null,
             )
         } throws IllegalArgumentException("Vorname darf nicht leer sein")
 
@@ -311,6 +321,7 @@ class PatientenControllerTest {
                 telFestnetz = null,
                 email = null,
                 geburtstag = null,
+                behandlungenProRezept = null,
             )
         }
     }
@@ -331,6 +342,7 @@ class PatientenControllerTest {
                 telFestnetz = null,
                 email = null,
                 geburtstag = null,
+                behandlungenProRezept = null,
             )
         } throws IllegalArgumentException("Nachname darf nicht leer sein")
 
@@ -362,6 +374,7 @@ class PatientenControllerTest {
                 telFestnetz = null,
                 email = null,
                 geburtstag = null,
+                behandlungenProRezept = null,
             )
         }
     }

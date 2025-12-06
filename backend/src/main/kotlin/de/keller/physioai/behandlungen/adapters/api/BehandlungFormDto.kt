@@ -8,4 +8,5 @@ data class BehandlungFormDto(
     val startZeit: LocalDateTime,
     val endZeit: LocalDateTime,
     val rezeptId: UUID?,
+    val behandlungsartId: UUID?,
 )

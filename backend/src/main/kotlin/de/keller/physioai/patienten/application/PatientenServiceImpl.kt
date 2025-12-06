@@ -27,6 +27,7 @@ class PatientenServiceImpl(
         telFestnetz: String?,
         email: String?,
         geburtstag: LocalDate?,
+        behandlungenProRezept: Int?,
     ): PatientAggregate {
         // Validate required fields
         require(vorname.isNotBlank()) { "Vorname darf nicht leer sein" }
@@ -43,6 +44,7 @@ class PatientenServiceImpl(
             telFestnetz = telFestnetz,
             email = email,
             geburtstag = geburtstag,
+            behandlungenProRezept = behandlungenProRezept,
         )
 
         return patientenRepository.save(p)
@@ -62,6 +64,7 @@ class PatientenServiceImpl(
         telFestnetz: String?,
         email: String?,
         geburtstag: LocalDate?,
+        behandlungenProRezept: Int?,
     ): PatientAggregate {
         // Validate required fields
         require(vorname.isNotBlank()) { "Vorname darf nicht leer sein" }
@@ -80,6 +83,7 @@ class PatientenServiceImpl(
             telFestnetz = telFestnetz,
             email = email,
             geburtstag = geburtstag,
+            behandlungenProRezept = behandlungenProRezept,
         )
 
         return patientenRepository.save(updatedPatient)

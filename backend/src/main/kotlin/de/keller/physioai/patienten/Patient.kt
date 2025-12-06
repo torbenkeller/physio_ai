@@ -16,4 +16,5 @@ interface Patient {
     val telFestnetz: String?
     val email: String?
     val geburtstag: LocalDate?
+    val behandlungenProRezept: Int?
 }

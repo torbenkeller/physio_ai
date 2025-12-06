@@ -11,27 +11,31 @@
       "type": "http",
       "url": "https://mcp.context7.com/mcp"
     },
-    "dart": {
-      "command": "dart",
-      "args": [
-        "mcp-server",
-        "--experimental-mcp-server"
-      ]
-    },
     "postgres": {
       "command": "docker",
       "args": [
         "run",
         "-i",
         "--rm",
+        "--network=host",
         "-e",
         "DATABASE_URI",
         "crystaldba/postgres-mcp",
         "--access-mode=unrestricted"
       ],
       "env": {
-        "DATABASE_URI": "postgresql://postgres:postgres@localhost:5432/physio_ai"
+        "DATABASE_URI": "postgresql://postgres:postgres@127.0.0.1:5432/physio_ai"
       }
+    },
+    "playwright": {
+      "type": "stdio",
+      "command": "npx",
+      "args": [
+        "@playwright/mcp@latest",
+        "--isolated",
+        "--headless"
+      ],
+      "env": {}
     }
   }
 }

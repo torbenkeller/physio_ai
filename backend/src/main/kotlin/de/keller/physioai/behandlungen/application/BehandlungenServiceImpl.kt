@@ -6,6 +6,7 @@ import de.keller.physioai.behandlungen.ports.BehandlungenService
 import de.keller.physioai.behandlungen.ports.GetWeeklyCalendarBehandlungResponse
 import de.keller.physioai.patienten.PatientenRepository
 import de.keller.physioai.shared.AggregateNotFoundException
+import de.keller.physioai.rezepte.domain.BehandlungsartId
 import de.keller.physioai.shared.BehandlungId
 import de.keller.physioai.shared.PatientId
 import de.keller.physioai.shared.RezeptId
@@ -29,14 +30,31 @@ class BehandlungenServiceImpl(
         startZeit: LocalDateTime,
         endZeit: LocalDateTime,
         rezeptId: RezeptId?,
+        behandlungsartId: BehandlungsartId?,
     ): BehandlungAggregate {
         val behandlung = BehandlungAggregate.create(
             patientId = patientId,
             startZeit = startZeit,
             endZeit = endZeit,
             rezeptId = rezeptId,
+            behandlungsartId = behandlungsartId,
         )
         return behandlungenRepository.save(behandlung)
+    }
+
+    override fun createBehandlungenBatch(behandlungen: List<BehandlungenService.CreateBehandlungCommand>): List<BehandlungAggregate> {
+        require(behandlungen.isNotEmpty()) { "Mindestens eine Behandlung erforderlich" }
+
+        return behandlungen.map { cmd ->
+            val behandlung = BehandlungAggregate.create(
+                patientId = cmd.patientId,
+                startZeit = cmd.startZeit,
+                endZeit = cmd.endZeit,
+                rezeptId = cmd.rezeptId,
+                behandlungsartId = cmd.behandlungsartId,
+            )
+            behandlungenRepository.save(behandlung)
+        }
     }
 
     override fun updateBehandlung(
@@ -44,6 +62,7 @@ class BehandlungenServiceImpl(
         startZeit: LocalDateTime,
         endZeit: LocalDateTime,
         rezeptId: RezeptId?,
+        behandlungsartId: BehandlungsartId?,
     ): BehandlungAggregate {
         val behandlung = behandlungenRepository.findById(id)
             ?: throw AggregateNotFoundException()
@@ -52,6 +71,7 @@ class BehandlungenServiceImpl(
             startZeit = startZeit,
             endZeit = endZeit,
             rezeptId = rezeptId,
+            behandlungsartId = behandlungsartId,
         )
         return behandlungenRepository.save(updatedBehandlung)
     }
@@ -113,5 +133,42 @@ class BehandlungenServiceImpl(
             weekStart.plusDays(5) to behandlungByDate[weekStart.plusDays(5)].orEmpty(),
             weekStart.plusDays(6) to behandlungByDate[weekStart.plusDays(6)].orEmpty(),
         )
+    }
+
+    override fun checkConflicts(slots: List<BehandlungenService.TimeSlotCheck>): List<BehandlungenService.ConflictResult> {
+        // Collect all overlapping behandlungen for all slots
+        val allOverlapping = slots
+            .flatMap { slot ->
+                behandlungenRepository.findOverlapping(slot.startZeit, slot.endZeit)
+            }.distinctBy { it.id }
+
+        // Fetch patient data for conflicting behandlungen
+        val patientIds = allOverlapping.map { it.patientId }.toSet()
+        val patients = if (patientIds.isNotEmpty()) {
+            patientenRepository.findAllByIdIn(patientIds)
+        } else {
+            emptyList()
+        }
+
+        // Check each slot for conflicts
+        return slots.mapIndexed { index, slot ->
+            val conflicting = allOverlapping.filter { behandlung ->
+                behandlung.startZeit < slot.endZeit && behandlung.endZeit > slot.startZeit
+            }
+
+            BehandlungenService.ConflictResult(
+                slotIndex = index,
+                hasConflict = conflicting.isNotEmpty(),
+                conflictingBehandlungen = conflicting.map { behandlung ->
+                    val patient = patients.find { it.id == behandlung.patientId }
+                    BehandlungenService.ConflictingBehandlung(
+                        id = behandlung.id,
+                        startZeit = behandlung.startZeit,
+                        endZeit = behandlung.endZeit,
+                        patientName = patient?.let { "${it.vorname} ${it.nachname}" } ?: "Unbekannt",
+                    )
+                },
+            )
+        }
     }
 }

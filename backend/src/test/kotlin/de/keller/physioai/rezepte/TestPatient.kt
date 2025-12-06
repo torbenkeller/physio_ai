@@ -17,4 +17,5 @@ data class TestPatient(
     override val telFestnetz: String?,
     override val email: String?,
     override val geburtstag: LocalDate?,
+    override val behandlungenProRezept: Int? = null,
 ) : Patient

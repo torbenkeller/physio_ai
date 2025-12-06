@@ -82,6 +82,7 @@ class RezeptServiceImplTest {
             telFestnetz = null,
             email = "max.mustermann@example.com",
             geburtstag = LocalDate.of(1980, 1, 1),
+            behandlungenProRezept = null,
         )
 
         behandlungsart1 = Behandlungsart(

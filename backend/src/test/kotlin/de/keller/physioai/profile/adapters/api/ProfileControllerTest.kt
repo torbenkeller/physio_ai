@@ -58,6 +58,7 @@ class ProfileControllerTest {
             praxisName = "Privatpraxis Carsten Huffmeyer",
             inhaberName = "Carsten Huffmeyer",
             profilePictureUrl = null,
+            defaultBehandlungenProRezept = 8,
             version = 0,
         )
 
@@ -86,10 +87,11 @@ class ProfileControllerTest {
             praxisName = "Privatpraxis Carsten Huffmeyer",
             inhaberName = "Carsten Huffmeyer",
             profilePictureUrl = null,
+            defaultBehandlungenProRezept = 8,
             version = 0,
         )
 
-        every { profileService.createProfile(any(), any(), any()) } returns createdProfile
+        every { profileService.createProfile(any(), any(), any(), any()) } returns createdProfile
 
         // Act & Assert
         mockMvc
@@ -113,14 +115,14 @@ class ProfileControllerTest {
             .andExpect(MockMvcResultMatchers.jsonPath("$.inhaberName").value("Carsten Huffmeyer"))
             .andExpect(MockMvcResultMatchers.jsonPath("$.profilePictureUrl").doesNotExist())
 
-        verify { profileService.createProfile(any(), any(), any()) }
+        verify { profileService.createProfile(any(), any(), any(), any()) }
     }
 
     @Test
     fun `updateProfile should throw exception when no profile exists to update`() {
         // Arrange
         val profileId = ProfileId(UUID.fromString("d7e8f9a0-b1c2-3d4e-5f6a-7b8c9d0e1f2a"))
-        every { profileService.updateProfile(profileId, any(), any(), any()) } throws AggregateNotFoundException()
+        every { profileService.updateProfile(profileId, any(), any(), any(), any()) } throws AggregateNotFoundException()
 
         // Act & Assert
         mockMvc
@@ -139,7 +141,7 @@ class ProfileControllerTest {
                     ),
             ).andExpect(MockMvcResultMatchers.status().isNotFound)
 
-        verify { profileService.updateProfile(profileId, any(), any(), any()) }
+        verify { profileService.updateProfile(profileId, any(), any(), any(), any()) }
     }
 
     @Test
@@ -152,10 +154,11 @@ class ProfileControllerTest {
             praxisName = "Updated Practice Name",
             inhaberName = "Updated Owner Name",
             profilePictureUrl = "http://example.com/new-photo.jpg",
+            defaultBehandlungenProRezept = 8,
             version = 1,
         )
 
-        every { profileService.updateProfile(profileId, any(), any(), any()) } returns updatedProfile
+        every { profileService.updateProfile(profileId, any(), any(), any(), any()) } returns updatedProfile
 
         // Act & Assert
         mockMvc
@@ -179,7 +182,7 @@ class ProfileControllerTest {
             .andExpect(MockMvcResultMatchers.jsonPath("$.inhaberName").value("Updated Owner Name"))
             .andExpect(MockMvcResultMatchers.jsonPath("$.profilePictureUrl").value("http://example.com/new-photo.jpg"))
 
-        verify { profileService.updateProfile(profileId, any(), any(), any()) }
+        verify { profileService.updateProfile(profileId, any(), any(), any(), any()) }
     }
 
     @Test
@@ -193,6 +196,7 @@ class ProfileControllerTest {
             inhaberName = "Carsten Huffmeyer",
             profilePictureUrl = null,
             accessToken = accessToken,
+            defaultBehandlungenProRezept = 8,
             version = 0,
         )
 

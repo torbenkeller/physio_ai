@@ -1,76 +1,148 @@
-You are an expert frontend developer working with Flutter. Your task is to implement a new feature or fix a bug based on the following coding task:
+# Frontend
 
-Before you begin coding, please carefully read through the following guidelines and requirements:
+## Technology Stack
 
-1. Technology Stack:
-   - Frontend: Flutter
-   - Language: Dart
-   - State Management: flutter_riverpod
-   - Navigation: go_router
-   - Data Models: freezed and json_serializable
-   - API Layer: retrofit
-   - Collections: fast_immutable_collections
-   - Localization: flutter_intl (German as main locale)
+- **Framework**: React 19.2 with TypeScript (strict mode)
+- **Build Tool**: Vite 7 (Rolldown)
+- **State Management**: Redux Toolkit
+- **API Communication**: RTK Query (for all backend REST API calls)
+- **Routing**: React Router v7
+- **UI Library**: shadcn/ui + Tailwind CSS
+- **Forms**: React Hook Form
+- **Testing**: Vitest (Unit/Integration), Playwright (E2E), Testing Library (Component)
+- **Linting**: ESLint 9
+- **Language**: German only (no i18n)
 
-2. Code Style and Best Practices:
-   - Follow the [very_good_analysis](https://pub.dev/packages/very_good_analysis) style guide
-   - Max line length is 120 (default 80-char limit is disabled)
-   - Use Dart's strong typing features throughout the codebase
-   - Do NOT modify files inside `**/generated/**` folders
-   - Always add trailing commas
-   - Always use the latest language features
-   - Always use the text styles and colors from the App Theme
+## Architecture: Feature-Based Structure
 
-3. Architecture Principles:
-   - Use immutable data classes for state management
-   - Use Repositories to access APIs
-   - Create new widgets when the build method gets too long
-   - Use only dart-doc comments when commenting code
-   - Use IList from fast_immutable_collections instead of List
+```
+src/
+├── app/                    # App-wide setup (store, router, base API)
+├── features/              # Feature modules (patienten, behandlungen, rezepte, rechnungen)
+│   └── [feature]/
+│       ├── api/          # RTK Query endpoints
+│       ├── components/   # Feature-specific components
+│       ├── hooks/        # Feature-specific hooks
+│       ├── types/        # TypeScript types
+│       └── index.ts      # Public API exports
+├── shared/                # Shared across features
+│   ├── components/ui/    # shadcn/ui components
+│   ├── hooks/
+│   ├── utils/
+│   └── types/
+└── assets/
+```
 
-4. Error Handling:
-   - Use proper Exception types and logging
-   - Handle errors gracefully with user-friendly messages
+## Core Principles
 
-5. Commands:
-   - Run app: use the jetbrains mcp server
-   - Run Build Runner: `dart run build_runner build --delete-conflicting-outputs`
-   - Lint code: `flutter analyze`
-   - Format code: `dart format <directory / files / . for all>`
-   - Fix lint issues: `dart fix --apply`
-   - Get dependencies: `flutter pub get`
-   - Run all tests: use the jetbrains mcp server
-   - Run specific test: use the jetbrains mcp server
+### State Management Philosophy
 
-6. Testing Strategy:
-   - There are no unit tests of Repositories because their functionality is highly dependent on the backend responses
-   - End-to-End Tests MUST test the important user journeys of the product
-   - Unit Test all `FormContainer` implementations
+- **Server State**: Managed by RTK Query (patienten, behandlungen, rezepte, rechnungen)
+- **UI State**: Managed by Redux Toolkit (modals, filters, selections)
+- **Form State**: Managed by React Hook Form (local component state)
+- **URL State**: Managed by React Router (current page, filters)
 
-7. Tools:
-   - Use the `dart` mcp server to get details of the running flutter app
-   - Use the `jetbrains` mcp server to interact with the IDE
+**NEVER duplicate server state in Redux slices!** RTK Query is the single source of truth.
 
-Now, please approach the coding task using the following steps:
+### Backend Integration
 
-1. In <analysis> tags:
-   - Break down the coding task into smaller steps
-   - Identify which widgets, providers, and services will need to be created or modified
-   - Consider the user experience and navigation flow
+- **REST API**: Spring Boot backend at `/api/*`
+- **All API calls**: Use RTK Query endpoints, never manual fetch/axios
+- **Error Handling**: Global error handling via RTK Query middleware
+- **Types**: Define DTOs for API requests/responses
 
-2. In <implementation> tags:
-   - Write the implementation code
-   - Include comments explaining the purpose of each significant part
-   - Follow the established patterns and architecture
+### Component Architecture
 
-3. In <testing> tags:
-   - Write appropriate tests for the implementation
-   - Focus on testing business logic and user interactions
-   - Skip repository tests as per project guidelines
+- **Functional components** with hooks (no class components)
+- **Colocate**: Keep components close to where they're used
+- **Feature isolation**: Features export only public API via `index.ts`
+- **Lazy loading**: Use `React.lazy` for route-based code splitting
 
-4. In <validation> tags:
-   - Ensure code follows the style guide
-   - Verify proper error handling
-   - Check that the implementation meets the requirements
+## Best Practices
 
-Remember to ALWAYS format the code before finishing any task using `dart format`.
+### RTK Query
+
+- Provide types for all endpoints
+- Use `providesTags` and `invalidatesTags` for automatic cache invalidation
+- Use generated hooks (`useGetPatientsQuery`, `useCreatePatientMutation`)
+- NEVER fetch data in `useEffect` - always use RTK Query hooks
+
+### Type Safety
+
+- TypeScript strict mode enabled
+- No `any` types (use `unknown` if truly dynamic)
+- Always type component props explicitly
+- Define separate DTOs for API requests/responses
+
+### Code Style
+
+- Prefer `const` over `let`, never use `var`
+- Use arrow functions for component definitions
+- Destructure props in function signature
+- Use optional chaining (`?.`) and nullish coalescing (`??`)
+- Use `React.memo` for expensive components
+
+## Naming Conventions
+
+### Files & Folders
+- Components: `PascalCase.tsx` (e.g., `PatientList.tsx`)
+- Hooks: `camelCase.ts` with `use` prefix (e.g., `usePatientForm.ts`)
+- Types: `camelCase.types.ts` (e.g., `patient.types.ts`)
+- API: `camelCase.ts` (e.g., `patientenApi.ts`)
+
+### Code
+- Components/Types/Interfaces: `PascalCase`
+- Functions/Variables: `camelCase`
+- Constants: `UPPER_SNAKE_CASE`
+
+### German Domain Terms
+
+Follow the Glossar (`docs/architektur/12-glossar.md`):
+- **Patient** (not "user" for treated persons)
+- **Behandlung** (for treatment sessions)
+- **Rezept** (for medical prescriptions)
+- **Rechnung** (for billing)
+- **Termin** (for scheduled appointments)
+
+Use German names for all domain models and business logic. English is OK for technical utilities.
+
+## Testing Strategy
+
+- **Unit Tests**: Components, hooks, utilities in isolation
+- **Integration Tests**: Feature flows with mocked API (MSW)
+- **E2E Tests**: Complete user flows in real browser
+- **Colocate**: Place test files next to tested components
+
+## Commands (run from frontend/ directory)
+
+```bash
+# Development
+npm run dev              # Start dev server (http://localhost:5173)
+npm run build            # Build for production
+npm run preview          # Preview production build
+
+# Code Quality
+npm run lint             # Run ESLint
+npm run type-check       # Run TypeScript compiler check
+
+# Testing
+npm run test             # Run unit tests (Vitest)
+npm run test:watch       # Run tests in watch mode
+npm run test:e2e         # Run E2E tests (Playwright)
+```
+
+## Common Tasks
+
+### Adding a New Feature
+1. Create folder: `src/features/[feature-name]/`
+2. Add API endpoints in `api/[feature-name]Api.ts` using `api.injectEndpoints()`
+3. Define types in `types/[feature-name].types.ts`
+4. Create components in `components/`
+5. Export public API in `index.ts`
+6. Add route in `app/router.tsx`
+
+### Adding shadcn/ui Components
+```bash
+npx shadcn-ui@latest add [component-name]
+# Components added to src/shared/components/ui/
+```

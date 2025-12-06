@@ -2,6 +2,7 @@ package de.keller.physioai.behandlungen.adapters.api
 
 import de.keller.physioai.behandlungen.ports.BehandlungenRepository
 import de.keller.physioai.behandlungen.ports.BehandlungenService
+import de.keller.physioai.rezepte.domain.BehandlungsartId
 import de.keller.physioai.shared.AggregateNotFoundException
 import de.keller.physioai.shared.BehandlungId
 import de.keller.physioai.shared.PatientId
@@ -39,9 +40,29 @@ class BehandlungenController(
             startZeit = formDto.startZeit,
             endZeit = formDto.endZeit,
             rezeptId = formDto.rezeptId?.let { RezeptId(it) },
+            behandlungsartId = formDto.behandlungsartId?.let { BehandlungsartId(it) },
         )
 
         return BehandlungDto.fromDomain(behandlung)
+    }
+
+    @PostMapping("/batch")
+    @ResponseStatus(HttpStatus.CREATED)
+    fun createBehandlungenBatch(
+        @RequestBody formDtos: List<BehandlungFormDto>,
+    ): List<BehandlungDto> {
+        val commands = formDtos.map { formDto ->
+            BehandlungenService.CreateBehandlungCommand(
+                patientId = PatientId(formDto.patientId),
+                startZeit = formDto.startZeit,
+                endZeit = formDto.endZeit,
+                rezeptId = formDto.rezeptId?.let { RezeptId(it) },
+                behandlungsartId = formDto.behandlungsartId?.let { BehandlungsartId(it) },
+            )
+        }
+
+        val behandlungen = behandlungenService.createBehandlungenBatch(commands)
+        return behandlungen.map { BehandlungDto.fromDomain(it) }
     }
 
     @GetMapping("/{id}")
@@ -78,6 +99,7 @@ class BehandlungenController(
             startZeit = formDto.startZeit,
             endZeit = formDto.endZeit,
             rezeptId = formDto.rezeptId?.let { RezeptId(it) },
+            behandlungsartId = formDto.behandlungsartId?.let { BehandlungsartId(it) },
         )
         return BehandlungDto.fromDomain(behandlung)
     }
@@ -106,6 +128,35 @@ class BehandlungenController(
             .mapValues { (_, behandlungen) ->
                 behandlungen.map { BehandlungKalenderDto.fromDomain(it) }
             }
+    }
+
+    @PostMapping("/check-conflicts")
+    fun checkConflicts(
+        @RequestBody request: ConflictCheckRequestDto,
+    ): List<ConflictResultDto> {
+        val slots = request.slots.map { slot ->
+            BehandlungenService.TimeSlotCheck(
+                startZeit = slot.startZeit,
+                endZeit = slot.endZeit,
+            )
+        }
+
+        val results = behandlungenService.checkConflicts(slots)
+
+        return results.map { result ->
+            ConflictResultDto(
+                slotIndex = result.slotIndex,
+                hasConflict = result.hasConflict,
+                conflictingBehandlungen = result.conflictingBehandlungen.map { conflicting ->
+                    ConflictingBehandlungDto(
+                        id = conflicting.id.id,
+                        startZeit = conflicting.startZeit,
+                        endZeit = conflicting.endZeit,
+                        patientName = conflicting.patientName,
+                    )
+                },
+            )
+        }
     }
 
     data class VerschiebeBehandlungDto(

@@ -17,6 +17,7 @@ data class PatientDto(
     val telFestnetz: String?,
     val email: String?,
     val geburtstag: LocalDate?,
+    val behandlungenProRezept: Int?,
 ) {
     companion object {
         fun fromPatient(p: Patient): PatientDto =
@@ -33,6 +34,7 @@ data class PatientDto(
                 telFestnetz = p.telFestnetz,
                 email = p.email,
                 geburtstag = p.geburtstag,
+                behandlungenProRezept = p.behandlungenProRezept,
             )
     }
 }

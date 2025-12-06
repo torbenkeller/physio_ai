@@ -21,6 +21,7 @@ class ProfileServiceImpl(
         praxisName: String,
         inhaberName: String,
         profilePictureUrl: String?,
+        defaultBehandlungenProRezept: Int,
     ): Profile {
         val profile =
             Profile(
@@ -28,6 +29,7 @@ class ProfileServiceImpl(
                 praxisName = praxisName,
                 inhaberName = inhaberName,
                 profilePictureUrl = Strings.trimToNull(profilePictureUrl),
+                defaultBehandlungenProRezept = defaultBehandlungenProRezept,
             )
 
         return repository.save(profile)
@@ -40,6 +42,7 @@ class ProfileServiceImpl(
         praxisName: String,
         inhaberName: String,
         profilePictureUrl: String?,
+        defaultBehandlungenProRezept: Int,
     ): Profile {
         val existingProfile = repository.findById(id) ?: throw AggregateNotFoundException()
 
@@ -52,6 +55,7 @@ class ProfileServiceImpl(
                 } else {
                     existingProfile.profilePictureUrl
                 },
+                defaultBehandlungenProRezept = defaultBehandlungenProRezept,
             )
 
         return repository.save(updatedProfile)

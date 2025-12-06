@@ -20,4 +20,5 @@ data class PatientFormDto(
     @Past
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     val geburtstag: LocalDate?,
+    val behandlungenProRezept: Int?,
 )

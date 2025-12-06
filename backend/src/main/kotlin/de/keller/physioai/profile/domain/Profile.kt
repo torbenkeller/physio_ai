@@ -15,6 +15,7 @@ data class Profile(
     val praxisName: String,
     val inhaberName: String,
     val profilePictureUrl: String?,
+    val defaultBehandlungenProRezept: Int = 8,
     val accessToken: UUID = UUID.randomUUID(),
     @Version
     val version: Int = 0,

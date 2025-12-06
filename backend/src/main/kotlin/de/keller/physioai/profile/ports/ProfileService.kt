@@ -10,6 +10,7 @@ interface ProfileService {
         praxisName: String,
         inhaberName: String,
         profilePictureUrl: String?,
+        defaultBehandlungenProRezept: Int = 8,
     ): Profile
 
     fun updateProfile(
@@ -17,5 +18,6 @@ interface ProfileService {
         praxisName: String,
         inhaberName: String,
         profilePictureUrl: String?,
+        defaultBehandlungenProRezept: Int,
     ): Profile
 }

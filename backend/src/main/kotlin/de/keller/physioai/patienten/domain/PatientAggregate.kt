@@ -25,6 +25,7 @@ data class PatientAggregate(
     override val telFestnetz: String?,
     override val email: String?,
     override val geburtstag: LocalDate?,
+    override val behandlungenProRezept: Int?,
     @Version
     val version: Int = 0,
 ) : Patient {
@@ -40,6 +41,7 @@ data class PatientAggregate(
         telFestnetz: String?,
         email: String?,
         geburtstag: LocalDate?,
+        behandlungenProRezept: Int?,
     ): PatientAggregate =
         copy(
             titel = titel,
@@ -53,6 +55,7 @@ data class PatientAggregate(
             telFestnetz = telFestnetz,
             email = email,
             geburtstag = geburtstag,
+            behandlungenProRezept = behandlungenProRezept,
         )
 
     companion object {
@@ -68,6 +71,7 @@ data class PatientAggregate(
             telFestnetz: String?,
             email: String?,
             geburtstag: LocalDate?,
+            behandlungenProRezept: Int?,
         ): PatientAggregate =
             PatientAggregate(
                 id = PatientId(UUID.randomUUID()),
@@ -82,6 +86,7 @@ data class PatientAggregate(
                 telFestnetz = telFestnetz,
                 email = email,
                 geburtstag = geburtstag,
+                behandlungenProRezept = behandlungenProRezept,
             )
     }
 }

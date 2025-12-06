@@ -521,4 +521,113 @@ class BehandlungenControllerTest {
             verify { behandlungenService.getWeeklyCalendar(LocalDate.of(2024, 1, 15)) }
         }
     }
+
+    @Nested
+    inner class CheckConflicts {
+        @Test
+        fun `should return conflict results for given slots`() {
+            // Arrange
+            val conflictingBehandlungId = BehandlungId(UUID.fromString("11111111-1111-1111-1111-111111111111"))
+
+            every {
+                behandlungenService.checkConflicts(any())
+            } returns listOf(
+                BehandlungenService.ConflictResult(
+                    slotIndex = 0,
+                    hasConflict = true,
+                    conflictingBehandlungen = listOf(
+                        BehandlungenService.ConflictingBehandlung(
+                            id = conflictingBehandlungId,
+                            startZeit = LocalDateTime.of(2024, 1, 15, 10, 30),
+                            endZeit = LocalDateTime.of(2024, 1, 15, 12, 0),
+                            patientName = "Max Mustermann",
+                        ),
+                    ),
+                ),
+                BehandlungenService.ConflictResult(
+                    slotIndex = 1,
+                    hasConflict = false,
+                    conflictingBehandlungen = emptyList(),
+                ),
+            )
+
+            // Act & Assert
+            mockMvc
+                .perform(
+                    MockMvcRequestBuilders
+                        .post("/behandlungen/check-conflicts")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(
+                            """
+                            {
+                                "slots": [
+                                    {
+                                        "startZeit": "2024-01-15T10:00:00",
+                                        "endZeit": "2024-01-15T11:30:00"
+                                    },
+                                    {
+                                        "startZeit": "2024-01-16T14:00:00",
+                                        "endZeit": "2024-01-16T15:30:00"
+                                    }
+                                ]
+                            }
+                            """,
+                        ),
+                ).andExpect(MockMvcResultMatchers.status().isOk)
+                .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.length()").value(2))
+                .andExpect(MockMvcResultMatchers.jsonPath("$[0].slotIndex").value(0))
+                .andExpect(MockMvcResultMatchers.jsonPath("$[0].hasConflict").value(true))
+                .andExpect(MockMvcResultMatchers.jsonPath("$[0].conflictingBehandlungen.length()").value(1))
+                .andExpect(
+                    MockMvcResultMatchers.jsonPath("$[0].conflictingBehandlungen[0].id").value("11111111-1111-1111-1111-111111111111"),
+                ).andExpect(MockMvcResultMatchers.jsonPath("$[0].conflictingBehandlungen[0].patientName").value("Max Mustermann"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$[1].slotIndex").value(1))
+                .andExpect(MockMvcResultMatchers.jsonPath("$[1].hasConflict").value(false))
+                .andExpect(MockMvcResultMatchers.jsonPath("$[1].conflictingBehandlungen.length()").value(0))
+
+            verify { behandlungenService.checkConflicts(any()) }
+        }
+
+        @Test
+        fun `should return empty conflicts when no overlapping exists`() {
+            // Arrange
+            every {
+                behandlungenService.checkConflicts(any())
+            } returns listOf(
+                BehandlungenService.ConflictResult(
+                    slotIndex = 0,
+                    hasConflict = false,
+                    conflictingBehandlungen = emptyList(),
+                ),
+            )
+
+            // Act & Assert
+            mockMvc
+                .perform(
+                    MockMvcRequestBuilders
+                        .post("/behandlungen/check-conflicts")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(
+                            """
+                            {
+                                "slots": [
+                                    {
+                                        "startZeit": "2024-01-15T10:00:00",
+                                        "endZeit": "2024-01-15T11:30:00"
+                                    }
+                                ]
+                            }
+                            """,
+                        ),
+                ).andExpect(MockMvcResultMatchers.status().isOk)
+                .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.length()").value(1))
+                .andExpect(MockMvcResultMatchers.jsonPath("$[0].slotIndex").value(0))
+                .andExpect(MockMvcResultMatchers.jsonPath("$[0].hasConflict").value(false))
+                .andExpect(MockMvcResultMatchers.jsonPath("$[0].conflictingBehandlungen.length()").value(0))
+
+            verify { behandlungenService.checkConflicts(any()) }
+        }
+    }
 }

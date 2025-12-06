@@ -1,87 +1,27 @@
-You are an expert backend developer working with Spring Boot and following strict Test-Driven Development (TDD)
-principles. Your task is to implement a new feature or fix a bug based on the following coding task:
+# PhysioAI - Monorepo Instructions
 
-<coding_task>
-{{codingtask}}
-</coding_task>
+This is a monorepo containing backend, frontend, and documentation for the PhysioAI system.
 
-Before you begin coding, please carefully read through the following guidelines and requirements:
+## Structure
 
-1. TDD Process:
-    - Write a test first. Do NOT create the implementation of the production code yet.
-    - Run the test and ensure it fails.
-    - Write MINIMAL production code to make the test pass.
-    - Refactor if necessary.
+```
+physio_ai/
+├── backend/  # Spring Boot backend → See backend/CLAUDE.md
+├── frontend/ # React frontend → See frontend/CLAUDE.md
+└── docs/     # Project documentation → See docs/CLAUDE.md
+```
 
-2. Technology Stack:
-    - Backend: Spring Boot
-    - Language: Kotlin
-    - Persistence: Spring Data JDBC
-    - Database Migrations: Flyway
-    - Testing: Mockk for mocking, WebMvcTest for Controller tests
-    - Architecture: Hexagonal (Ports and Adapters)
+## Working with this Monorepo
 
-      The project follows a hexagonal architecture with clear separation of concerns, enhanced by jMolecules
-      annotations:
-        - Domain: Core business entities marked with @AggregateRoot (e.g., PatientAggregate)
-        - Ports: Interfaces defining interactions with external systems, annotated with @PrimaryPort (service
-          interfaces) and @SecondaryPort (repository
-          interfaces)
-        - Adapters: Implementations connecting to external systems, annotated with @PrimaryAdapter (REST controllers)
-          and @SecondaryAdapter (repository
-          implementations)
-        - Application: Service implementations orchestrating domain operations, annotated with @Application
+Each subdirectory contains its own `CLAUDE.md` with specific instructions:
 
-      These jMolecules annotations (@AggregateRoot, @PrimaryPort, @SecondaryPort, @PrimaryAdapter, @SecondaryAdapter,
-      @Application) explicitly document the
-      architectural role of each component, enhancing code clarity and enabling static architecture validation. The
-      architecture follows a strict dependency rule
-      where the domain core has no dependencies on infrastructure concerns.
+- **Backend tasks**: Navigate to `backend/` and follow `backend/CLAUDE.md`
+- **Frontend tasks**: Navigate to `frontend/` and follow `frontend/CLAUDE.md`
+- **Documentation**: See `docs/CLAUDE.md` for project documentation guidelines
 
-3. Code Style and Best Practices:
-    - Use constructor injection over property injection
-    - Use immutable data classes for domain models
-    - Follow the ktlint code style
-    - Use necessary test configuration for each test
+## General Guidelines
 
-4. Error Handling:
-    - Throw AggregateNotFoundException() when the repository doesn't find an aggregate
-    - Throw AccessDeniedException() when a user has no permission to access a resource
-
-5. Commands:
-    - Run: ./mvnw spring-boot:run
-    - Build Backend: ./mvnw package
-    - Test: ./mvnw test
-    - Test single class: ./mvnw -Dtest=<TestClass> test
-    - Format: ./mvnw antrun:run@ktlint-format
-    - Lint: ./mvnw antrun:run@ktlint-lint
-
-Now, please approach the coding task using the following steps:
-
-1. In <tdd_planning> tags:
-    - Break down the coding task into smaller steps.
-    - For each step, explicitly state which TDD principle it follows.
-    - List out the classes and methods that will likely need to be created or modified.
-
-2. In <test_design> tags:
-    - Outline the test cases needed to cover the feature or bug fix.
-    - For each test case, specify the expected input and output.
-
-3. In <test> tags:
-    - Write the initial test for the feature or bug fix.
-    - Include comments explaining the purpose of each part of the test.
-    - Explicitly state which part of the test is expected to fail initially.
-
-4. In <production> tags:
-    - Write the minimal production code to make the test pass.
-    - Include comments explaining how each line of code addresses the failing test.
-    - Explicitly state why this is the minimal code needed to make the test pass.
-
-5. In <refactor> tags, if necessary, suggest any refactoring that should be done.
-
-ALWAYS use your own tools to interact with the file system.
-ALWAYS use UTF-8 Encoding.
-
-Remember to adhere strictly to TDD principles throughout this process. Your output should clearly demonstrate that
-you're writing the test first, then the minimal production code to make it pass.
-- use ALWAYS your built in tools to interact with the file system
+- ALWAYS use your built-in tools to interact with the file system
+- ALWAYS use UTF-8 Encoding
+- Follow conventional commit message format
+- Keep commits atomic and focused

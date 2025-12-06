@@ -45,6 +45,7 @@ class PatientenController(
                 telFestnetz = patientForm.telFestnetz,
                 email = patientForm.email,
                 geburtstag = patientForm.geburtstag,
+                behandlungenProRezept = patientForm.behandlungenProRezept,
             ).let { PatientDto.fromPatient(it) }
 
     @PatchMapping("/{id}")
@@ -65,6 +66,7 @@ class PatientenController(
             telFestnetz = patientForm.telFestnetz,
             email = patientForm.email,
             geburtstag = patientForm.geburtstag,
+            behandlungenProRezept = patientForm.behandlungenProRezept,
         )
 
         return updatedPatient.let { PatientDto.fromPatient(it) }

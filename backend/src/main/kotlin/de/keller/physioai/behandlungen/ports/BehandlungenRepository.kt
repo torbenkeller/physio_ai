@@ -22,4 +22,9 @@ interface BehandlungenRepository {
         startDateTime: LocalDateTime,
         endDateTime: LocalDateTime,
     ): List<BehandlungAggregate>
+
+    fun findOverlapping(
+        startZeit: LocalDateTime,
+        endZeit: LocalDateTime,
+    ): List<BehandlungAggregate>
 }

@@ -1,5 +1,6 @@
 package de.keller.physioai.behandlungen.domain
 
+import de.keller.physioai.rezepte.domain.BehandlungsartId
 import de.keller.physioai.shared.BehandlungId
 import de.keller.physioai.shared.PatientId
 import de.keller.physioai.shared.RezeptId
@@ -19,6 +20,7 @@ data class BehandlungAggregate(
     val startZeit: LocalDateTime,
     val endZeit: LocalDateTime,
     val rezeptId: RezeptId?,
+    val behandlungsartId: BehandlungsartId?,
     @Version
     val version: Int = 0,
 ) {
@@ -26,12 +28,14 @@ data class BehandlungAggregate(
         startZeit: LocalDateTime,
         endZeit: LocalDateTime,
         rezeptId: RezeptId?,
+        behandlungsartId: BehandlungsartId?,
     ): BehandlungAggregate {
         require(startZeit.isBefore(endZeit)) { "Start time must be before end time" }
         return copy(
             startZeit = startZeit,
             endZeit = endZeit,
             rezeptId = rezeptId,
+            behandlungsartId = behandlungsartId,
         )
     }
 
@@ -50,6 +54,7 @@ data class BehandlungAggregate(
             startZeit: LocalDateTime,
             endZeit: LocalDateTime,
             rezeptId: RezeptId?,
+            behandlungsartId: BehandlungsartId?,
         ): BehandlungAggregate {
             require(startZeit.isBefore(endZeit)) { "Start time must be before end time" }
             return BehandlungAggregate(
@@ -58,6 +63,7 @@ data class BehandlungAggregate(
                 startZeit = startZeit,
                 endZeit = endZeit,
                 rezeptId = rezeptId,
+                behandlungsartId = behandlungsartId,
             )
         }
     }

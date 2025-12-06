@@ -31,4 +31,10 @@ interface BehandlungenRepositoryImpl :
         @Param("startDateTime") startDateTime: LocalDateTime,
         @Param("endDateTime") endDateTime: LocalDateTime,
     ): List<BehandlungAggregate>
+
+    @Query("SELECT * FROM behandlungen WHERE start_zeit < :endZeit AND end_zeit > :startZeit ORDER BY start_zeit")
+    override fun findOverlapping(
+        @Param("startZeit") startZeit: LocalDateTime,
+        @Param("endZeit") endZeit: LocalDateTime,
+    ): List<BehandlungAggregate>
 }

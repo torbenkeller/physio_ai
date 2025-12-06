@@ -8,4 +8,5 @@ data class ProfileFormDto(
     @NotBlank
     val inhaberName: String,
     val profilePictureUrl: String?,
+    val defaultBehandlungenProRezept: Int = 8,
 )

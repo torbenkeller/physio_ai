@@ -1,6 +1,6 @@
 HELP.md
 target/
-!.mvn/wrapper/maven-wrapper.jar
+!backend/.mvn/wrapper/maven-wrapper.jar
 !**/src/main/**/target/
 !**/src/test/**/target/
 
@@ -35,3 +35,18 @@ build/
 **/CLAUDE.local.md
 
 **/.claude/settings.local.json
+
+### Dev Container ###
+# DTD connection file (generated at runtime)
+.env.dtd
+
+# Temporary log files from Flutter startup
+/tmp/physio_ai_flutter_output.log
+
+# Docker override files (local customizations)
+docker-compose.override.yml
+
+# Environment files with secrets
+.env
+.env.local
+.env.*.local

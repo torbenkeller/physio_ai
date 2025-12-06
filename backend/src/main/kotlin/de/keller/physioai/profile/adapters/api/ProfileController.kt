@@ -51,6 +51,7 @@ class ProfileController
                 praxisName = profileFormDto.praxisName,
                 inhaberName = profileFormDto.inhaberName,
                 profilePictureUrl = profileFormDto.profilePictureUrl,
+                defaultBehandlungenProRezept = profileFormDto.defaultBehandlungenProRezept,
             )
             return ProfileDto.Companion.fromProfile(profile, host)
         }
@@ -67,6 +68,7 @@ class ProfileController
                     praxisName = profileFormDto.praxisName,
                     inhaberName = profileFormDto.inhaberName,
                     profilePictureUrl = profileFormDto.profilePictureUrl,
+                    defaultBehandlungenProRezept = profileFormDto.defaultBehandlungenProRezept,
                 ).let { ProfileDto.Companion.fromProfile(it, host) }
         }
 

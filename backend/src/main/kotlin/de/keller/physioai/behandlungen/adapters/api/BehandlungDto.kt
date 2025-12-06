@@ -10,6 +10,7 @@ data class BehandlungDto(
     val startZeit: LocalDateTime,
     val endZeit: LocalDateTime,
     val rezeptId: UUID?,
+    val behandlungsartId: UUID?,
 ) {
     companion object {
         fun fromDomain(aggregate: BehandlungAggregate): BehandlungDto =
@@ -19,6 +20,7 @@ data class BehandlungDto(
                 startZeit = aggregate.startZeit,
                 endZeit = aggregate.endZeit,
                 rezeptId = aggregate.rezeptId?.id,
+                behandlungsartId = aggregate.behandlungsartId?.id,
             )
     }
 }

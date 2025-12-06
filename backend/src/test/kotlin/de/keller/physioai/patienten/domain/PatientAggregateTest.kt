@@ -21,6 +21,7 @@ class PatientAggregateTest {
             telFestnetz = "0987654321",
             email = "max@example.com",
             geburtstag = LocalDate.of(1990, 1, 1),
+            behandlungenProRezept = null,
         )
 
         // Then - patient should be created with all data
@@ -53,6 +54,7 @@ class PatientAggregateTest {
             telFestnetz = null,
             email = null,
             geburtstag = null,
+            behandlungenProRezept = null,
         )
 
         // When - updating patient data
@@ -68,6 +70,7 @@ class PatientAggregateTest {
             telFestnetz = "1234567890",
             email = "new@example.com",
             geburtstag = LocalDate.of(1985, 5, 15),
+            behandlungenProRezept = null,
         )
 
         // Then - patient data should be updated

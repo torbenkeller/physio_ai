@@ -35,6 +35,7 @@ interface PatientenService {
         telFestnetz: String?,
         email: String?,
         geburtstag: LocalDate?,
+        behandlungenProRezept: Int?,
     ): PatientAggregate
 
     /**
@@ -67,5 +68,6 @@ interface PatientenService {
         telFestnetz: String?,
         email: String?,
         geburtstag: LocalDate?,
+        behandlungenProRezept: Int?,
     ): PatientAggregate
 }

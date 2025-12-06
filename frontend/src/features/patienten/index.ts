@@ -1,0 +1,6 @@
+export { PatientenListe } from './components/PatientenListe'
+export { PatientDetail } from './components/PatientDetail'
+export { PatientNeu } from './components/PatientNeu'
+export { PatientForm } from './components/PatientForm'
+export * from './api/patientenApi'
+export * from './types/patient.types'

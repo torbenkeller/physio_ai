@@ -62,7 +62,7 @@ export const Kalender = () => {
   const [currentWeekStart, setCurrentWeekStart] = useState(() => getWeekStart(new Date()))
   const [planungsModus, setPlanungsModus] = useState(false)
   const [selectedSlotId, setSelectedSlotId] = useState<string | null>(null)
-  const [selectedPatientId, setSelectedPatientId] = useState('')
+  const [selectedPatientId, setSelectedPatientId] = useState(NEW_PATIENT_ID)
   const [selectedBehandlungsartId, setSelectedBehandlungsartId] = useState('')
   const [newPatientForm, setNewPatientForm] = useState<NewPatientForm>(INITIAL_NEW_PATIENT_FORM)
   const [duration, setDuration] = useState(90) // Termin-Dauer in Minuten

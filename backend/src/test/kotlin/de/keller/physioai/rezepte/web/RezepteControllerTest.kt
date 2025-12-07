@@ -231,6 +231,84 @@ class RezepteControllerTest {
     }
 
     @Nested
+    inner class GetRezept {
+        @Test
+        fun `should return rezept when it exists`() {
+            // Arrange
+            every { rezeptRepository.findById(rezeptId1) } returns rezept1
+            every { patientenRepository.findById(patientId) } returns patient
+            every { aerzteRepository.findById(arztId) } returns arzt
+
+            // Act & Assert
+            mockMvc
+                .perform(get("/rezepte/${rezeptId1.id}"))
+                .andExpect(status().isOk)
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.id").value(rezeptId1.id.toString()))
+                .andExpect(jsonPath("$.patient.id").value(patientId.id.toString()))
+                .andExpect(jsonPath("$.patient.vorname").value("Max"))
+                .andExpect(jsonPath("$.patient.nachname").value("Mustermann"))
+                .andExpect(jsonPath("$.ausgestelltVon.id").value(arztId.id.toString()))
+                .andExpect(jsonPath("$.ausgestelltAm").value("2023-01-01"))
+                .andExpect(jsonPath("$.positionen[0].behandlungsart.id").value(behandlungsartId1.id.toString()))
+
+            verify { rezeptRepository.findById(rezeptId1) }
+            verify { patientenRepository.findById(patientId) }
+            verify { aerzteRepository.findById(arztId) }
+        }
+
+        @Test
+        fun `should return rezept without arzt when arzt is null`() {
+            // Arrange
+            every { rezeptRepository.findById(rezeptId2) } returns rezept2
+            every { patientenRepository.findById(patientId) } returns patient
+
+            // Act & Assert
+            mockMvc
+                .perform(get("/rezepte/${rezeptId2.id}"))
+                .andExpect(status().isOk)
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.id").value(rezeptId2.id.toString()))
+                .andExpect(jsonPath("$.patient.id").value(patientId.id.toString()))
+                .andExpect(jsonPath("$.ausgestelltVon").doesNotExist())
+
+            verify { rezeptRepository.findById(rezeptId2) }
+            verify { patientenRepository.findById(patientId) }
+            verify(exactly = 0) { aerzteRepository.findById(anyValue()) }
+        }
+
+        @Test
+        fun `should return 404 when rezept does not exist`() {
+            // Arrange
+            val nonExistentId = RezeptId(UUID.randomUUID())
+            every { rezeptRepository.findById(nonExistentId) } returns null
+
+            // Act & Assert
+            mockMvc
+                .perform(get("/rezepte/${nonExistentId.id}"))
+                .andExpect(status().isNotFound)
+
+            verify { rezeptRepository.findById(nonExistentId) }
+            verify(exactly = 0) { patientenRepository.findById(anyValue()) }
+        }
+
+        @Test
+        fun `should return 404 when patient does not exist`() {
+            // Arrange
+            every { rezeptRepository.findById(rezeptId1) } returns rezept1
+            every { patientenRepository.findById(patientId) } returns null
+
+            // Act & Assert
+            mockMvc
+                .perform(get("/rezepte/${rezeptId1.id}"))
+                .andExpect(status().isNotFound)
+
+            verify { rezeptRepository.findById(rezeptId1) }
+            verify { patientenRepository.findById(patientId) }
+        }
+    }
+
+    @Nested
     inner class DeleteRezept {
         @Test
         fun `should delete rezept successfully`() {

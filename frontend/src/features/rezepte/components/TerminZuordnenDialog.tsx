@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { toast } from 'sonner'
 import {
   Dialog,
   DialogContent,
@@ -78,7 +79,18 @@ export const TerminZuordnenDialog = ({
       })
     })
 
-    await Promise.all(updates.filter(Boolean))
+    const results = await Promise.allSettled(updates.filter(Boolean))
+    const failures = results.filter((r) => r.status === 'rejected')
+    const successes = results.filter((r) => r.status === 'fulfilled')
+
+    if (failures.length > 0) {
+      toast.error(`${failures.length} Termine konnten nicht zugeordnet werden`)
+    }
+
+    if (successes.length > 0) {
+      toast.success(`${successes.length} Termine erfolgreich zugeordnet`)
+    }
+
     setSelectedIds(new Set())
     onOpenChange(false)
     onSuccess?.()

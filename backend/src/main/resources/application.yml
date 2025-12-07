@@ -3,18 +3,18 @@ spring:
     name: physio_ai
 
   datasource:
-    url: jdbc:postgresql://localhost:5432/physio_ai
-    username: postgres
-    password: postgres
-    
+    url: jdbc:postgresql://${PHYSIO_DB_HOST:localhost}:${PHYSIO_DB_PORT:5432}/${PHYSIO_DB_NAME:physio_ai}
+    username: ${PHYSIO_DB_USER:postgres}
+    password: ${PHYSIO_DB_PASSWORD:postgres}
+
 server:
-  host: http://localhost:8080
+  port: ${PHYSIO_BACKEND_PORT:8080}
 
   flyway:
     locations: classpath:/db/migration
-    url: jdbc:postgresql://localhost:5432/physio_ai
-    user: postgres
-    password: postgres
+    url: jdbc:postgresql://${PHYSIO_DB_HOST:localhost}:${PHYSIO_DB_PORT:5432}/${PHYSIO_DB_NAME:physio_ai}
+    user: ${PHYSIO_DB_USER:postgres}
+    password: ${PHYSIO_DB_PASSWORD:postgres}
 
   data:
     jdbc:

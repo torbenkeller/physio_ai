@@ -145,6 +145,14 @@ describe('formatGeburtstag', () => {
   it('formatiert einstellige Tage/Monate mit führender Null', () => {
     expect(formatGeburtstag('1985-01-05')).toBe('05.01.1985')
   })
+
+  it('parst ISO-Datum timezone-unabhängig (ohne new Date())', () => {
+    // Dieser Test stellt sicher, dass z.B. "1990-05-01" nicht als
+    // 30.04.1990 interpretiert wird, was bei new Date() in manchen
+    // Zeitzonen passieren kann
+    expect(formatGeburtstag('1990-01-01')).toBe('01.01.1990')
+    expect(formatGeburtstag('2000-12-31')).toBe('31.12.2000')
+  })
 })
 
 describe('formatPatientForDisplay', () => {

@@ -1,14 +1,20 @@
 import type { PatientDto } from '../types/patient.types'
 
 /**
+ * Parst ein ISO-Datum (yyyy-MM-dd) ohne Timezone-Probleme
+ * (new Date(isoDate) kann in manchen Zeitzonen zum falschen Tag führen)
+ */
+function parseIsoDate(isoDate: string): { day: number; month: number; year: number } {
+  const [year, month, day] = isoDate.split('-').map(Number)
+  return { day, month, year }
+}
+
+/**
  * Formatiert ein ISO-Datum (yyyy-MM-dd) zu deutschem Format (dd.MM.yyyy)
  */
 export function formatGeburtstag(isoDate: string): string {
-  const date = new Date(isoDate)
-  const day = date.getDate().toString().padStart(2, '0')
-  const month = (date.getMonth() + 1).toString().padStart(2, '0')
-  const year = date.getFullYear()
-  return `${day}.${month}.${year}`
+  const { day, month, year } = parseIsoDate(isoDate)
+  return `${day.toString().padStart(2, '0')}.${month.toString().padStart(2, '0')}.${year}`
 }
 
 /**
@@ -27,10 +33,7 @@ function prepareSearchTerms(patient: PatientDto): string[] {
   ]
 
   if (patient.geburtstag) {
-    const date = new Date(patient.geburtstag)
-    const day = date.getDate()
-    const month = date.getMonth() + 1
-    const year = date.getFullYear()
+    const { day, month, year } = parseIsoDate(patient.geburtstag)
     const yearShort = year.toString().slice(-2)
 
     // Verschiedene Datumsformate

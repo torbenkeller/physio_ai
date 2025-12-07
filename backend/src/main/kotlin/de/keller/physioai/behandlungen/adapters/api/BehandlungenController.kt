@@ -2,6 +2,8 @@ package de.keller.physioai.behandlungen.adapters.api
 
 import de.keller.physioai.behandlungen.ports.BehandlungenRepository
 import de.keller.physioai.behandlungen.ports.BehandlungenService
+import de.keller.physioai.behandlungen.ports.GetWeeklyCalendarBehandlungResponse
+import de.keller.physioai.patienten.PatientenRepository
 import de.keller.physioai.rezepte.domain.BehandlungsartId
 import de.keller.physioai.shared.AggregateNotFoundException
 import de.keller.physioai.shared.BehandlungId
@@ -29,6 +31,7 @@ import java.util.UUID
 class BehandlungenController(
     private val behandlungenService: BehandlungenService,
     private val behandlungenRepository: BehandlungenRepository,
+    private val patientenRepository: PatientenRepository,
 ) {
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
@@ -87,6 +90,48 @@ class BehandlungenController(
     ): List<BehandlungDto> {
         val behandlungen = behandlungenRepository.findAllByPatientId(PatientId(patientId))
         return behandlungen.map { BehandlungDto.fromDomain(it) }
+    }
+
+    @GetMapping("/patient/{patientId}/unassigned")
+    fun getUnassignedBehandlungenByPatient(
+        @PathVariable patientId: UUID,
+    ): List<BehandlungKalenderDto> {
+        val behandlungen = behandlungenRepository.findUnassignedByPatientId(PatientId(patientId))
+        val patient = patientenRepository.findById(PatientId(patientId))
+            ?: throw AggregateNotFoundException()
+
+        return behandlungen.map { behandlung ->
+            BehandlungKalenderDto.fromDomain(
+                GetWeeklyCalendarBehandlungResponse(
+                    behandlungAggregate = behandlung,
+                    patient = patient,
+                ),
+            )
+        }
+    }
+
+    @GetMapping("/rezept/{rezeptId}")
+    fun getBehandlungenByRezept(
+        @PathVariable rezeptId: UUID,
+    ): List<BehandlungKalenderDto> {
+        val behandlungen = behandlungenRepository.findByRezeptId(RezeptId(rezeptId))
+
+        if (behandlungen.isEmpty()) {
+            return emptyList()
+        }
+
+        val patientIds = behandlungen.map { it.patientId }.toSet()
+        val patients = patientenRepository.findAllByIdIn(patientIds)
+
+        return behandlungen.map { behandlung ->
+            BehandlungKalenderDto.fromDomain(
+                GetWeeklyCalendarBehandlungResponse(
+                    behandlungAggregate = behandlung,
+                    patient = patients.find { it.id == behandlung.patientId }
+                        ?: throw AggregateNotFoundException(),
+                ),
+            )
+        }
     }
 
     @PutMapping("/{id}")

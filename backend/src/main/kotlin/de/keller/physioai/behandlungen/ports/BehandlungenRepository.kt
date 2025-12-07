@@ -3,6 +3,7 @@ package de.keller.physioai.behandlungen.ports
 import de.keller.physioai.behandlungen.domain.BehandlungAggregate
 import de.keller.physioai.shared.BehandlungId
 import de.keller.physioai.shared.PatientId
+import de.keller.physioai.shared.RezeptId
 import org.jmolecules.architecture.hexagonal.SecondaryPort
 import java.time.LocalDateTime
 
@@ -27,4 +28,8 @@ interface BehandlungenRepository {
         startZeit: LocalDateTime,
         endZeit: LocalDateTime,
     ): List<BehandlungAggregate>
+
+    fun findByRezeptId(rezeptId: RezeptId): List<BehandlungAggregate>
+
+    fun findUnassignedByPatientId(patientId: PatientId): List<BehandlungAggregate>
 }

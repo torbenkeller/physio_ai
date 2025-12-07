@@ -3,6 +3,8 @@ package de.keller.physioai.behandlungen.adapters.jdbc
 import de.keller.physioai.behandlungen.domain.BehandlungAggregate
 import de.keller.physioai.behandlungen.ports.BehandlungenRepository
 import de.keller.physioai.shared.BehandlungId
+import de.keller.physioai.shared.PatientId
+import de.keller.physioai.shared.RezeptId
 import org.jmolecules.architecture.hexagonal.SecondaryAdapter
 import org.springframework.data.jdbc.repository.query.Modifying
 import org.springframework.data.jdbc.repository.query.Query
@@ -36,5 +38,15 @@ interface BehandlungenRepositoryImpl :
     override fun findOverlapping(
         @Param("startZeit") startZeit: LocalDateTime,
         @Param("endZeit") endZeit: LocalDateTime,
+    ): List<BehandlungAggregate>
+
+    @Query("SELECT * FROM behandlungen WHERE rezept_id = :rezeptId ORDER BY start_zeit")
+    override fun findByRezeptId(
+        @Param("rezeptId") rezeptId: RezeptId,
+    ): List<BehandlungAggregate>
+
+    @Query("SELECT * FROM behandlungen WHERE patient_id = :patientId AND rezept_id IS NULL ORDER BY start_zeit")
+    override fun findUnassignedByPatientId(
+        @Param("patientId") patientId: PatientId,
     ): List<BehandlungAggregate>
 }

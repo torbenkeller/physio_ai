@@ -53,6 +53,21 @@ class RezepteController(
         }
     }
 
+    @GetMapping("/{id}")
+    fun getRezept(
+        @PathVariable id: UUID,
+    ): RezeptDto {
+        val rezept = rezeptRepository.findById(RezeptId(id)) ?: throw AggregateNotFoundException()
+        val patient = patientenRepository.findById(rezept.patientId) ?: throw AggregateNotFoundException()
+        val arzt = rezept.ausgestelltVonArztId?.let { aerzteRepository.findById(it) }
+
+        return RezeptDto.fromDomain(
+            rezept = rezept,
+            patient = patient,
+            arzt = arzt,
+        )
+    }
+
     @DeleteMapping("/{id}")
     fun deleteRezept(
         @PathVariable id: UUID,

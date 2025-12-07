@@ -2,6 +2,7 @@ import { api } from '@/app/api'
 import type {
   BehandlungDto,
   BehandlungFormDto,
+  BehandlungKalenderDto,
   VerschiebeBehandlungDto,
   WeeklyCalendarResponse,
   ConflictCheckRequest,
@@ -20,6 +21,14 @@ export const behandlungenApi = api.injectEndpoints({
     }),
     getBehandlungenByPatient: builder.query<BehandlungDto[], string>({
       query: (patientId) => `/behandlungen/patient/${patientId}`,
+      providesTags: ['Behandlungen'],
+    }),
+    getUnassignedBehandlungenByPatient: builder.query<BehandlungKalenderDto[], string>({
+      query: (patientId) => `/behandlungen/patient/${patientId}/unassigned`,
+      providesTags: ['Behandlungen'],
+    }),
+    getBehandlungenByRezept: builder.query<BehandlungKalenderDto[], string>({
+      query: (rezeptId) => `/behandlungen/rezept/${rezeptId}`,
       providesTags: ['Behandlungen'],
     }),
     getWeeklyCalendar: builder.query<WeeklyCalendarResponse, string>({
@@ -79,6 +88,8 @@ export const {
   useGetBehandlungenQuery,
   useGetBehandlungQuery,
   useGetBehandlungenByPatientQuery,
+  useGetUnassignedBehandlungenByPatientQuery,
+  useGetBehandlungenByRezeptQuery,
   useGetWeeklyCalendarQuery,
   useCreateBehandlungMutation,
   useUpdateBehandlungMutation,

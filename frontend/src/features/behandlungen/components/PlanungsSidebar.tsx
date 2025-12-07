@@ -16,13 +16,14 @@ import {
   SelectValue,
 } from '@/shared/components/ui/select'
 import { cn } from '@/shared/utils'
+import { PatientenSuche, NEW_PATIENT_ID } from '@/features/patienten/components/PatientenSuche'
 import { addMinutesToTime, getWeekDaysConfig } from '../utils/kalenderUtils'
 import type { SelectedTimeSlot, SeriesConfig, DayTimeConfig } from '../types/behandlung.types'
 import type { PatientDto } from '@/features/patienten/types/patient.types'
 import type { BehandlungsartDto } from '@/features/rezepte/types/rezept.types'
 
-// Spezielle ID für "Neuer Patient" Option
-export const NEW_PATIENT_ID = '__new__'
+// Re-export NEW_PATIENT_ID für Abwärtskompatibilität
+export { NEW_PATIENT_ID } from '@/features/patienten/components/PatientenSuche'
 
 export interface NewPatientForm {
   vorname: string
@@ -172,19 +173,12 @@ export const PlanungsSidebar = ({
           {/* Patient Selection */}
           <div className="space-y-2">
             <Label>Patient</Label>
-            <Select value={selectedPatientId} onValueChange={onPatientChange}>
-              <SelectTrigger>
-                <SelectValue placeholder="Patient auswählen..." />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value={NEW_PATIENT_ID}>+ Neuer Patient</SelectItem>
-                {patienten?.map((patient) => (
-                  <SelectItem key={patient.id} value={patient.id}>
-                    {patient.vorname} {patient.nachname}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <PatientenSuche
+              patienten={patienten}
+              selectedPatientId={selectedPatientId}
+              onPatientChange={onPatientChange}
+              showNewPatientOption={true}
+            />
             {selectedPatientId === NEW_PATIENT_ID && (
               <div className="space-y-2 pt-2">
                 <Input

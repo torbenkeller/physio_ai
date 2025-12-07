@@ -26,6 +26,20 @@ export const CONFLICT_COLORS = {
 
 export const WEEKDAY_NAMES_SHORT = ['Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa', 'So'] as const
 
+// Wochentag-Konfiguration für UI-Komponenten
+export const WEEK_DAYS_CONFIG = [
+  { index: 0, short: 'Mo', long: 'Montag' },
+  { index: 1, short: 'Di', long: 'Dienstag' },
+  { index: 2, short: 'Mi', long: 'Mittwoch' },
+  { index: 3, short: 'Do', long: 'Donnerstag' },
+  { index: 4, short: 'Fr', long: 'Freitag' },
+  { index: 5, short: 'Sa', long: 'Samstag' },
+  { index: 6, short: 'So', long: 'Sonntag' },
+] as const
+
+export const getWeekDaysConfig = (includeWeekend: boolean = false) =>
+  includeWeekend ? WEEK_DAYS_CONFIG : WEEK_DAYS_CONFIG.slice(0, 5)
+
 // Zeit addieren (HH:mm + Minuten → HH:mm)
 export const addMinutesToTime = (time: string, minutes: number): string => {
   const [h, m] = time.split(':').map(Number)
@@ -37,7 +51,12 @@ export const addMinutesToTime = (time: string, minutes: number): string => {
 export const TOTAL_HOURS = 24
 export const TOTAL_HEIGHT = TOTAL_HOURS * HOUR_HEIGHT
 export const DEFAULT_SCROLL_HOUR = 8 // Beim Öffnen zu 8 Uhr scrollen
-export const DAYS = ['Montag', 'Dienstag', 'Mittwoch', 'Donnerstag', 'Freitag']
+// Tagesname formatieren (lang oder kurz) mit Intl API
+export const formatWeekday = (date: Date, style: 'long' | 'short' = 'long'): string => {
+  const name = new Intl.DateTimeFormat('de-DE', { weekday: style }).format(date)
+  // Bei 'short' einen Punkt anhängen ("Mo" → "Mo.")
+  return style === 'short' ? `${name}.` : name
+}
 
 // Wochenstart berechnen (Montag)
 export const getWeekStart = (date: Date): Date => {
@@ -58,8 +77,9 @@ export const formatDateForApi = (date: Date): string => {
 }
 
 // Wochentage als Array von Dates
-export const getWeekDays = (weekStart: Date): Date[] => {
-  return Array.from({ length: 5 }, (_, i) => {
+export const getWeekDays = (weekStart: Date, includeWeekend: boolean = false): Date[] => {
+  const length = includeWeekend ? 7 : 5
+  return Array.from({ length }, (_, i) => {
     const date = new Date(weekStart)
     date.setDate(weekStart.getDate() + i)
     return date
@@ -157,7 +177,12 @@ export const getSlotStyle = (
   const [endHour, endMin] = endZeit.split(':').map(Number)
 
   const startMinutes = startHour * 60 + startMin
-  const endMinutes = endHour * 60 + endMin
+  let endMinutes = endHour * 60 + endMin
+
+  // Falls Endzeit über Mitternacht geht (00:xx), auf 24:00 begrenzen
+  if (endMinutes <= startMinutes) {
+    endMinutes = 24 * 60 // 24:00 = Ende des Tages
+  }
 
   const top = (startMinutes / 60) * HOUR_HEIGHT
   const height = ((endMinutes - startMinutes) / 60) * HOUR_HEIGHT
@@ -173,10 +198,19 @@ export const formatDateTimeForApi = (date: Date, time: string): string => {
   return `${year}-${month}-${day}T${time}:00`
 }
 
-// Wochenbereich formatieren (z.B. "1. Dez - 5. Dez 2025")
-export const formatWeekRange = (weekStart: Date): string => {
-  const endOfWeek = new Date(weekStart)
-  endOfWeek.setDate(endOfWeek.getDate() + 4)
-  const options: Intl.DateTimeFormatOptions = { day: 'numeric', month: 'short' }
-  return `${weekStart.toLocaleDateString('de-DE', options)} - ${endOfWeek.toLocaleDateString('de-DE', options)} ${weekStart.getFullYear()}`
+// ISO Kalenderwoche berechnen
+export const getISOWeekNumber = (date: Date): number => {
+  const d = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()))
+  const dayNum = d.getUTCDay() || 7
+  d.setUTCDate(d.getUTCDate() + 4 - dayNum)
+  const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1))
+  return Math.ceil((((d.getTime() - yearStart.getTime()) / 86400000) + 1) / 7)
+}
+
+// Wochenbereich formatieren (z.B. "KW 49 · Dezember 2025")
+export const formatWeekRange = (weekStart: Date, _includeWeekend: boolean = false): string => {
+  const weekNumber = getISOWeekNumber(weekStart)
+  const month = new Intl.DateTimeFormat('de-DE', { month: 'long' }).format(weekStart)
+  const year = weekStart.getFullYear()
+  return `KW ${weekNumber} · ${month} ${year}`
 }

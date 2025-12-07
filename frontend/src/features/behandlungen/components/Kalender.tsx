@@ -5,6 +5,8 @@ import { useGetPatientenQuery, useCreatePatientMutation } from '@/features/patie
 import { useGetBehandlungsartenQuery } from '@/features/rezepte/api/rezepteApi'
 import { useGetProfileQuery } from '@/features/profil/api/profileApi'
 import { useMultiTerminSelection } from '../hooks/useMultiTerminSelection'
+import { useKalenderSettings } from '../hooks/useKalenderSettings'
+import { KalenderSettingsDialog } from './KalenderSettingsDialog'
 import { PageHeader } from '@/shared/components/PageHeader'
 import { Button } from '@/shared/components/ui/button'
 import { Card } from '@/shared/components/ui/card'
@@ -16,7 +18,7 @@ import {
   TOTAL_HOURS,
   TOTAL_HEIGHT,
   DEFAULT_SCROLL_HOUR,
-  DAYS,
+  formatWeekday,
   getWeekStart,
   formatDateForApi,
   getWeekDays,
@@ -68,7 +70,7 @@ export const Kalender = () => {
   // Muster-Definition für Zwei-Phasen-Planung
   const [dayTimeConfigs, setDayTimeConfigs] = useState<DayTimeConfig[]>([])
   const [patternWeekStart, setPatternWeekStart] = useState<Date | null>(null)
-  const [addingSingleSlot, setAddingSingleSlot] = useState(false)
+  const [isSeriesOpen, setIsSeriesOpen] = useState(false)
   const scrollContainerRef = useRef<HTMLDivElement>(null)
 
   // Drag & Drop State
@@ -76,6 +78,7 @@ export const Kalender = () => {
   const [dragPreview, setDragPreview] = useState<{ dayIndex: number; top: number } | null>(null)
   const columnRefsRef = useRef<(HTMLDivElement | null)[]>([])
   const prevSelectedSlotIdRef = useRef<string | null>(null)
+  const dragJustEndedRef = useRef(false)
 
   const dateStr = formatDateForApi(currentWeekStart)
   const { data: calendarData, isLoading, refetch } = useGetWeeklyCalendarQuery(dateStr)
@@ -97,7 +100,13 @@ export const Kalender = () => {
     markConflicts,
   } = useMultiTerminSelection()
 
-  const weekDays = useMemo(() => getWeekDays(currentWeekStart), [currentWeekStart])
+  // Kalender-Einstellungen (Wochenende ein/aus)
+  const { settings, setShowWeekend } = useKalenderSettings()
+
+  const weekDays = useMemo(
+    () => getWeekDays(currentWeekStart, settings.showWeekend),
+    [currentWeekStart, settings.showWeekend]
+  )
 
   // Default count from patient or profile
   const selectedPatientData = patienten?.find((p) => p.id === selectedPatientId)
@@ -111,12 +120,8 @@ export const Kalender = () => {
   }, [isLoading])
 
   // Handler für Wochentag-Toggle (Muster-Phase)
+  // Slots werden NICHT gelöscht - nur "Generieren" ersetzt die Slots
   const handleDayToggle = useCallback((dayIndex: number) => {
-    // Bei Änderung: Bestehende Slots löschen
-    if (slots.length > 0) {
-      clearSlots()
-    }
-
     setDayTimeConfigs(prev => {
       const exists = prev.find(c => c.dayIndex === dayIndex)
       if (exists) {
@@ -129,19 +134,15 @@ export const Kalender = () => {
           .sort((a, b) => a.dayIndex - b.dayIndex)
       }
     })
-  }, [slots.length, clearSlots])
+  }, [])
 
   // Handler für Zeit-Änderung eines Tages (via Drag oder Sidebar-Input)
+  // Slots werden NICHT gelöscht - nur "Generieren" ersetzt die Slots
   const handleDayTimeChange = useCallback((dayIndex: number, startZeit: string) => {
-    // Bei Änderung: Bestehende Slots löschen
-    if (slots.length > 0) {
-      clearSlots()
-    }
-
     setDayTimeConfigs(prev =>
       prev.map(c => c.dayIndex === dayIndex ? { ...c, startZeit } : c)
     )
-  }, [slots.length, clearSlots])
+  }, [])
 
   // Konflikte prüfen wenn Slots sich ändern
   useEffect(() => {
@@ -183,6 +184,19 @@ export const Kalender = () => {
     }
   }, [selectedSlotId, slots, planungsModus, currentWeekStart])
 
+  // Pattern aktualisieren wenn Serie-Akkordeon geöffnet wird und Slots existieren
+  useEffect(() => {
+    if (isSeriesOpen && slots.length > 0) {
+      // Ersten Slot nach Datum sortiert finden
+      const sortedSlots = [...slots].sort((a, b) => a.date.getTime() - b.date.getTime())
+      const firstSlot = sortedSlots[0]
+      const dayOfWeek = (firstSlot.date.getDay() + 6) % 7 // 0=Mo, 1=Di, etc.
+
+      setDayTimeConfigs([{ dayIndex: dayOfWeek, startZeit: firstSlot.startZeit }])
+      setPatternWeekStart(getWeekStart(firstSlot.date))
+    }
+  }, [isSeriesOpen, slots])
+
   const goToPreviousWeek = () => {
     const newWeekStart = new Date(currentWeekStart)
     newWeekStart.setDate(newWeekStart.getDate() - 7)
@@ -200,7 +214,8 @@ export const Kalender = () => {
   }
 
   const handleColumnClick = (e: React.MouseEvent<HTMLDivElement>, dayIndex: number) => {
-    if (dragState) return // Ignorieren während Drag
+    // Ignorieren während Drag oder direkt nach Drag-Ende
+    if (dragState || dragJustEndedRef.current) return
 
     const rect = e.currentTarget.getBoundingClientRect()
     const y = e.clientY - rect.top
@@ -210,27 +225,16 @@ export const Kalender = () => {
     const startZeit = formatTimeInput(start)
     const endZeit = formatTimeInput(end)
 
-    // Modus: Einzeltermin hinzufügen (nach Generierung)
-    if (addingSingleSlot && slots.length > 0) {
-      addSlot(date, startZeit, endZeit)
-      setAddingSingleSlot(false)
-      return
-    }
+    // Immer Slot direkt erstellen (grün)
+    addSlot(date, startZeit, endZeit)
 
-    if (!planungsModus) {
-      // Planungsmodus aktivieren, Muster setzen (KEIN Slot erstellen!)
+    // Bei erstem Slot: Pattern initialisieren + Sidebar öffnen
+    if (slots.length === 0) {
       const dayOfWeek = (date.getDay() + 6) % 7
       setDayTimeConfigs([{ dayIndex: dayOfWeek, startZeit }])
       setPatternWeekStart(getWeekStart(date))
       setPlanungsModus(true)
-    } else if (slots.length === 0 && dayTimeConfigs.length === 0) {
-      // Initiales Muster setzen (nur wenn noch kein Muster definiert)
-      // Wenn bereits Muster existiert → Klick ignorieren (Tage über Sidebar hinzufügen)
-      const dayOfWeek = (date.getDay() + 6) % 7
-      setDayTimeConfigs([{ dayIndex: dayOfWeek, startZeit }])
-      setPatternWeekStart(getWeekStart(date))
     }
-    // Wenn bereits Muster definiert oder Slots generiert → Klick ignorieren
   }
 
   const handleCancelPlanung = () => {
@@ -241,7 +245,7 @@ export const Kalender = () => {
     setNewPatientForm(INITIAL_NEW_PATIENT_FORM)
     setDayTimeConfigs([])
     setPatternWeekStart(null)
-    setAddingSingleSlot(false)
+    setIsSeriesOpen(false)
     clearSlots()
   }
 
@@ -471,6 +475,12 @@ export const Kalender = () => {
         })
       }
 
+      // Drag beendet - kurzzeitig merken um Click-Event zu ignorieren
+      dragJustEndedRef.current = true
+      setTimeout(() => {
+        dragJustEndedRef.current = false
+      }, 50)
+
       setDragState(null)
       setDragPreview(null)
     }
@@ -499,6 +509,10 @@ export const Kalender = () => {
         description="Verwalten Sie Ihre Behandlungstermine"
         actions={
           <div className="flex items-center gap-2">
+            <KalenderSettingsDialog
+              showWeekend={settings.showWeekend}
+              onShowWeekendChange={setShowWeekend}
+            />
             <Button variant="outline" onClick={goToToday}>
               Heute
             </Button>
@@ -506,7 +520,7 @@ export const Kalender = () => {
               <ChevronLeft className="h-4 w-4" />
             </Button>
             <span className="min-w-[200px] text-center font-medium">
-              {formatWeekRange(currentWeekStart)}
+              {formatWeekRange(currentWeekStart, settings.showWeekend)}
             </span>
             <Button variant="outline" size="icon" onClick={goToNextWeek}>
               <ChevronRight className="h-4 w-4" />
@@ -550,17 +564,22 @@ export const Kalender = () => {
             onDayToggle={handleDayToggle}
             onDayTimeChange={handleDayTimeChange}
             patternWeekStart={patternWeekStart}
-            onAddSingleSlot={() => setAddingSingleSlot(true)}
-            addingSingleSlot={addingSingleSlot}
-            onCancelAddSingleSlot={() => setAddingSingleSlot(false)}
+            isSeriesOpen={isSeriesOpen}
+            onSeriesOpenChange={setIsSeriesOpen}
             clearSlots={clearSlots}
+            showWeekend={settings.showWeekend}
           />
         </div>
 
         {/* Kalender */}
-        <Card className={cn('flex-1 flex flex-col overflow-hidden transition-all duration-300', planungsModus && 'rounded-l-none border-l-0')}>
+        <Card className={cn('@container flex-1 flex flex-col overflow-hidden transition-all duration-300', planungsModus && 'rounded-l-none border-l-0')}>
           {/* Header mit Wochentagen - fixiert */}
-          <div className="grid grid-cols-[60px_repeat(5,1fr)] border-b flex-shrink-0">
+          <div className={cn(
+            'grid border-b flex-shrink-0',
+            settings.showWeekend
+              ? 'grid-cols-[60px_repeat(7,1fr)]'
+              : 'grid-cols-[60px_repeat(5,1fr)]'
+          )}>
             <div className="p-2 bg-muted/50" />
             {weekDays.map((date, i) => (
               <div
@@ -570,7 +589,19 @@ export const Kalender = () => {
                   isToday(date) && 'bg-primary/10'
                 )}
               >
-                <div className="text-sm font-medium">{DAYS[i]}</div>
+                <div className="text-sm font-medium">
+                  {settings.showWeekend ? (
+                    <>
+                      <span className="hidden @3xl:inline">{formatWeekday(date, 'long')}</span>
+                      <span className="@3xl:hidden">{formatWeekday(date, 'short')}</span>
+                    </>
+                  ) : (
+                    <>
+                      <span className="hidden @lg:inline">{formatWeekday(date, 'long')}</span>
+                      <span className="@lg:hidden">{formatWeekday(date, 'short')}</span>
+                    </>
+                  )}
+                </div>
                 <div
                   className={cn(
                     'text-2xl font-bold',
@@ -588,10 +619,15 @@ export const Kalender = () => {
             ref={scrollContainerRef}
             className="flex-1 overflow-y-auto overflow-x-hidden"
           >
-            <div className="grid grid-cols-[60px_repeat(5,1fr)]">
+            <div className={cn(
+              'grid',
+              settings.showWeekend
+                ? 'grid-cols-[60px_repeat(7,1fr)]'
+                : 'grid-cols-[60px_repeat(5,1fr)]'
+            )}>
               {/* Zeitspalte */}
               <div className="relative" style={{ height: TOTAL_HEIGHT }}>
-                {Array.from({ length: TOTAL_HOURS + 1 }, (_, i) => (
+                {Array.from({ length: TOTAL_HOURS }, (_, i) => (
                   <div
                     key={i}
                     className="absolute right-2 text-xs text-muted-foreground"
@@ -657,9 +693,10 @@ export const Kalender = () => {
                       )
                     })}
 
-                    {/* Muster-Previews (in allen Wochen, nur wenn keine Slots generiert) */}
+                    {/* Muster-Previews (nur wenn Serie-Akkordeon geöffnet) */}
                     {planungsModus &&
-                      slots.length === 0 &&
+                      isSeriesOpen &&
+                      dayTimeConfigs.length > 0 &&
                       dayTimeConfigs.map((config) => {
                         // Nur Mo-Fr anzeigen (dayIndex 0-4)
                         if (config.dayIndex > 4) return null
@@ -687,8 +724,9 @@ export const Kalender = () => {
                         )
                       })}
 
-                    {/* Geplante Slots im Planungsmodus (nach Generierung) */}
+                    {/* Geplante Slots im Planungsmodus (nur wenn Akkordeon geschlossen) */}
                     {planungsModus &&
+                      !isSeriesOpen &&
                       slots.length > 0 &&
                       daySlots.map((slot) => {
                         const style = getSlotStyle(slot.date, slot.startZeit, slot.endZeit)
@@ -721,11 +759,6 @@ export const Kalender = () => {
                           </div>
                         )
                       })}
-
-                    {/* Visuelles Feedback für "Einzeltermin hinzufügen" Modus */}
-                    {addingSingleSlot && (
-                      <div className="absolute inset-0 bg-emerald-500/10 pointer-events-none z-5" />
-                    )}
 
                     {/* Drag Preview Ghost Element für Slots */}
                     {dragState?.type === 'slot' && dragPreview && dragPreview.dayIndex === dayIndex && (() => {

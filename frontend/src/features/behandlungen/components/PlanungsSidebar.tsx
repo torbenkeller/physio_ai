@@ -1,10 +1,11 @@
 import { useState, useEffect } from 'react'
-import { X, Calendar, Trash2, Plus, MousePointer, AlertTriangle } from 'lucide-react'
+import { X, Calendar, Trash2, Plus, AlertTriangle, ChevronDown } from 'lucide-react'
 import { Button } from '@/shared/components/ui/button'
 import { Input } from '@/shared/components/ui/input'
 import { TimeInput } from '@/shared/components/ui/time-input'
 import { Label } from '@/shared/components/ui/label'
 import { Separator } from '@/shared/components/ui/separator'
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/shared/components/ui/collapsible'
 import { ScrollArea } from '@/shared/components/ui/scroll-area'
 import { PlanungSlotCard } from './PlanungSlotCard'
 import {
@@ -15,7 +16,7 @@ import {
   SelectValue,
 } from '@/shared/components/ui/select'
 import { cn } from '@/shared/utils'
-import { addMinutesToTime } from '../utils/kalenderUtils'
+import { addMinutesToTime, getWeekDaysConfig } from '../utils/kalenderUtils'
 import type { SelectedTimeSlot, SeriesConfig, DayTimeConfig } from '../types/behandlung.types'
 import type { PatientDto } from '@/features/patienten/types/patient.types'
 import type { BehandlungsartDto } from '@/features/rezepte/types/rezept.types'
@@ -58,10 +59,10 @@ interface PlanungsSidebarProps {
   onDayToggle: (dayIndex: number) => void
   onDayTimeChange: (dayIndex: number, startZeit: string) => void
   patternWeekStart: Date | null
-  onAddSingleSlot: () => void
-  addingSingleSlot: boolean
-  onCancelAddSingleSlot: () => void
+  isSeriesOpen: boolean
+  onSeriesOpenChange: (open: boolean) => void
   clearSlots: () => void
+  showWeekend: boolean
 }
 
 const DURATION_OPTIONS = [
@@ -72,15 +73,6 @@ const DURATION_OPTIONS = [
   { value: 120, label: '120 Min' },
 ]
 
-const WEEK_DAYS = [
-  { index: 0, short: 'Mo', long: 'Montag' },
-  { index: 1, short: 'Di', long: 'Dienstag' },
-  { index: 2, short: 'Mi', long: 'Mittwoch' },
-  { index: 3, short: 'Do', long: 'Donnerstag' },
-  { index: 4, short: 'Fr', long: 'Freitag' },
-  { index: 5, short: 'Sa', long: 'Samstag' },
-  { index: 6, short: 'So', long: 'Sonntag' },
-]
 
 export const PlanungsSidebar = ({
   slots,
@@ -109,12 +101,15 @@ export const PlanungsSidebar = ({
   onDayToggle,
   onDayTimeChange,
   patternWeekStart,
-  onAddSingleSlot,
-  addingSingleSlot,
-  onCancelAddSingleSlot,
+  isSeriesOpen,
+  onSeriesOpenChange,
   clearSlots,
+  showWeekend,
 }: PlanungsSidebarProps) => {
   const [count, setCount] = useState(defaultCount)
+
+  // Wochentage basierend auf Einstellung
+  const WEEK_DAYS = getWeekDaysConfig(showWeekend)
   const [repeatEveryWeeks, setRepeatEveryWeeks] = useState(1)
 
   // Aktualisiere count wenn defaultCount sich ändert (neuer Patient ausgewählt)
@@ -173,7 +168,7 @@ export const PlanungsSidebar = ({
       </div>
 
       <ScrollArea className="flex-1">
-        <div className="p-4 space-y-6">
+        <div className="p-4 space-y-3">
           {/* Patient Selection */}
           <div className="space-y-2">
             <Label>Patient</Label>
@@ -239,124 +234,130 @@ export const PlanungsSidebar = ({
             </Select>
           </div>
 
+          {/* Dauer */}
+          <div className="space-y-2">
+            <Label>Dauer</Label>
+            <Select value={String(duration)} onValueChange={(v) => onDurationChange(parseInt(v))}>
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {DURATION_OPTIONS.map((opt) => (
+                  <SelectItem key={opt.value} value={String(opt.value)}>
+                    {opt.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
           <Separator />
 
           {/* Series Creator */}
-          <div className="space-y-4">
-            <div className="text-sm font-medium">Muster definieren</div>
-
-            {dayTimeConfigs.length > 0 ? (
-              <>
-                <div className="space-y-1">
-                  <Label className="text-xs">Dauer</Label>
-                  <Select value={String(duration)} onValueChange={(v) => onDurationChange(parseInt(v))}>
-                    <SelectTrigger className="h-8">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {DURATION_OPTIONS.map((opt) => (
-                        <SelectItem key={opt.value} value={String(opt.value)}>
-                          {opt.label}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                <div className="space-y-1">
-                  <Label className="text-xs">Wiederholen alle</Label>
-                  <div className="flex items-center gap-2">
-                    <Input
-                      type="number"
-                      min={1}
-                      max={12}
-                      value={repeatEveryWeeks}
-                      onChange={(e) => setRepeatEveryWeeks(parseInt(e.target.value) || 1)}
-                      className="h-8 w-16"
-                    />
-                    <span className="text-sm text-muted-foreground">Woche(n)</span>
-                  </div>
-                </div>
-
-                <div className="space-y-1">
-                  <Label className="text-xs">An diesen Tagen</Label>
-                  <div className="space-y-2">
-                    {/* Wochentag-Buttons */}
-                    <div className="flex gap-1">
-                      {WEEK_DAYS.map((day) => {
-                        const isFirstDay = day.index === firstDayIndex
-                        const isSelected = isDaySelected(day.index)
-                        return (
-                          <button
-                            key={day.index}
-                            type="button"
-                            onClick={() => onDayToggle(day.index)}
-                            className={cn(
-                              'flex-1 h-8 text-xs font-medium rounded-md border transition-colors',
-                              isSelected
-                                ? 'bg-primary text-primary-foreground border-primary'
-                                : 'bg-background hover:bg-muted border-input',
-                              isFirstDay && 'cursor-default opacity-90'
-                            )}
-                            title={isFirstDay ? `${day.long} (Erster Tag)` : day.long}
-                          >
-                            {day.short}
-                          </button>
-                        )
-                      })}
+          <Collapsible open={isSeriesOpen} onOpenChange={onSeriesOpenChange}>
+            <CollapsibleTrigger className="flex items-center justify-between w-full py-2 text-sm font-medium hover:text-primary transition-colors">
+              <span>Serie erstellen</span>
+              <ChevronDown className={cn('h-4 w-4 transition-transform', isSeriesOpen && 'rotate-180')} />
+            </CollapsibleTrigger>
+            <CollapsibleContent className="space-y-4 pt-2">
+              {dayTimeConfigs.length > 0 ? (
+                <>
+                  <div className="flex gap-4">
+                    <div className="space-y-1 flex-1">
+                      <Label className="text-xs">Alle X Wochen</Label>
+                      <Input
+                        type="number"
+                        min={1}
+                        max={12}
+                        value={repeatEveryWeeks}
+                        onChange={(e) => setRepeatEveryWeeks(parseInt(e.target.value) || 1)}
+                        className="h-8"
+                      />
                     </div>
+                    <div className="space-y-1 flex-1">
+                      <Label className="text-xs">Anzahl Termine</Label>
+                      <Input
+                        type="number"
+                        min={1}
+                        max={52}
+                        value={count}
+                        onChange={(e) => setCount(parseInt(e.target.value) || 1)}
+                        className="h-8"
+                      />
+                    </div>
+                  </div>
 
-                    {/* Zeit-Inputs für ausgewählte Tage */}
-                    {dayTimeConfigs.length > 0 && (
-                      <div className="space-y-1 pt-1">
-                        {dayTimeConfigs.map(({ dayIndex, startZeit }) => {
-                          const day = WEEK_DAYS.find(d => d.index === dayIndex)!
+                  <div className="space-y-1">
+                    <Label className="text-xs">An diesen Tagen</Label>
+                    <div className="space-y-2">
+                      {/* Wochentag-Buttons */}
+                      <div className="flex gap-1">
+                        {WEEK_DAYS.map((day) => {
+                          const isFirstDay = day.index === firstDayIndex
+                          const isSelected = isDaySelected(day.index)
                           return (
-                            <div key={dayIndex} className="flex items-center gap-2">
-                              <span className="text-xs text-muted-foreground w-10">
-                                {day.short}
-                              </span>
-                              <TimeInput
-                                value={startZeit}
-                                onChange={(value) => onDayTimeChange(dayIndex, value)}
-                                className="h-8 w-20 text-xs"
-                                aria-label={`Startzeit für ${day.long}`}
-                              />
-                            </div>
+                            <button
+                              key={day.index}
+                              type="button"
+                              onClick={() => onDayToggle(day.index)}
+                              className={cn(
+                                'flex-1 h-8 text-xs font-medium rounded-md border transition-colors',
+                                isSelected
+                                  ? 'bg-primary text-primary-foreground border-primary'
+                                  : 'bg-background hover:bg-muted border-input',
+                                isFirstDay && 'cursor-default opacity-90'
+                              )}
+                              title={isFirstDay ? `${day.long} (Erster Tag)` : day.long}
+                            >
+                              {day.short}
+                            </button>
                           )
                         })}
                       </div>
-                    )}
+
+                      {/* Zeit-Inputs für ausgewählte Tage */}
+                      {dayTimeConfigs.length > 0 && (
+                        <div className="space-y-1 pt-1">
+                          {dayTimeConfigs.map(({ dayIndex, startZeit }) => {
+                            const day = WEEK_DAYS.find(d => d.index === dayIndex)!
+                            return (
+                              <div key={dayIndex} className="flex items-center gap-2">
+                                <span className="text-xs text-muted-foreground w-10">
+                                  {day.short}
+                                </span>
+                                <TimeInput
+                                  value={startZeit}
+                                  onChange={(value) => onDayTimeChange(dayIndex, value)}
+                                  className="h-8 w-20 text-xs"
+                                  aria-label={`Startzeit für ${day.long}`}
+                                />
+                              </div>
+                            )
+                          })}
+                        </div>
+                      )}
+                    </div>
                   </div>
-                </div>
 
-                <div className="space-y-1">
-                  <Label className="text-xs">Anzahl Termine</Label>
-                  <Input
-                    type="number"
-                    min={1}
-                    max={52}
-                    value={count}
-                    onChange={(e) => setCount(parseInt(e.target.value) || 1)}
-                    className="h-8"
-                  />
+                  <Button
+                    onClick={() => {
+                      handleGenerateSeries()
+                      onSeriesOpenChange(false)
+                    }}
+                    className="w-full"
+                    variant="default"
+                    size="sm"
+                  >
+                    {count} Termine generieren
+                  </Button>
+                </>
+              ) : (
+                <div className="text-sm text-muted-foreground text-center py-4">
+                  Klicke in den Kalender, um das Muster zu definieren
                 </div>
-
-                <Button
-                  onClick={handleGenerateSeries}
-                  className="w-full"
-                  variant="default"
-                  size="sm"
-                >
-                  {count} Termine generieren
-                </Button>
-              </>
-            ) : (
-              <div className="text-sm text-muted-foreground text-center py-4">
-                Klicke in den Kalender, um das Muster zu definieren
-              </div>
-            )}
-          </div>
+              )}
+            </CollapsibleContent>
+          </Collapsible>
 
           <Separator />
 
@@ -379,16 +380,10 @@ export const PlanungsSidebar = ({
               )}
             </div>
 
-            {/* Hinweis wenn noch keine Termine generiert */}
-            {slots.length === 0 && dayTimeConfigs.length > 0 && (
+            {/* Hinweis wenn noch keine Termine vorhanden */}
+            {slots.length === 0 && (
               <div className="text-sm text-muted-foreground text-center py-4">
-                Klicke auf "Termine generieren" um die Serie zu erstellen
-              </div>
-            )}
-
-            {slots.length === 0 && dayTimeConfigs.length === 0 && (
-              <div className="text-sm text-muted-foreground text-center py-4">
-                Noch keine Termine geplant
+                Klicke in den Kalender um Termine hinzuzufügen
               </div>
             )}
 
@@ -408,33 +403,16 @@ export const PlanungsSidebar = ({
               </div>
             )}
 
-            {/* Einzeltermin hinzufügen Button */}
-            {slots.length > 0 && (
-              addingSingleSlot ? (
-                <div className="flex items-center gap-2 p-2 rounded-md bg-emerald-500/10 text-emerald-700 text-sm">
-                  <MousePointer className="h-4 w-4" />
-                  <span className="flex-1">Klicke in den Kalender...</span>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="h-7"
-                    onClick={onCancelAddSingleSlot}
-                  >
-                    Abbrechen
-                  </Button>
-                </div>
-              ) : (
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="w-full"
-                  onClick={onAddSingleSlot}
-                >
-                  <Plus className="h-4 w-4 mr-1" />
-                  Einzeltermin hinzufügen
-                </Button>
-              )
-            )}
+            {/* Einzeltermin hinzufügen Button - schließt Akkordeon wenn offen */}
+            <Button
+              variant="outline"
+              size="sm"
+              className="w-full"
+              onClick={() => isSeriesOpen && onSeriesOpenChange(false)}
+            >
+              <Plus className="h-4 w-4 mr-1" />
+              Einzeltermin hinzufügen
+            </Button>
           </div>
         </div>
       </ScrollArea>

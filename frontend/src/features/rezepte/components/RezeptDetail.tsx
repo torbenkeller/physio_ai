@@ -1,5 +1,8 @@
+import { useState } from 'react'
 import { useParams, useNavigate, Link } from 'react-router-dom'
+import { toast } from 'sonner'
 import { useGetRezeptQuery } from '../api/rezepteApi'
+import { useGetBehandlungenByRezeptQuery } from '@/features/behandlungen/api/behandlungenApi'
 import { PageHeader } from '@/shared/components/PageHeader'
 import { Button } from '@/shared/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/shared/components/ui/card'
@@ -13,15 +16,28 @@ import {
   TableHeader,
   TableRow,
 } from '@/shared/components/ui/table'
-import { ArrowLeft, User, Calendar, Stethoscope } from 'lucide-react'
+import { ArrowLeft, User, Calendar, Stethoscope, Receipt, Plus, CalendarDays } from 'lucide-react'
+import { TerminZuordnenDialog } from './TerminZuordnenDialog'
 
 export const RezeptDetail = () => {
   const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
   const { data: rezept, isLoading, error } = useGetRezeptQuery(id!)
+  const { data: termine, refetch: refetchTermine } = useGetBehandlungenByRezeptQuery(id!, {
+    skip: !id,
+  })
+  const [terminDialogOpen, setTerminDialogOpen] = useState(false)
 
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('de-DE')
+  }
+
+  const formatDateTime = (dateString: string) => {
+    const date = new Date(dateString)
+    return {
+      date: date.toLocaleDateString('de-DE'),
+      time: date.toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' }),
+    }
   }
 
   const formatCurrency = (amount: number) => {
@@ -29,6 +45,12 @@ export const RezeptDetail = () => {
       style: 'currency',
       currency: 'EUR',
     }).format(amount)
+  }
+
+  const handleAbrechnungErstellen = () => {
+    toast.info('Abrechnung wird erstellt...', {
+      description: 'Diese Funktion ist noch nicht implementiert.',
+    })
   }
 
   if (isLoading) {
@@ -47,16 +69,25 @@ export const RezeptDetail = () => {
     )
   }
 
+  const verordneteBehandlungen = rezept.positionen.reduce((sum, pos) => sum + pos.anzahl, 0)
+  const zugeordneteTermine = termine?.length ?? 0
+
   return (
     <div>
       <PageHeader
         title={`Rezept für ${rezept.patient.vorname} ${rezept.patient.nachname}`}
         description={`Ausgestellt am ${formatDate(rezept.ausgestelltAm)}`}
         actions={
-          <Button variant="outline" onClick={() => navigate('/rezepte')}>
-            <ArrowLeft className="mr-2 h-4 w-4" />
-            Zurück
-          </Button>
+          <div className="flex gap-2">
+            <Button onClick={handleAbrechnungErstellen}>
+              <Receipt className="mr-2 h-4 w-4" />
+              Abrechnung erstellen
+            </Button>
+            <Button variant="outline" onClick={() => navigate('/rezepte')}>
+              <ArrowLeft className="mr-2 h-4 w-4" />
+              Zurück
+            </Button>
+          </div>
         }
       />
 
@@ -135,7 +166,10 @@ export const RezeptDetail = () => {
                 {formatCurrency(rezept.preisGesamt)}
               </div>
               <div className="text-sm text-muted-foreground">
-                {rezept.positionen.reduce((sum, pos) => sum + pos.anzahl, 0)} Behandlungen gesamt
+                {verordneteBehandlungen} Behandlungen verordnet
+              </div>
+              <div className="text-sm text-muted-foreground">
+                {zugeordneteTermine} Termine zugeordnet
               </div>
             </div>
           </CardContent>
@@ -186,6 +220,63 @@ export const RezeptDetail = () => {
           </Table>
         </CardContent>
       </Card>
+
+      <Separator className="my-6" />
+
+      {/* Zugeordnete Termine */}
+      <Card>
+        <CardHeader className="flex flex-row items-center justify-between">
+          <CardTitle className="flex items-center gap-2">
+            <CalendarDays className="h-5 w-5" />
+            Zugeordnete Behandlungstermine
+          </CardTitle>
+          <Button variant="outline" size="sm" onClick={() => setTerminDialogOpen(true)}>
+            <Plus className="mr-2 h-4 w-4" />
+            Termin zuordnen
+          </Button>
+        </CardHeader>
+        <CardContent>
+          {termine && termine.length > 0 ? (
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Datum</TableHead>
+                  <TableHead>Uhrzeit</TableHead>
+                  <TableHead>Patient</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {termine.map((termin) => {
+                  const { date, time: startTime } = formatDateTime(termin.startZeit)
+                  const endTime = formatDateTime(termin.endZeit).time
+
+                  return (
+                    <TableRow key={termin.id}>
+                      <TableCell>{date}</TableCell>
+                      <TableCell>
+                        {startTime} - {endTime}
+                      </TableCell>
+                      <TableCell>{termin.patient.name}</TableCell>
+                    </TableRow>
+                  )
+                })}
+              </TableBody>
+            </Table>
+          ) : (
+            <div className="flex h-24 items-center justify-center text-muted-foreground">
+              Keine Termine zugeordnet
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
+      <TerminZuordnenDialog
+        open={terminDialogOpen}
+        onOpenChange={setTerminDialogOpen}
+        patientId={rezept.patient.id}
+        rezeptId={id!}
+        onSuccess={() => refetchTermine()}
+      />
     </div>
   )
 }

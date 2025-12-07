@@ -9,8 +9,8 @@ import { DayButton, DayPicker, getDefaultClassNames } from "react-day-picker"
 import { cn } from "@/shared/utils"
 import { Button, buttonVariants } from "@/shared/components/ui/button"
 
-// Extrahierte und memoized Components um Re-Renders zu vermeiden
-const CalendarRoot = React.memo(function CalendarRoot({
+// Extrahierte Components
+function CalendarRoot({
   className,
   rootRef,
   ...props
@@ -22,26 +22,25 @@ const CalendarRoot = React.memo(function CalendarRoot({
   return (
     <div data-slot="calendar" ref={rootRef} className={cn(className)} {...props} />
   )
-})
+}
 
-const CalendarChevron = React.memo(function CalendarChevron({
+function CalendarChevron({
   className,
   orientation,
-  ...props
 }: {
   className?: string
   orientation?: "left" | "right" | "up" | "down"
 }) {
   if (orientation === "left") {
-    return <ChevronLeftIcon className={cn("size-4", className)} {...props} />
+    return <ChevronLeftIcon className={cn("size-4", className)} />
   }
   if (orientation === "right") {
-    return <ChevronRightIcon className={cn("size-4", className)} {...props} />
+    return <ChevronRightIcon className={cn("size-4", className)} />
   }
-  return <ChevronDownIcon className={cn("size-4", className)} {...props} />
-})
+  return <ChevronDownIcon className={cn("size-4", className)} />
+}
 
-const CalendarWeekNumber = React.memo(function CalendarWeekNumber({
+function CalendarWeekNumber({
   children,
   ...props
 }: {
@@ -54,7 +53,7 @@ const CalendarWeekNumber = React.memo(function CalendarWeekNumber({
       </div>
     </td>
   )
-})
+}
 
 function Calendar({
   className,
@@ -184,7 +183,7 @@ function Calendar({
 // Cached default class names um wiederholte Aufrufe zu vermeiden
 const dayButtonDefaultClass = getDefaultClassNames().day
 
-const CalendarDayButton = React.memo(function CalendarDayButton({
+function CalendarDayButton({
   className,
   day,
   modifiers,
@@ -218,6 +217,6 @@ const CalendarDayButton = React.memo(function CalendarDayButton({
       {...props}
     />
   )
-})
+}
 
 export { Calendar, CalendarDayButton }

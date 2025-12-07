@@ -60,6 +60,7 @@ class BehandlungServiceImplTest {
                 startZeit = startZeit,
                 endZeit = endZeit,
                 rezeptId = rezeptId,
+                behandlungsartId = null,
             )
 
             // Assert
@@ -87,6 +88,7 @@ class BehandlungServiceImplTest {
                 startZeit = startZeit,
                 endZeit = endZeit,
                 rezeptId = null,
+                behandlungsartId = null,
             )
 
             // Assert
@@ -118,6 +120,7 @@ class BehandlungServiceImplTest {
                 startZeit = originalStartZeit,
                 endZeit = originalEndZeit,
                 rezeptId = null,
+                behandlungsartId = null,
                 version = 0,
             )
 
@@ -132,6 +135,7 @@ class BehandlungServiceImplTest {
                 startZeit = newStartZeit,
                 endZeit = newEndZeit,
                 rezeptId = newRezeptId,
+                behandlungsartId = null,
             )
 
             // Assert
@@ -162,6 +166,7 @@ class BehandlungServiceImplTest {
                     startZeit = startZeit,
                     endZeit = endZeit,
                     rezeptId = null,
+                    behandlungsartId = null,
                 )
             }
 
@@ -185,6 +190,7 @@ class BehandlungServiceImplTest {
                 startZeit = startZeit,
                 endZeit = endZeit,
                 rezeptId = RezeptId(UUID.randomUUID()),
+                behandlungsartId = null,
                 version = 0,
             )
 
@@ -199,6 +205,7 @@ class BehandlungServiceImplTest {
                 startZeit = newStartZeit,
                 endZeit = newEndZeit,
                 rezeptId = null,
+                behandlungsartId = null,
             )
 
             // Assert
@@ -231,6 +238,7 @@ class BehandlungServiceImplTest {
                 startZeit = originalStartZeit,
                 endZeit = originalEndZeit,
                 rezeptId = null,
+                behandlungsartId = null,
                 version = 0,
             )
 
@@ -283,6 +291,7 @@ class BehandlungServiceImplTest {
                 startZeit = LocalDateTime.of(2024, 1, 15, 10, 0),
                 endZeit = LocalDateTime.of(2024, 1, 15, 11, 0),
                 rezeptId = null,
+                behandlungsartId = null,
                 version = 0,
             )
 
@@ -375,6 +384,7 @@ class BehandlungServiceImplTest {
                 startZeit = LocalDateTime.of(2024, 1, 15, 10, 30),
                 endZeit = LocalDateTime.of(2024, 1, 15, 12, 0),
                 rezeptId = null,
+                behandlungsartId = null,
                 version = 0,
             )
 
@@ -419,6 +429,7 @@ class BehandlungServiceImplTest {
                 startZeit = LocalDateTime.of(2024, 1, 15, 10, 30),
                 endZeit = LocalDateTime.of(2024, 1, 15, 12, 0),
                 rezeptId = null,
+                behandlungsartId = null,
                 version = 0,
             )
 

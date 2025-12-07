@@ -24,6 +24,7 @@ class BehandlungAggregateTest {
             startZeit = startZeit,
             endZeit = endZeit,
             rezeptId = null,
+            behandlungsartId = null,
         )
 
         // Then - behandlung should be created with null rezeptId
@@ -48,6 +49,7 @@ class BehandlungAggregateTest {
             startZeit = startZeit,
             endZeit = endZeit,
             rezeptId = rezeptId,
+            behandlungsartId = null,
         )
 
         // Then - behandlung should be created with rezeptId
@@ -72,6 +74,7 @@ class BehandlungAggregateTest {
                 startZeit = startZeit,
                 endZeit = endZeit,
                 rezeptId = null,
+                behandlungsartId = null,
             )
         }
     }
@@ -87,6 +90,7 @@ class BehandlungAggregateTest {
             startZeit = originalStartZeit,
             endZeit = originalEndZeit,
             rezeptId = null,
+            behandlungsartId = null,
         )
 
         // When - updating behandlung
@@ -97,6 +101,7 @@ class BehandlungAggregateTest {
             startZeit = newStartZeit,
             endZeit = newEndZeit,
             rezeptId = newRezeptId,
+            behandlungsartId = null,
         )
 
         // Then - behandlung should be updated
@@ -116,6 +121,7 @@ class BehandlungAggregateTest {
             startZeit = LocalDateTime.of(2024, 1, 15, 10, 0),
             endZeit = LocalDateTime.of(2024, 1, 15, 11, 0),
             rezeptId = null,
+            behandlungsartId = null,
         )
 
         // When/Then - updating with invalid time range should throw exception
@@ -127,6 +133,7 @@ class BehandlungAggregateTest {
                 startZeit = invalidStartZeit,
                 endZeit = invalidEndZeit,
                 rezeptId = null,
+                behandlungsartId = null,
             )
         }
     }
@@ -140,6 +147,7 @@ class BehandlungAggregateTest {
             startZeit = LocalDateTime.of(2024, 1, 15, 10, 0),
             endZeit = LocalDateTime.of(2024, 1, 15, 11, 0),
             rezeptId = null,
+            behandlungsartId = null,
         )
 
         // When - moving behandlung to 14:00

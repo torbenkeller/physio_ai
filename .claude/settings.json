@@ -1,6 +1,21 @@
 {
+  "includeCoAuthoredBy": false,
   "permissions": {
     "allow": [],
     "deny": []
+  },
+  "gitAttribution": false,
+  "hooks": {
+    "Stop": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "scripts/run-tests"
+          }
+        ]
+      }
+    ]
   }
 }

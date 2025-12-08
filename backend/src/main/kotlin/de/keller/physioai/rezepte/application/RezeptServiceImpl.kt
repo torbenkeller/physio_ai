@@ -4,13 +4,13 @@ import de.keller.physioai.patienten.PatientenRepository
 import de.keller.physioai.rezepte.adapters.api.BehandlungsartDto
 import de.keller.physioai.rezepte.adapters.api.RezeptCreateDto
 import de.keller.physioai.rezepte.adapters.api.RezeptUpdateDto
-import de.keller.physioai.rezepte.domain.BehandlungsartId
 import de.keller.physioai.rezepte.domain.Rezept
 import de.keller.physioai.rezepte.ports.BehandlungsartenRepository
 import de.keller.physioai.rezepte.ports.RezeptRepository
 import de.keller.physioai.rezepte.ports.RezeptService
 import de.keller.physioai.rezepte.ports.RezepteAiService
 import de.keller.physioai.shared.AggregateNotFoundException
+import de.keller.physioai.shared.BehandlungsartId
 import de.keller.physioai.shared.PatientId
 import de.keller.physioai.shared.RezeptId
 import org.slf4j.Logger

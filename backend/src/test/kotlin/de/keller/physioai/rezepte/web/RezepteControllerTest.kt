@@ -10,7 +10,6 @@ import de.keller.physioai.rezepte.adapters.api.RezepteController
 import de.keller.physioai.rezepte.domain.Arzt
 import de.keller.physioai.rezepte.domain.ArztId
 import de.keller.physioai.rezepte.domain.Behandlungsart
-import de.keller.physioai.rezepte.domain.BehandlungsartId
 import de.keller.physioai.rezepte.domain.Rezept
 import de.keller.physioai.rezepte.domain.RezeptPos
 import de.keller.physioai.rezepte.ports.AerzteRepository
@@ -18,6 +17,7 @@ import de.keller.physioai.rezepte.ports.BehandlungsartenRepository
 import de.keller.physioai.rezepte.ports.RezeptRepository
 import de.keller.physioai.rezepte.ports.RezeptService
 import de.keller.physioai.rezepte.ports.RezepteAiService
+import de.keller.physioai.shared.BehandlungsartId
 import de.keller.physioai.shared.PatientId
 import de.keller.physioai.shared.RezeptId
 import de.keller.physioai.shared.anyValue

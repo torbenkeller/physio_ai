@@ -2,8 +2,8 @@ package de.keller.physioai.behandlungen.ports
 
 import de.keller.physioai.behandlungen.domain.BehandlungAggregate
 import de.keller.physioai.patienten.Patient
-import de.keller.physioai.rezepte.domain.BehandlungsartId
 import de.keller.physioai.shared.BehandlungId
+import de.keller.physioai.shared.BehandlungsartId
 import de.keller.physioai.shared.PatientId
 import de.keller.physioai.shared.RezeptId
 import org.jmolecules.architecture.hexagonal.PrimaryPort

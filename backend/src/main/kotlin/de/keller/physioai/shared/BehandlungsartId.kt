@@ -1,4 +1,4 @@
-package de.keller.physioai.rezepte.domain
+package de.keller.physioai.shared
 
 import java.util.UUID
 

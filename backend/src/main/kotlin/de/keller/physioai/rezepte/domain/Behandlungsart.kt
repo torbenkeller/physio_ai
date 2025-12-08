@@ -1,5 +1,6 @@
 package de.keller.physioai.rezepte.domain
 
+import de.keller.physioai.shared.BehandlungsartId
 import org.jmolecules.ddd.annotation.AggregateRoot
 import org.springframework.data.annotation.Id
 import org.springframework.data.annotation.Version

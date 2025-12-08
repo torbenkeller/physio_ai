@@ -1,0 +1,56 @@
+#!/bin/bash
+
+# Run tests for both frontend and backend
+# This script is executed by the Stop hook in .claude/settings.json
+# Output is formatted for agent consumption
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PROJECT_ROOT="$(dirname "$SCRIPT_DIR")"
+
+FRONTEND_OUTPUT=""
+BACKEND_OUTPUT=""
+FRONTEND_EXIT=0
+BACKEND_EXIT=0
+
+# Run frontend tests (Vitest)
+cd "$PROJECT_ROOT/frontend"
+FRONTEND_OUTPUT=$(npm run test -- --run 2>&1)
+FRONTEND_EXIT=$?
+
+# Run backend tests (Maven)
+cd "$PROJECT_ROOT/backend"
+BACKEND_OUTPUT=$(./mvnw test -q 2>&1)
+BACKEND_EXIT=$?
+
+# Report results
+if [ $FRONTEND_EXIT -eq 0 ] && [ $BACKEND_EXIT -eq 0 ]; then
+    echo "All tests passed."
+    echo ""
+    echo "Frontend: PASSED"
+    echo "Backend: PASSED"
+    exit 0
+fi
+
+# Report failures to stderr
+{
+    echo "TEST FAILURES DETECTED"
+    echo ""
+
+    if [ $FRONTEND_EXIT -ne 0 ]; then
+        echo "=== Frontend Tests FAILED ==="
+        echo "$FRONTEND_OUTPUT"
+        echo ""
+    else
+        echo "Frontend: PASSED"
+    fi
+
+    if [ $BACKEND_EXIT -ne 0 ]; then
+        echo "=== Backend Tests FAILED ==="
+        echo "$BACKEND_OUTPUT"
+        echo ""
+    else
+        echo "Backend: PASSED"
+    fi
+} >&2
+
+exit 2

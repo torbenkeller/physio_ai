@@ -1,7 +1,7 @@
 package de.keller.physioai.rezepte.ports
 
 import de.keller.physioai.rezepte.domain.Behandlungsart
-import de.keller.physioai.rezepte.domain.BehandlungsartId
+import de.keller.physioai.shared.BehandlungsartId
 import org.jmolecules.architecture.hexagonal.SecondaryPort
 
 @SecondaryPort

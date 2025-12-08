@@ -1,7 +1,7 @@
 package de.keller.physioai.behandlungen.domain
 
-import de.keller.physioai.rezepte.domain.BehandlungsartId
 import de.keller.physioai.shared.BehandlungId
+import de.keller.physioai.shared.BehandlungsartId
 import de.keller.physioai.shared.PatientId
 import de.keller.physioai.shared.RezeptId
 import org.jmolecules.ddd.annotation.AggregateRoot

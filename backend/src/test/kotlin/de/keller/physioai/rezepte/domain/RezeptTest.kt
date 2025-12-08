@@ -1,5 +1,6 @@
 package de.keller.physioai.rezepte.domain
 
+import de.keller.physioai.shared.BehandlungsartId
 import de.keller.physioai.shared.PatientId
 import org.junit.jupiter.api.Test
 import java.time.LocalDate

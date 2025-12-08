@@ -3,9 +3,9 @@ package de.keller.physioai.rezepte.application
 import de.keller.physioai.patienten.Patient
 import de.keller.physioai.patienten.PatientenRepository
 import de.keller.physioai.rezepte.domain.Behandlungsart
-import de.keller.physioai.rezepte.domain.BehandlungsartId
 import de.keller.physioai.rezepte.ports.BehandlungsartenRepository
 import de.keller.physioai.rezepte.ports.RezepteAiService
+import de.keller.physioai.shared.BehandlungsartId
 import de.keller.physioai.shared.PatientId
 import io.mockk.impl.annotations.MockK
 import java.time.LocalDate

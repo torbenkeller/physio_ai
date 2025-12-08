@@ -8,27 +8,29 @@ interface RailNavItemProps {
 }
 
 const RailNavItem = ({ item }: RailNavItemProps) => (
-  <Tooltip delayDuration={0}>
-    <TooltipTrigger className="flex justify-center w-full">
-      <NavLink
-        to={item.to}
-        className={({ isActive }) =>
-          cn(
-            'flex h-14 w-14 items-center justify-center rounded-2xl transition-colors',
-            isActive
-              ? 'bg-primary text-primary-foreground'
-              : 'text-muted-foreground hover:bg-accent hover:text-accent-foreground'
-          )
-        }
-      >
-        <item.icon className="h-5 w-5" />
-        <span className="sr-only">{item.label}</span>
-      </NavLink>
-    </TooltipTrigger>
-    <TooltipContent side="right" sideOffset={8}>
-      {item.label}
-    </TooltipContent>
-  </Tooltip>
+  <div className="flex justify-center w-full">
+    <Tooltip delayDuration={0}>
+      <TooltipTrigger asChild>
+        <NavLink
+          to={item.to}
+          className={({ isActive }) =>
+            cn(
+              'flex h-14 w-14 items-center justify-center rounded-2xl transition-colors',
+              isActive
+                ? 'bg-primary text-primary-foreground'
+                : 'text-muted-foreground hover:bg-accent hover:text-accent-foreground'
+            )
+          }
+        >
+          <item.icon className="h-5 w-5" />
+          <span className="sr-only">{item.label}</span>
+        </NavLink>
+      </TooltipTrigger>
+      <TooltipContent side="right" sideOffset={8}>
+        {item.label}
+      </TooltipContent>
+    </Tooltip>
+  </div>
 )
 
 export const NavigationRail = () => {
@@ -40,7 +42,7 @@ export const NavigationRail = () => {
       </div>
 
       {/* Haupt-Navigation */}
-      <nav className="flex-1 flex flex-col justify-center gap-2">
+      <nav aria-label="Hauptnavigation" className="flex-1 flex flex-col justify-center gap-2">
         {NAV_ITEMS.map((item) => (
           <RailNavItem key={item.to} item={item} />
         ))}

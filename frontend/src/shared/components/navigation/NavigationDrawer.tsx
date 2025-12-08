@@ -32,7 +32,7 @@ export const NavigationDrawer = () => {
       </div>
 
       {/* Haupt-Navigation */}
-      <nav className="flex-1 space-y-1 p-4">
+      <nav aria-label="Hauptnavigation" className="flex-1 space-y-1 p-4">
         {NAV_ITEMS.map((item) => (
           <DrawerNavItem key={item.to} item={item} />
         ))}

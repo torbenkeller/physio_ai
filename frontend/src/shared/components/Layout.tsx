@@ -26,7 +26,7 @@ export const Layout = ({ children }: LayoutProps) => {
           <MobileHeader />
 
           {/* Content */}
-          <main className="flex-1 p-4 overflow-auto pb-20 sm:pb-4">{children}</main>
+          <main className="flex-1 p-4 overflow-auto pb-16 sm:pb-4">{children}</main>
         </div>
 
         {/* Mobile Bottom Navigation (< 640px) */}

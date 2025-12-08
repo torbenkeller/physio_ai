@@ -9,12 +9,12 @@ interface RailNavItemProps {
 
 const RailNavItem = ({ item }: RailNavItemProps) => (
   <Tooltip delayDuration={0}>
-    <TooltipTrigger asChild>
+    <TooltipTrigger className="flex justify-center w-full">
       <NavLink
         to={item.to}
         className={({ isActive }) =>
           cn(
-            'flex h-12 w-12 items-center justify-center rounded-lg transition-colors',
+            'flex h-14 w-14 items-center justify-center rounded-2xl transition-colors',
             isActive
               ? 'bg-primary text-primary-foreground'
               : 'text-muted-foreground hover:bg-accent hover:text-accent-foreground'
@@ -33,21 +33,21 @@ const RailNavItem = ({ item }: RailNavItemProps) => (
 
 export const NavigationRail = () => {
   return (
-    <aside className="hidden sm:flex lg:hidden h-screen w-16 flex-col items-center border-r bg-card py-4">
+    <aside className="hidden sm:flex lg:hidden h-screen w-20 flex-col border-r bg-card py-4">
       {/* Logo (kompakt) */}
-      <div className="flex h-12 w-12 items-center justify-center mb-4">
+      <div className="h-14 flex items-center justify-center mb-4">
         <span className="text-lg font-bold text-primary">P</span>
       </div>
 
       {/* Haupt-Navigation */}
-      <nav className="flex-1 flex flex-col items-center gap-2">
+      <nav className="flex-1 flex flex-col justify-center gap-2">
         {NAV_ITEMS.map((item) => (
           <RailNavItem key={item.to} item={item} />
         ))}
       </nav>
 
       {/* Footer-Navigation */}
-      <div className="flex flex-col items-center gap-2 border-t pt-4">
+      <div className="flex flex-col gap-2 border-t pt-4">
         {FOOTER_NAV_ITEMS.map((item) => (
           <RailNavItem key={item.to} item={item} />
         ))}

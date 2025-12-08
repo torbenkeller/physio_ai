@@ -11,13 +11,24 @@ export const BottomNavigation = () => {
           to={item.to}
           className={({ isActive }) =>
             cn(
-              'flex flex-col items-center justify-center gap-1 px-3 py-2 rounded-lg min-w-[64px] transition-colors',
+              'flex flex-col items-center justify-center gap-1 px-3 py-2 min-w-[64px] transition-colors',
               isActive ? 'text-primary' : 'text-muted-foreground hover:text-accent-foreground'
             )
           }
         >
-          <item.icon className="h-5 w-5" />
-          <span className="text-xs font-medium truncate">{item.label}</span>
+          {({ isActive }) => (
+            <>
+              <span
+                className={cn(
+                  'flex items-center justify-center h-8 w-16 rounded-full transition-colors',
+                  isActive && 'bg-primary'
+                )}
+              >
+                <item.icon className={cn('h-5 w-5', isActive && 'text-primary-foreground')} />
+              </span>
+              <span className="text-xs font-medium truncate">{item.label}</span>
+            </>
+          )}
         </NavLink>
       ))}
     </nav>

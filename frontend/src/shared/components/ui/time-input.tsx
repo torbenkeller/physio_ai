@@ -44,6 +44,11 @@ const TimeInput = React.forwardRef<HTMLInputElement, TimeInputProps>(
       onChange(`${hours}:${String(Math.min(59, Math.max(0, m))).padStart(2, '0')}`)
     }
 
+    // Focus Handler: Text selektieren für schnelles Überschreiben
+    const handleFocus = (e: React.FocusEvent<HTMLInputElement>) => {
+      e.target.select()
+    }
+
     const handleKeyDown = (
       e: React.KeyboardEvent<HTMLInputElement>,
       type: 'hours' | 'minutes'
@@ -74,8 +79,8 @@ const TimeInput = React.forwardRef<HTMLInputElement, TimeInputProps>(
     return (
       <div
         className={cn(
-          'flex h-9 items-center rounded-md border border-input bg-transparent px-2 text-sm shadow-sm',
-          'focus-within:ring-1 focus-within:ring-ring',
+          'flex h-9 items-center rounded-md border border-input bg-background px-2 text-sm shadow-sm ring-offset-background',
+          'focus-within:outline-none focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2',
           props.disabled && 'cursor-not-allowed opacity-50',
           className
         )}
@@ -88,6 +93,7 @@ const TimeInput = React.forwardRef<HTMLInputElement, TimeInputProps>(
           value={hours}
           onChange={handleHoursChange}
           onBlur={handleHoursBlur}
+          onFocus={handleFocus}
           onKeyDown={(e) => handleKeyDown(e, 'hours')}
           className="w-6 bg-transparent text-center outline-none"
           aria-label={props['aria-label'] ? `${props['aria-label']} Stunden` : 'Stunden'}
@@ -101,6 +107,7 @@ const TimeInput = React.forwardRef<HTMLInputElement, TimeInputProps>(
           value={minutes}
           onChange={handleMinutesChange}
           onBlur={handleMinutesBlur}
+          onFocus={handleFocus}
           onKeyDown={(e) => handleKeyDown(e, 'minutes')}
           className="w-6 bg-transparent text-center outline-none"
           aria-label={props['aria-label'] ? `${props['aria-label']} Minuten` : 'Minuten'}

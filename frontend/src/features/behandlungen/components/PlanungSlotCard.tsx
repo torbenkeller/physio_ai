@@ -1,4 +1,4 @@
-import { memo, useCallback } from 'react'
+import { memo, useCallback, useMemo } from 'react'
 import { X, AlertTriangle } from 'lucide-react'
 import { Button } from '@/shared/components/ui/button'
 import { TimeInput } from '@/shared/components/ui/time-input'
@@ -54,6 +54,11 @@ export const PlanungSlotCard = memo(function PlanungSlotCard({
     e.stopPropagation()
   }, [])
 
+  const weekday = useMemo(
+    () => slot.date.toLocaleDateString('de-DE', { weekday: 'short' }).replace('.', ''),
+    [slot.date]
+  )
+
   return (
     <div
       className={cn(
@@ -66,8 +71,8 @@ export const PlanungSlotCard = memo(function PlanungSlotCard({
       onClick={handleClick}
     >
       <div className="flex items-center gap-2">
-        <span className="text-xs text-muted-foreground w-4">
-          {index + 1}.
+        <span className="text-xs text-muted-foreground w-10 flex-shrink-0">
+          {index + 1}. {weekday}
         </span>
         <div className="flex-1" onClick={handleStopPropagation}>
           <DateInput
@@ -89,23 +94,23 @@ export const PlanungSlotCard = memo(function PlanungSlotCard({
         </Button>
       </div>
       <div
-        className="flex items-center gap-1 mt-2 ml-6"
+        className="flex items-center gap-1 mt-2 ml-12"
         onClick={handleStopPropagation}
       >
         <TimeInput
           value={slot.startZeit}
           onChange={handleStartZeitChange}
-          className="w-20 h-8 text-xs"
+          className="w-20 h-7 text-xs"
         />
         <span className="text-xs text-muted-foreground">-</span>
         <TimeInput
           value={slot.endZeit}
           onChange={handleEndZeitChange}
-          className="w-20 h-8 text-xs"
+          className="w-20 h-7 text-xs"
         />
       </div>
       {slot.hasConflict && slot.conflictingWith && slot.conflictingWith.length > 0 && (
-        <div className="mt-2 ml-6 text-xs text-amber-600">
+        <div className="mt-2 ml-12 text-xs text-amber-600">
           Konflikt mit: {slot.conflictingWith.map((c) => c.patientName).join(', ')}
         </div>
       )}

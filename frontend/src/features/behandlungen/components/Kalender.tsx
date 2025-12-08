@@ -1,12 +1,22 @@
 import { useState, useMemo, useRef, useEffect, useCallback } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { toast } from 'sonner'
-import { useGetWeeklyCalendarQuery, useCreateBehandlungenBatchMutation, useCheckConflictsMutation } from '../api/behandlungenApi'
-import { useGetPatientenQuery, useCreatePatientMutation } from '@/features/patienten/api/patientenApi'
+import {
+  useGetWeeklyCalendarQuery,
+  useCreateBehandlungenBatchMutation,
+  useCheckConflictsMutation,
+} from '../api/behandlungenApi'
+import {
+  useGetPatientenQuery,
+  useCreatePatientMutation,
+} from '@/features/patienten/api/patientenApi'
 import { useGetBehandlungsartenQuery } from '@/features/rezepte/api/rezepteApi'
 import { useGetProfileQuery } from '@/features/profil/api/profileApi'
 import { useMultiTerminSelection } from '../hooks/useMultiTerminSelection'
 import { useKalenderSettings } from '../hooks/useKalenderSettings'
+import { useIsMobile } from '@/shared/hooks/useIsMobile'
 import { KalenderSettingsDialog } from './KalenderSettingsDialog'
+import { BehandlungDetailPopover } from './BehandlungDetailPopover'
 import { PageHeader } from '@/shared/components/PageHeader'
 import { Button } from '@/shared/components/ui/button'
 import { Card } from '@/shared/components/ui/card'
@@ -38,7 +48,12 @@ import {
   WEEKDAY_NAMES_SHORT,
   addMinutesToTime,
 } from '../utils/kalenderUtils'
-import type { BehandlungKalenderDto, SelectedTimeSlot, SeriesConfig, DayTimeConfig } from '../types/behandlung.types'
+import type {
+  BehandlungKalenderDto,
+  SelectedTimeSlot,
+  SeriesConfig,
+  DayTimeConfig,
+} from '../types/behandlung.types'
 
 // Snapping-Konstante: 15 Minuten = 15px bei HOUR_HEIGHT=60
 const SNAP_MINUTES = 15
@@ -46,9 +61,9 @@ const SNAP_HEIGHT = (SNAP_MINUTES / 60) * HOUR_HEIGHT
 
 interface DragState {
   type: 'slot' | 'pattern'
-  slotId?: string          // Für konkrete Slots
-  dayIndex?: number        // Für Muster-Previews
-  offsetY: number          // Offset vom Element-Top zur Maus-Start-Position
+  slotId?: string // Für konkrete Slots
+  dayIndex?: number // Für Muster-Previews
+  offsetY: number // Offset vom Element-Top zur Maus-Start-Position
   originalDayIndex: number
 }
 
@@ -59,6 +74,9 @@ const INITIAL_NEW_PATIENT_FORM: NewPatientForm = {
 }
 
 export const Kalender = () => {
+  const navigate = useNavigate()
+  const isMobile = useIsMobile()
+
   const [currentWeekStart, setCurrentWeekStart] = useState(() => getWeekStart(new Date()))
   const [planungsModus, setPlanungsModus] = useState(false)
   const [selectedSlotId, setSelectedSlotId] = useState<string | null>(null)
@@ -66,6 +84,10 @@ export const Kalender = () => {
   const [selectedBehandlungsartId, setSelectedBehandlungsartId] = useState('')
   const [newPatientForm, setNewPatientForm] = useState<NewPatientForm>(INITIAL_NEW_PATIENT_FORM)
   const [duration, setDuration] = useState(90) // Termin-Dauer in Minuten
+
+  // Termin-Detail-Popover State
+  const [selectedTermin, setSelectedTermin] = useState<BehandlungKalenderDto | null>(null)
+  const [terminAnchorEl, setTerminAnchorEl] = useState<HTMLElement | null>(null)
 
   // Muster-Definition für Zwei-Phasen-Planung
   const [dayTimeConfigs, setDayTimeConfigs] = useState<DayTimeConfig[]>([])
@@ -110,7 +132,8 @@ export const Kalender = () => {
 
   // Default count from patient or profile
   const selectedPatientData = patienten?.find((p) => p.id === selectedPatientId)
-  const defaultCount = selectedPatientData?.behandlungenProRezept ?? profile?.defaultBehandlungenProRezept ?? 8
+  const defaultCount =
+    selectedPatientData?.behandlungenProRezept ?? profile?.defaultBehandlungenProRezept ?? 8
 
   // Scroll zu 8 Uhr beim ersten Laden
   useEffect(() => {
@@ -122,16 +145,17 @@ export const Kalender = () => {
   // Handler für Wochentag-Toggle (Muster-Phase)
   // Slots werden NICHT gelöscht - nur "Generieren" ersetzt die Slots
   const handleDayToggle = useCallback((dayIndex: number) => {
-    setDayTimeConfigs(prev => {
-      const exists = prev.find(c => c.dayIndex === dayIndex)
+    setDayTimeConfigs((prev) => {
+      const exists = prev.find((c) => c.dayIndex === dayIndex)
       if (exists) {
         // Letzter Tag darf nicht abgewählt werden
         if (prev.length === 1) return prev
-        return prev.filter(c => c.dayIndex !== dayIndex)
+        return prev.filter((c) => c.dayIndex !== dayIndex)
       } else {
         const defaultTime = prev[0]?.startZeit ?? '09:00'
-        return [...prev, { dayIndex, startZeit: defaultTime }]
-          .sort((a, b) => a.dayIndex - b.dayIndex)
+        return [...prev, { dayIndex, startZeit: defaultTime }].sort(
+          (a, b) => a.dayIndex - b.dayIndex
+        )
       }
     })
   }, [])
@@ -139,8 +163,8 @@ export const Kalender = () => {
   // Handler für Zeit-Änderung eines Tages (via Drag oder Sidebar-Input)
   // Slots werden NICHT gelöscht - nur "Generieren" ersetzt die Slots
   const handleDayTimeChange = useCallback((dayIndex: number, startZeit: string) => {
-    setDayTimeConfigs(prev =>
-      prev.map(c => c.dayIndex === dayIndex ? { ...c, startZeit } : c)
+    setDayTimeConfigs((prev) =>
+      prev.map((c) => (c.dayIndex === dayIndex ? { ...c, startZeit } : c))
     )
   }, [])
 
@@ -301,9 +325,7 @@ export const Kalender = () => {
 
   // Geplante Slots für einen bestimmten Tag
   const getSlotsForDay = (date: Date): SelectedTimeSlot[] => {
-    return slots.filter(
-      (slot) => formatDateForApi(slot.date) === formatDateForApi(date)
-    )
+    return slots.filter((slot) => formatDateForApi(slot.date) === formatDateForApi(date))
   }
 
   // Snapping-Hilfsfunktion: Y-Position auf 15-Minuten-Intervalle runden
@@ -328,7 +350,7 @@ export const Kalender = () => {
 
   // Zeit aus Y-Position berechnen (in Minuten ab Mitternacht)
   const getMinutesFromY = useCallback((y: number): number => {
-    return Math.round(y / HOUR_HEIGHT * 60)
+    return Math.round((y / HOUR_HEIGHT) * 60)
   }, [])
 
   // Zeit als HH:mm String formatieren
@@ -339,65 +361,71 @@ export const Kalender = () => {
   }, [])
 
   // Drag für konkrete Slots starten
-  const handleSlotMouseDown = useCallback((e: React.MouseEvent, slotId: string, dayIndex: number) => {
-    e.preventDefault()
-    e.stopPropagation()
+  const handleSlotMouseDown = useCallback(
+    (e: React.MouseEvent, slotId: string, dayIndex: number) => {
+      e.preventDefault()
+      e.stopPropagation()
 
-    const slot = slots.find((s) => s.id === slotId)
-    if (!slot) return
+      const slot = slots.find((s) => s.id === slotId)
+      if (!slot) return
 
-    // Element-Top-Position berechnen
-    const col = columnRefsRef.current[dayIndex]
-    if (!col) return
+      // Element-Top-Position berechnen
+      const col = columnRefsRef.current[dayIndex]
+      if (!col) return
 
-    const colRect = col.getBoundingClientRect()
-    const slotStyle = getSlotStyle(slot.date, slot.startZeit, slot.endZeit)
-    const elementTop = slotStyle.top
-    const mouseY = e.clientY - colRect.top + (scrollContainerRef.current?.scrollTop || 0)
+      const colRect = col.getBoundingClientRect()
+      const slotStyle = getSlotStyle(slot.date, slot.startZeit, slot.endZeit)
+      const elementTop = slotStyle.top
+      const mouseY = e.clientY - colRect.top + (scrollContainerRef.current?.scrollTop || 0)
 
-    setDragState({
-      type: 'slot',
-      slotId,
-      offsetY: mouseY - elementTop,
-      originalDayIndex: dayIndex,
-    })
+      setDragState({
+        type: 'slot',
+        slotId,
+        offsetY: mouseY - elementTop,
+        originalDayIndex: dayIndex,
+      })
 
-    // Initial Preview setzen
-    setDragPreview({
-      dayIndex,
-      top: snapToGrid(elementTop),
-    })
-  }, [slots, snapToGrid])
+      // Initial Preview setzen
+      setDragPreview({
+        dayIndex,
+        top: snapToGrid(elementTop),
+      })
+    },
+    [slots, snapToGrid]
+  )
 
   // Drag für Muster-Previews starten
-  const handlePatternMouseDown = useCallback((e: React.MouseEvent, patternDayIndex: number) => {
-    e.preventDefault()
-    e.stopPropagation()
+  const handlePatternMouseDown = useCallback(
+    (e: React.MouseEvent, patternDayIndex: number) => {
+      e.preventDefault()
+      e.stopPropagation()
 
-    const config = dayTimeConfigs.find(c => c.dayIndex === patternDayIndex)
-    if (!config) return
+      const config = dayTimeConfigs.find((c) => c.dayIndex === patternDayIndex)
+      if (!config) return
 
-    const col = columnRefsRef.current[patternDayIndex]
-    if (!col) return
+      const col = columnRefsRef.current[patternDayIndex]
+      if (!col) return
 
-    const colRect = col.getBoundingClientRect()
-    const endZeit = addMinutesToTime(config.startZeit, duration)
-    const style = getSlotStyle(weekDays[patternDayIndex], config.startZeit, endZeit)
-    const scrollTop = scrollContainerRef.current?.scrollTop || 0
-    const mouseY = e.clientY - colRect.top + scrollTop
+      const colRect = col.getBoundingClientRect()
+      const endZeit = addMinutesToTime(config.startZeit, duration)
+      const style = getSlotStyle(weekDays[patternDayIndex], config.startZeit, endZeit)
+      const scrollTop = scrollContainerRef.current?.scrollTop || 0
+      const mouseY = e.clientY - colRect.top + scrollTop
 
-    setDragState({
-      type: 'pattern',
-      dayIndex: patternDayIndex,
-      offsetY: mouseY - style.top,
-      originalDayIndex: patternDayIndex,
-    })
+      setDragState({
+        type: 'pattern',
+        dayIndex: patternDayIndex,
+        offsetY: mouseY - style.top,
+        originalDayIndex: patternDayIndex,
+      })
 
-    setDragPreview({
-      dayIndex: patternDayIndex,
-      top: snapToGrid(style.top),
-    })
-  }, [dayTimeConfigs, duration, weekDays, snapToGrid])
+      setDragPreview({
+        dayIndex: patternDayIndex,
+        top: snapToGrid(style.top),
+      })
+    },
+    [dayTimeConfigs, duration, weekDays, snapToGrid]
+  )
 
   // Global Mouse Events für Drag (Slot und Pattern)
   useEffect(() => {
@@ -461,7 +489,7 @@ export const Kalender = () => {
 
         const [startH, startM] = slot.startZeit.split(':').map(Number)
         const [endH, endM] = slot.endZeit.split(':').map(Number)
-        const slotDuration = (endH * 60 + endM) - (startH * 60 + startM)
+        const slotDuration = endH * 60 + endM - (startH * 60 + startM)
 
         const newStartMinutes = getMinutesFromY(dragPreview.top)
         const newEndMinutes = newStartMinutes + slotDuration
@@ -492,7 +520,18 @@ export const Kalender = () => {
       document.removeEventListener('mousemove', handleGlobalMouseMove)
       document.removeEventListener('mouseup', handleGlobalMouseUp)
     }
-  }, [dragState, dragPreview, slots, weekDays, updateSlot, getDayIndexFromX, snapToGrid, getMinutesFromY, formatMinutesToTime, handleDayTimeChange])
+  }, [
+    dragState,
+    dragPreview,
+    slots,
+    weekDays,
+    updateSlot,
+    getDayIndexFromX,
+    snapToGrid,
+    getMinutesFromY,
+    formatMinutesToTime,
+    handleDayTimeChange,
+  ])
 
   if (isLoading) {
     return (
@@ -572,14 +611,21 @@ export const Kalender = () => {
         </div>
 
         {/* Kalender */}
-        <Card className={cn('@container flex-1 flex flex-col overflow-hidden transition-all duration-300', planungsModus && 'rounded-l-none border-l-0')}>
+        <Card
+          className={cn(
+            '@container flex-1 flex flex-col overflow-hidden transition-all duration-300',
+            planungsModus && 'rounded-l-none border-l-0'
+          )}
+        >
           {/* Header mit Wochentagen - fixiert */}
-          <div className={cn(
-            'grid border-b flex-shrink-0',
-            settings.showWeekend
-              ? 'grid-cols-[60px_repeat(7,1fr)]'
-              : 'grid-cols-[60px_repeat(5,1fr)]'
-          )}>
+          <div
+            className={cn(
+              'grid border-b flex-shrink-0',
+              settings.showWeekend
+                ? 'grid-cols-[60px_repeat(7,1fr)]'
+                : 'grid-cols-[60px_repeat(5,1fr)]'
+            )}
+          >
             <div className="p-2 bg-muted/50" />
             {weekDays.map((date, i) => (
               <div
@@ -602,12 +648,7 @@ export const Kalender = () => {
                     </>
                   )}
                 </div>
-                <div
-                  className={cn(
-                    'text-2xl font-bold',
-                    isToday(date) && 'text-primary'
-                  )}
-                >
+                <div className={cn('text-2xl font-bold', isToday(date) && 'text-primary')}>
                   {date.getDate()}
                 </div>
               </div>
@@ -615,16 +656,15 @@ export const Kalender = () => {
           </div>
 
           {/* Kalender-Body - scrollbar */}
-          <div
-            ref={scrollContainerRef}
-            className="flex-1 overflow-y-auto overflow-x-hidden"
-          >
-            <div className={cn(
-              'grid',
-              settings.showWeekend
-                ? 'grid-cols-[60px_repeat(7,1fr)]'
-                : 'grid-cols-[60px_repeat(5,1fr)]'
-            )}>
+          <div ref={scrollContainerRef} className="flex-1 overflow-y-auto overflow-x-hidden">
+            <div
+              className={cn(
+                'grid',
+                settings.showWeekend
+                  ? 'grid-cols-[60px_repeat(7,1fr)]'
+                  : 'grid-cols-[60px_repeat(5,1fr)]'
+              )}
+            >
               {/* Zeitspalte */}
               <div className="relative" style={{ height: TOTAL_HEIGHT }}>
                 {Array.from({ length: TOTAL_HOURS }, (_, i) => (
@@ -645,7 +685,9 @@ export const Kalender = () => {
                 return (
                   <div
                     key={dayIndex}
-                    ref={(el) => { columnRefsRef.current[dayIndex] = el }}
+                    ref={(el) => {
+                      columnRefsRef.current[dayIndex] = el
+                    }}
                     className={cn(
                       'relative border-l',
                       isToday(date) && 'bg-primary/5',
@@ -679,13 +721,19 @@ export const Kalender = () => {
                       return (
                         <div
                           key={termin.id}
-                          className="absolute left-1 right-1 rounded-md bg-primary text-primary-foreground p-2 overflow-hidden shadow-sm hover:shadow-md transition-shadow cursor-default"
+                          className="absolute left-1 right-1 rounded-md bg-primary text-primary-foreground p-2 overflow-hidden shadow-sm hover:shadow-md transition-shadow cursor-pointer"
                           style={{ top: style.top, height: style.height - 4 }}
-                          onClick={(e) => e.stopPropagation()}
+                          onClick={(e) => {
+                            e.stopPropagation()
+                            if (isMobile) {
+                              navigate(`/kalender/termin/${termin.id}`)
+                            } else {
+                              setSelectedTermin(termin)
+                              setTerminAnchorEl(e.currentTarget as HTMLElement)
+                            }
+                          }}
                         >
-                          <div className="font-medium text-sm truncate">
-                            {termin.patient.name}
-                          </div>
+                          <div className="font-medium text-sm truncate">{termin.patient.name}</div>
                           <div className="text-xs opacity-80">
                             {formatTime(termin.startZeit)} - {formatTime(termin.endZeit)}
                           </div>
@@ -704,7 +752,8 @@ export const Kalender = () => {
 
                         const endZeit = addMinutesToTime(config.startZeit, duration)
                         const style = getSlotStyle(weekDays[dayIndex], config.startZeit, endZeit)
-                        const isBeingDragged = dragState?.type === 'pattern' && dragState.dayIndex === config.dayIndex
+                        const isBeingDragged =
+                          dragState?.type === 'pattern' && dragState.dayIndex === config.dayIndex
 
                         return (
                           <div
@@ -712,14 +761,20 @@ export const Kalender = () => {
                             onMouseDown={(e) => handlePatternMouseDown(e, config.dayIndex)}
                             className={cn(
                               'absolute left-1 right-1 rounded-md p-2 shadow-sm border-2 border-dashed cursor-grab select-none',
-                              PATTERN_COLORS.bg, PATTERN_COLORS.border, PATTERN_COLORS.text,
+                              PATTERN_COLORS.bg,
+                              PATTERN_COLORS.border,
+                              PATTERN_COLORS.text,
                               isBeingDragged && 'opacity-50 cursor-grabbing'
                             )}
                             style={{ top: style.top, height: style.height - 4 }}
                             onClick={(e) => e.stopPropagation()}
                           >
-                            <div className="font-medium text-xs">{WEEKDAY_NAMES_SHORT[config.dayIndex]}</div>
-                            <div className="text-xs opacity-90">{config.startZeit} - {endZeit}</div>
+                            <div className="font-medium text-xs">
+                              {WEEKDAY_NAMES_SHORT[config.dayIndex]}
+                            </div>
+                            <div className="text-xs opacity-90">
+                              {config.startZeit} - {endZeit}
+                            </div>
                           </div>
                         )
                       })}
@@ -730,7 +785,8 @@ export const Kalender = () => {
                       slots.length > 0 &&
                       daySlots.map((slot) => {
                         const style = getSlotStyle(slot.date, slot.startZeit, slot.endZeit)
-                        const isDragging = dragState?.type === 'slot' && dragState.slotId === slot.id
+                        const isDragging =
+                          dragState?.type === 'slot' && dragState.slotId === slot.id
                         const colors = slot.hasConflict ? CONFLICT_COLORS : SLOT_COLORS
                         return (
                           <div
@@ -738,9 +794,13 @@ export const Kalender = () => {
                             onMouseDown={(e) => handleSlotMouseDown(e, slot.id, dayIndex)}
                             className={cn(
                               'absolute left-1 right-1 rounded-md p-2 overflow-hidden shadow-sm border-2 select-none',
-                              colors.bg, colors.border, colors.text,
+                              colors.bg,
+                              colors.border,
+                              colors.text,
                               isDragging ? 'cursor-grabbing opacity-50' : 'cursor-grab',
-                              selectedSlotId === slot.id && !isDragging && 'ring-2 ring-offset-1 ring-primary'
+                              selectedSlotId === slot.id &&
+                                !isDragging &&
+                                'ring-2 ring-offset-1 ring-primary'
                             )}
                             style={{ top: style.top, height: style.height - 4 }}
                             onClick={(e) => {
@@ -761,48 +821,64 @@ export const Kalender = () => {
                       })}
 
                     {/* Drag Preview Ghost Element für Slots */}
-                    {dragState?.type === 'slot' && dragPreview && dragPreview.dayIndex === dayIndex && (() => {
-                      const draggingSlot = slots.find((s) => s.id === dragState.slotId)
-                      if (!draggingSlot) return null
-                      const style = getSlotStyle(draggingSlot.date, draggingSlot.startZeit, draggingSlot.endZeit)
-                      return (
-                        <div
-                          className="absolute left-1 right-1 rounded-md p-2 overflow-hidden shadow-lg border-2 border-primary bg-primary/20 pointer-events-none z-20"
-                          style={{ top: dragPreview.top, height: style.height }}
-                        >
-                          <div className="font-medium text-sm truncate text-primary">
-                            Termin
+                    {dragState?.type === 'slot' &&
+                      dragPreview &&
+                      dragPreview.dayIndex === dayIndex &&
+                      (() => {
+                        const draggingSlot = slots.find((s) => s.id === dragState.slotId)
+                        if (!draggingSlot) return null
+                        const style = getSlotStyle(
+                          draggingSlot.date,
+                          draggingSlot.startZeit,
+                          draggingSlot.endZeit
+                        )
+                        return (
+                          <div
+                            className="absolute left-1 right-1 rounded-md p-2 overflow-hidden shadow-lg border-2 border-primary bg-primary/20 pointer-events-none z-20"
+                            style={{ top: dragPreview.top, height: style.height }}
+                          >
+                            <div className="font-medium text-sm truncate text-primary">Termin</div>
+                            <div className="text-xs text-primary/80">
+                              {formatMinutesToTime(getMinutesFromY(dragPreview.top))} -{' '}
+                              {formatMinutesToTime(
+                                getMinutesFromY(dragPreview.top) +
+                                  (parseInt(draggingSlot.endZeit.split(':')[0]) * 60 +
+                                    parseInt(draggingSlot.endZeit.split(':')[1]) -
+                                    (parseInt(draggingSlot.startZeit.split(':')[0]) * 60 +
+                                      parseInt(draggingSlot.startZeit.split(':')[1])))
+                              )}
+                            </div>
                           </div>
-                          <div className="text-xs text-primary/80">
-                            {formatMinutesToTime(getMinutesFromY(dragPreview.top))} - {formatMinutesToTime(getMinutesFromY(dragPreview.top) + ((parseInt(draggingSlot.endZeit.split(':')[0]) * 60 + parseInt(draggingSlot.endZeit.split(':')[1])) - (parseInt(draggingSlot.startZeit.split(':')[0]) * 60 + parseInt(draggingSlot.startZeit.split(':')[1]))))}
-                          </div>
-                        </div>
-                      )
-                    })()}
+                        )
+                      })()}
 
                     {/* Drag Preview Ghost Element für Muster */}
-                    {dragState?.type === 'pattern' && dragPreview && dragPreview.dayIndex === dayIndex && (() => {
-                      const config = dayTimeConfigs.find(c => c.dayIndex === dragState.dayIndex)
-                      if (!config) return null
-                      const endZeit = addMinutesToTime(config.startZeit, duration)
-                      const style = getSlotStyle(weekDays[dayIndex], config.startZeit, endZeit)
-                      return (
-                        <div
-                          className={cn(
-                            'absolute left-1 right-1 rounded-md p-2 overflow-hidden shadow-lg border-2 pointer-events-none z-20',
-                            'bg-blue-500/30 border-blue-500'
-                          )}
-                          style={{ top: dragPreview.top, height: style.height }}
-                        >
-                          <div className="font-medium text-xs text-blue-600">
-                            {WEEKDAY_NAMES_SHORT[config.dayIndex]}
+                    {dragState?.type === 'pattern' &&
+                      dragPreview &&
+                      dragPreview.dayIndex === dayIndex &&
+                      (() => {
+                        const config = dayTimeConfigs.find((c) => c.dayIndex === dragState.dayIndex)
+                        if (!config) return null
+                        const endZeit = addMinutesToTime(config.startZeit, duration)
+                        const style = getSlotStyle(weekDays[dayIndex], config.startZeit, endZeit)
+                        return (
+                          <div
+                            className={cn(
+                              'absolute left-1 right-1 rounded-md p-2 overflow-hidden shadow-lg border-2 pointer-events-none z-20',
+                              'bg-blue-500/30 border-blue-500'
+                            )}
+                            style={{ top: dragPreview.top, height: style.height }}
+                          >
+                            <div className="font-medium text-xs text-blue-600">
+                              {WEEKDAY_NAMES_SHORT[config.dayIndex]}
+                            </div>
+                            <div className="text-xs text-blue-500">
+                              {formatMinutesToTime(getMinutesFromY(dragPreview.top))} -{' '}
+                              {formatMinutesToTime(getMinutesFromY(dragPreview.top) + duration)}
+                            </div>
                           </div>
-                          <div className="text-xs text-blue-500">
-                            {formatMinutesToTime(getMinutesFromY(dragPreview.top))} - {formatMinutesToTime(getMinutesFromY(dragPreview.top) + duration)}
-                          </div>
-                        </div>
-                      )
-                    })()}
+                        )
+                      })()}
                   </div>
                 )
               })}
@@ -810,6 +886,22 @@ export const Kalender = () => {
           </div>
         </Card>
       </div>
+
+      {/* Termin-Detail-Popover (nur Desktop) */}
+      {selectedTermin && !isMobile && (
+        <BehandlungDetailPopover
+          behandlung={selectedTermin}
+          behandlungsarten={behandlungsarten}
+          open={!!selectedTermin}
+          onOpenChange={(open) => {
+            if (!open) {
+              setSelectedTermin(null)
+              setTerminAnchorEl(null)
+            }
+          }}
+          anchorEl={terminAnchorEl}
+        />
+      )}
     </div>
   )
 }

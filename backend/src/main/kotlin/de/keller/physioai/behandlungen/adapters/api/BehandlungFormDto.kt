@@ -9,4 +9,5 @@ data class BehandlungFormDto(
     val endZeit: LocalDateTime,
     val rezeptId: UUID?,
     val behandlungsartId: UUID?,
+    val bemerkung: String? = null,
 )

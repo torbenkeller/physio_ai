@@ -60,6 +60,7 @@ class BehandlungenControllerTest {
                 endZeit = endZeit,
                 rezeptId = rezeptId,
                 behandlungsartId = null,
+                bemerkung = null,
                 version = 0,
             )
 
@@ -115,6 +116,7 @@ class BehandlungenControllerTest {
                 endZeit = endZeit,
                 rezeptId = null,
                 behandlungsartId = null,
+                bemerkung = null,
                 version = 0,
             )
 
@@ -174,6 +176,7 @@ class BehandlungenControllerTest {
                 endZeit = endZeit,
                 rezeptId = rezeptId,
                 behandlungsartId = null,
+                bemerkung = null,
                 version = 0,
             )
 
@@ -221,6 +224,7 @@ class BehandlungenControllerTest {
                 endZeit = LocalDateTime.of(2024, 1, 15, 11, 0),
                 rezeptId = RezeptId(UUID.fromString("a1b2c3d4-e5f6-7890-1234-567890abcdef")),
                 behandlungsartId = null,
+                bemerkung = null,
                 version = 0,
             )
 
@@ -231,6 +235,7 @@ class BehandlungenControllerTest {
                 endZeit = LocalDateTime.of(2024, 1, 16, 15, 0),
                 rezeptId = null,
                 behandlungsartId = null,
+                bemerkung = null,
                 version = 0,
             )
 
@@ -262,6 +267,7 @@ class BehandlungenControllerTest {
                 endZeit = LocalDateTime.of(2024, 1, 15, 11, 0),
                 rezeptId = RezeptId(UUID.fromString("a1b2c3d4-e5f6-7890-1234-567890abcdef")),
                 behandlungsartId = null,
+                bemerkung = null,
                 version = 0,
             )
 
@@ -298,6 +304,7 @@ class BehandlungenControllerTest {
                 endZeit = endZeit,
                 rezeptId = rezeptId,
                 behandlungsartId = null,
+                bemerkung = null,
                 version = 1,
             )
 
@@ -307,6 +314,7 @@ class BehandlungenControllerTest {
                     startZeit,
                     endZeit,
                     rezeptId,
+                    null,
                     null,
                 )
             } returns updatedBehandlung
@@ -340,6 +348,7 @@ class BehandlungenControllerTest {
                     endZeit,
                     rezeptId,
                     null,
+                    null,
                 )
             }
         }
@@ -353,7 +362,7 @@ class BehandlungenControllerTest {
             val rezeptId = RezeptId(UUID.fromString("a1b2c3d4-e5f6-7890-1234-567890abcdef"))
 
             every {
-                behandlungenService.updateBehandlung(behandlungId, startZeit, endZeit, rezeptId, null)
+                behandlungenService.updateBehandlung(behandlungId, startZeit, endZeit, rezeptId, null, null)
             } throws AggregateNotFoundException()
 
             // Act & Assert
@@ -374,7 +383,7 @@ class BehandlungenControllerTest {
                         ),
                 ).andExpect(MockMvcResultMatchers.status().isNotFound)
 
-            verify { behandlungenService.updateBehandlung(behandlungId, startZeit, endZeit, rezeptId, null) }
+            verify { behandlungenService.updateBehandlung(behandlungId, startZeit, endZeit, rezeptId, null, null) }
         }
     }
 
@@ -428,6 +437,7 @@ class BehandlungenControllerTest {
                 endZeit = neueEndZeit,
                 rezeptId = null,
                 behandlungsartId = null,
+                bemerkung = null,
                 version = 1,
             )
 
@@ -498,6 +508,7 @@ class BehandlungenControllerTest {
                 endZeit = LocalDateTime.of(2024, 1, 15, 11, 0),
                 rezeptId = null,
                 behandlungsartId = null,
+                bemerkung = null,
                 version = 0,
             )
 
@@ -508,6 +519,7 @@ class BehandlungenControllerTest {
                 endZeit = LocalDateTime.of(2024, 1, 17, 15, 0),
                 rezeptId = null,
                 behandlungsartId = null,
+                bemerkung = null,
                 version = 0,
             )
 
@@ -667,6 +679,7 @@ class BehandlungenControllerTest {
                 endZeit = endZeit,
                 rezeptId = null,
                 behandlungsartId = null,
+                bemerkung = null,
                 version = 0,
             )
 
@@ -777,6 +790,7 @@ class BehandlungenControllerTest {
                 endZeit = endZeit,
                 rezeptId = rezeptId,
                 behandlungsartId = null,
+                bemerkung = null,
                 version = 0,
             )
 
@@ -847,6 +861,7 @@ class BehandlungenControllerTest {
                 endZeit = LocalDateTime.of(2024, 1, 15, 11, 0),
                 rezeptId = rezeptId,
                 behandlungsartId = null,
+                bemerkung = null,
                 version = 0,
             )
 
@@ -857,6 +872,7 @@ class BehandlungenControllerTest {
                 endZeit = LocalDateTime.of(2024, 1, 16, 15, 0),
                 rezeptId = rezeptId,
                 behandlungsartId = null,
+                bemerkung = null,
                 version = 0,
             )
 

@@ -25,7 +25,7 @@ const DrawerNavItem = ({ item }: DrawerNavItemProps) => (
 
 export const NavigationDrawer = () => {
   return (
-    <aside className="hidden lg:flex h-screen w-64 flex-col border-r bg-card">
+    <aside className="flex h-screen w-64 flex-col border-r bg-card">
       {/* Logo */}
       <div className="flex h-16 items-center border-b px-6">
         <h1 className="text-xl font-bold text-primary">PhysioAI</h1>

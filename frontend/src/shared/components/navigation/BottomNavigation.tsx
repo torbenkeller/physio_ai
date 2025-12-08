@@ -6,7 +6,7 @@ export const BottomNavigation = () => {
   return (
     <nav
       aria-label="Hauptnavigation"
-      className="flex sm:hidden fixed bottom-0 left-0 right-0 h-16 items-center justify-around border-t bg-card px-2 z-50"
+      className="flex fixed bottom-0 left-0 right-0 h-16 items-center justify-around border-t bg-card px-2 z-40"
     >
       {MOBILE_NAV_ITEMS.map((item) => (
         <NavLink

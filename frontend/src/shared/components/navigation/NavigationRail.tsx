@@ -9,7 +9,7 @@ interface RailNavItemProps {
 
 const RailNavItem = ({ item }: RailNavItemProps) => (
   <div className="flex justify-center w-full">
-    <Tooltip delayDuration={0}>
+    <Tooltip delayDuration={200}>
       <TooltipTrigger asChild>
         <NavLink
           to={item.to}
@@ -35,7 +35,7 @@ const RailNavItem = ({ item }: RailNavItemProps) => (
 
 export const NavigationRail = () => {
   return (
-    <aside className="hidden sm:flex lg:hidden h-screen w-20 flex-col border-r bg-card py-4">
+    <aside className="flex h-screen w-20 flex-col border-r bg-card py-4">
       {/* Logo (kompakt) */}
       <div className="h-14 flex items-center justify-center mb-4">
         <span className="text-lg font-bold text-primary">P</span>

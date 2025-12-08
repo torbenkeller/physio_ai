@@ -4,7 +4,7 @@ import { Button } from '@/shared/components/ui/button'
 
 export const MobileHeader = () => {
   return (
-    <header className="flex sm:hidden h-14 items-center justify-between border-b bg-card px-4">
+    <header className="flex h-14 items-center justify-between border-b bg-card px-4">
       {/* Logo */}
       <h1 className="text-lg font-bold text-primary">PhysioAI</h1>
 

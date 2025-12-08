@@ -1,0 +1,27 @@
+#!/bin/bash
+
+# Setup Git hooks for PhysioAI
+# Run this script after cloning the repository
+
+set -e
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+ROOT_DIR="$(dirname "$SCRIPT_DIR")"
+HOOKS_DIR="$ROOT_DIR/.git/hooks"
+
+echo "Setting up Git hooks..."
+
+# Create symlink for pre-commit hook
+if [ -L "$HOOKS_DIR/pre-commit" ]; then
+    rm "$HOOKS_DIR/pre-commit"
+fi
+
+if [ -f "$HOOKS_DIR/pre-commit" ]; then
+    echo "Backing up existing pre-commit hook to pre-commit.backup"
+    mv "$HOOKS_DIR/pre-commit" "$HOOKS_DIR/pre-commit.backup"
+fi
+
+ln -s ../../scripts/pre-commit "$HOOKS_DIR/pre-commit"
+echo "✓ pre-commit hook installed"
+
+echo "Git hooks setup complete!"

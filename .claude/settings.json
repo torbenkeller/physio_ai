@@ -6,13 +6,13 @@
   },
   "gitAttribution": false,
   "hooks": {
-    "Stop": [
+    "Notification": [
       {
         "matcher": "",
         "hooks": [
           {
             "type": "command",
-            "command": "scripts/run-tests"
+            "command": "notify-send 'Claude Code' 'Awaiting your input'"
           }
         ]
       }

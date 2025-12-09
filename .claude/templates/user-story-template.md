@@ -1,17 +1,13 @@
 # User Story Template
 
-Dieses Template definiert das Standard-Format für User Stories im PhysioAI Projekt.
-
----
-
-## Template
-
 ```markdown
 ## User Story
 Als {{ROLLE}} möchte ich {{FUNKTIONALITÄT}}, damit {{NUTZEN}}.
 
-## Persona
-{{PERSONA_LINK}}
+## Kontext
+- **Persona**: {{PERSONA_LINK}}
+- **User Journey**: {{USER_JOURNEY_LINK}}
+- **Step**: {{USER_JOURNEY_STEP}}
 
 ## Beschreibung
 {{BESCHREIBUNG}}
@@ -28,53 +24,15 @@ Als {{ROLLE}} möchte ich {{FUNKTIONALITÄT}}, damit {{NUTZEN}}.
 - [ ] Dokumentation aktualisiert (falls nötig)
 ```
 
----
+## Variablen
 
-## Variablen-Beschreibung
-
-| Variable | Beschreibung | Beispiel |
-|----------|--------------|----------|
-| `{{ROLLE}}` | Die Persona/Rolle des Nutzers (aus Glossar) | Physiotherapeut |
-| `{{FUNKTIONALITÄT}}` | Was der Nutzer tun können soll | ein Rezept fotografieren und hochladen |
-| `{{NUTZEN}}` | Der Mehrwert für den Nutzer | die Rezeptdaten automatisch erfasst werden |
-| `{{PERSONA_LINK}}` | Link zur Persona im Wiki | [Carsten Weber](wiki-link) |
-| `{{BESCHREIBUNG}}` | Detaillierte Erklärung der Story | Ausführlicher Kontext und Details |
-| `{{KRITERIUM_N}}` | Testbare Akzeptanzkriterien | Rezeptbild wird im JPEG/PNG Format akzeptiert |
-
----
-
-## Richtlinien
-
-### User Story Satz
-- Verwendet die ubiquitäre Sprache aus dem Glossar (`docs/architektur/glossary.md`)
-- Format: "Als [Rolle] möchte ich [Funktionalität], damit [Nutzen]."
-- Fokus auf den Geschäftswert, nicht auf technische Implementierung
-
-### Persona
-- Verlinkt zur entsprechenden Persona im GitHub Wiki
-- Hauptpersona: Carsten Weber (Physiotherapeut)
-
-### Beschreibung
-- Erklärt den Kontext und Hintergrund
-- Beschreibt das "Warum" hinter der Story
-- Kann technische Randbedingungen enthalten
-
-### Akzeptanzkriterien
-- 3-7 spezifische, testbare Kriterien
-- Als Checkbox-Liste formatiert
-- Jedes Kriterium ist eigenständig überprüfbar
-- Vermeidet vage Formulierungen wie "sollte gut funktionieren"
-
-### Definition of Done
-- Standard-DoD wird für alle Stories verwendet
-- Kann bei Bedarf story-spezifisch erweitert werden
-- Nicht reduzieren ohne triftigen Grund
-
----
-
-## Hinweise zur Verwendung
-
-- **Milestone/Epic**: Wird über GitHub CLI zugewiesen (`--milestone`), nicht im Body dupliziert
-- **Labels**: Standard-Label `story` wird beim Erstellen hinzugefügt
-- **Sprache**: Alle Inhalte auf Deutsch
-- **Terminologie**: Nur Begriffe aus dem Domain-Glossar verwenden
+| Variable | Beschreibung |
+|----------|--------------|
+| `{{ROLLE}}` | Nutzerrolle aus dem Glossar (z.B. Physiotherapeut) |
+| `{{FUNKTIONALITÄT}}` | Was der Nutzer tun können soll |
+| `{{NUTZEN}}` | Warum das wertvoll ist |
+| `{{PERSONA_LINK}}` | Link zur Persona im Wiki |
+| `{{USER_JOURNEY_LINK}}` | Link zur User Journey im Wiki |
+| `{{USER_JOURNEY_STEP}}` | Aktueller Step in der Journey (z.B. "3. Rezept hochladen") |
+| `{{BESCHREIBUNG}}` | Detaillierter Kontext |
+| `{{KRITERIUM_N}}` | Testbare Akzeptanzkriterien (3-7 Stück) |

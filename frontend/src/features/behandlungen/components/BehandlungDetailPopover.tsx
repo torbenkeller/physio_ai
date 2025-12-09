@@ -65,14 +65,18 @@ export const BehandlungDetailPopover = ({
     }
   }, [open, behandlung.bemerkung])
 
-  // Cleanup debounce timer on unmount
+  // Cleanup debounce timer on unmount or when popover closes
   useEffect(() => {
+    if (!open && debounceTimerRef.current) {
+      clearTimeout(debounceTimerRef.current)
+      debounceTimerRef.current = null
+    }
     return () => {
       if (debounceTimerRef.current) {
         clearTimeout(debounceTimerRef.current)
       }
     }
-  }, [])
+  }, [open])
 
   const saveBemerkung = useCallback(
     async (value: string) => {
@@ -312,9 +316,15 @@ export const BehandlungDetailPopover = ({
               value={bemerkung}
               onChange={handleBemerkungChange}
               placeholder="Bemerkung hinzufügen..."
+              aria-label="Bemerkung"
+              aria-describedby={isSaving ? 'saving-status' : undefined}
               className="flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 resize-none"
             />
-            {isSaving && <p className="text-xs text-muted-foreground">Wird gespeichert...</p>}
+            {isSaving && (
+              <p id="saving-status" role="status" className="text-xs text-muted-foreground">
+                Wird gespeichert...
+              </p>
+            )}
           </div>
         </div>
       </Card>

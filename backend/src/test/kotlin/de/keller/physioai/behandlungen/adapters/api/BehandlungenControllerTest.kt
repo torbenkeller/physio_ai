@@ -388,6 +388,97 @@ class BehandlungenControllerTest {
     }
 
     @Nested
+    inner class UpdateBemerkung {
+        @Test
+        fun `should update bemerkung and return updated BehandlungDto`() {
+            // Arrange
+            val behandlungId = BehandlungId(UUID.fromString("f1e2d3c4-b5a6-9870-1234-567890fedcba"))
+            val patientId = PatientId(UUID.fromString("d7e8f9a0-b1c2-3d4e-5f6a-7b8c9d0e1f2a"))
+            val bemerkung = "Neue Bemerkung"
+
+            val updatedBehandlung = BehandlungAggregate(
+                id = behandlungId,
+                patientId = patientId,
+                startZeit = LocalDateTime.of(2024, 1, 15, 10, 0),
+                endZeit = LocalDateTime.of(2024, 1, 15, 11, 0),
+                rezeptId = null,
+                behandlungsartId = null,
+                bemerkung = bemerkung,
+                version = 1,
+            )
+
+            every { behandlungenService.updateBemerkung(behandlungId, bemerkung) } returns updatedBehandlung
+
+            // Act & Assert
+            mockMvc
+                .perform(
+                    MockMvcRequestBuilders
+                        .patch("/behandlungen/${behandlungId.id}/bemerkung")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""{"bemerkung": "$bemerkung"}"""),
+                ).andExpect(MockMvcResultMatchers.status().isOk)
+                .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.id").value(behandlungId.id.toString()))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.bemerkung").value(bemerkung))
+
+            verify { behandlungenService.updateBemerkung(behandlungId, bemerkung) }
+        }
+
+        @Test
+        fun `should clear bemerkung when set to null`() {
+            // Arrange
+            val behandlungId = BehandlungId(UUID.fromString("f1e2d3c4-b5a6-9870-1234-567890fedcba"))
+            val patientId = PatientId(UUID.fromString("d7e8f9a0-b1c2-3d4e-5f6a-7b8c9d0e1f2a"))
+
+            val updatedBehandlung = BehandlungAggregate(
+                id = behandlungId,
+                patientId = patientId,
+                startZeit = LocalDateTime.of(2024, 1, 15, 10, 0),
+                endZeit = LocalDateTime.of(2024, 1, 15, 11, 0),
+                rezeptId = null,
+                behandlungsartId = null,
+                bemerkung = null,
+                version = 1,
+            )
+
+            every { behandlungenService.updateBemerkung(behandlungId, null) } returns updatedBehandlung
+
+            // Act & Assert
+            mockMvc
+                .perform(
+                    MockMvcRequestBuilders
+                        .patch("/behandlungen/${behandlungId.id}/bemerkung")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""{"bemerkung": null}"""),
+                ).andExpect(MockMvcResultMatchers.status().isOk)
+                .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.id").value(behandlungId.id.toString()))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.bemerkung").doesNotExist())
+
+            verify { behandlungenService.updateBemerkung(behandlungId, null) }
+        }
+
+        @Test
+        fun `should return 404 when behandlung does not exist`() {
+            // Arrange
+            val behandlungId = BehandlungId(UUID.fromString("f1e2d3c4-b5a6-9870-1234-567890fedcba"))
+
+            every { behandlungenService.updateBemerkung(behandlungId, any()) } throws AggregateNotFoundException()
+
+            // Act & Assert
+            mockMvc
+                .perform(
+                    MockMvcRequestBuilders
+                        .patch("/behandlungen/${behandlungId.id}/bemerkung")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""{"bemerkung": "Test"}"""),
+                ).andExpect(MockMvcResultMatchers.status().isNotFound)
+
+            verify { behandlungenService.updateBemerkung(behandlungId, "Test") }
+        }
+    }
+
+    @Nested
     inner class DeleteBehandlung {
         @Test
         fun `should call service delete method`() {

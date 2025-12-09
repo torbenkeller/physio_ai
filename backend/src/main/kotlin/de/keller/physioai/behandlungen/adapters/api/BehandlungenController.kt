@@ -9,6 +9,7 @@ import de.keller.physioai.shared.BehandlungId
 import de.keller.physioai.shared.BehandlungsartId
 import de.keller.physioai.shared.PatientId
 import de.keller.physioai.shared.RezeptId
+import jakarta.validation.Valid
 import org.jmolecules.architecture.hexagonal.PrimaryAdapter
 import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.DeleteMapping
@@ -154,7 +155,7 @@ class BehandlungenController(
     @PatchMapping("/{id}/bemerkung")
     fun updateBemerkung(
         @PathVariable id: UUID,
-        @RequestBody dto: UpdateBemerkungDto,
+        @Valid @RequestBody dto: UpdateBemerkungDto,
     ): BehandlungDto {
         val behandlung = behandlungenService.updateBemerkung(
             id = BehandlungId(id),

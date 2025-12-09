@@ -7,6 +7,7 @@ import type {
   WeeklyCalendarResponse,
   ConflictCheckRequest,
   ConflictResult,
+  UpdateBemerkungDto,
 } from '../types/behandlung.types'
 
 export const behandlungenApi = api.injectEndpoints({
@@ -58,7 +59,10 @@ export const behandlungenApi = api.injectEndpoints({
       }),
       invalidatesTags: ['Behandlungen'],
     }),
-    verschiebeBehandlung: builder.mutation<BehandlungDto, { id: string; data: VerschiebeBehandlungDto }>({
+    verschiebeBehandlung: builder.mutation<
+      BehandlungDto,
+      { id: string; data: VerschiebeBehandlungDto }
+    >({
       query: ({ id, data }) => ({
         url: `/behandlungen/${id}/verschiebe`,
         method: 'PUT',
@@ -81,6 +85,14 @@ export const behandlungenApi = api.injectEndpoints({
         body,
       }),
     }),
+    updateBemerkung: builder.mutation<BehandlungDto, { id: string; data: UpdateBemerkungDto }>({
+      query: ({ id, data }) => ({
+        url: `/behandlungen/${id}/bemerkung`,
+        method: 'PATCH',
+        body: data,
+      }),
+      invalidatesTags: ['Behandlungen'],
+    }),
   }),
 })
 
@@ -97,4 +109,5 @@ export const {
   useVerschiebeBehandlungMutation,
   useCreateBehandlungenBatchMutation,
   useCheckConflictsMutation,
+  useUpdateBemerkungMutation,
 } = behandlungenApi

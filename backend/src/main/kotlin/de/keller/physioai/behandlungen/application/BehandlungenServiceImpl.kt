@@ -63,6 +63,7 @@ class BehandlungenServiceImpl(
         endZeit: LocalDateTime,
         rezeptId: RezeptId?,
         behandlungsartId: BehandlungsartId?,
+        bemerkung: String?,
     ): BehandlungAggregate {
         val behandlung = behandlungenRepository.findById(id)
             ?: throw AggregateNotFoundException()
@@ -72,7 +73,19 @@ class BehandlungenServiceImpl(
             endZeit = endZeit,
             rezeptId = rezeptId,
             behandlungsartId = behandlungsartId,
+            bemerkung = bemerkung,
         )
+        return behandlungenRepository.save(updatedBehandlung)
+    }
+
+    override fun updateBemerkung(
+        id: BehandlungId,
+        bemerkung: String?,
+    ): BehandlungAggregate {
+        val behandlung = behandlungenRepository.findById(id)
+            ?: throw AggregateNotFoundException()
+
+        val updatedBehandlung = behandlung.updateBemerkung(bemerkung)
         return behandlungenRepository.save(updatedBehandlung)
     }
 

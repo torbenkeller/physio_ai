@@ -21,6 +21,7 @@ data class BehandlungAggregate(
     val endZeit: LocalDateTime,
     val rezeptId: RezeptId?,
     val behandlungsartId: BehandlungsartId?,
+    val bemerkung: String?,
     @Version
     val version: Int = 0,
 ) {
@@ -29,6 +30,7 @@ data class BehandlungAggregate(
         endZeit: LocalDateTime,
         rezeptId: RezeptId?,
         behandlungsartId: BehandlungsartId?,
+        bemerkung: String?,
     ): BehandlungAggregate {
         require(startZeit.isBefore(endZeit)) { "Start time must be before end time" }
         return copy(
@@ -36,8 +38,11 @@ data class BehandlungAggregate(
             endZeit = endZeit,
             rezeptId = rezeptId,
             behandlungsartId = behandlungsartId,
+            bemerkung = bemerkung,
         )
     }
+
+    fun updateBemerkung(bemerkung: String?): BehandlungAggregate = copy(bemerkung = bemerkung)
 
     fun verschiebe(nach: LocalDateTime): BehandlungAggregate {
         val duration = java.time.Duration.between(startZeit, endZeit)
@@ -55,6 +60,7 @@ data class BehandlungAggregate(
             endZeit: LocalDateTime,
             rezeptId: RezeptId?,
             behandlungsartId: BehandlungsartId?,
+            bemerkung: String? = null,
         ): BehandlungAggregate {
             require(startZeit.isBefore(endZeit)) { "Start time must be before end time" }
             return BehandlungAggregate(
@@ -64,6 +70,7 @@ data class BehandlungAggregate(
                 endZeit = endZeit,
                 rezeptId = rezeptId,
                 behandlungsartId = behandlungsartId,
+                bemerkung = bemerkung,
             )
         }
     }

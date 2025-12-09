@@ -97,11 +97,13 @@ class BehandlungAggregateTest {
         val newStartZeit = LocalDateTime.of(2024, 1, 15, 14, 0)
         val newEndZeit = LocalDateTime.of(2024, 1, 15, 15, 0)
         val newRezeptId = RezeptId(UUID.randomUUID())
+        val newBemerkung = "Test Bemerkung"
         val updatedBehandlung = behandlung.update(
             startZeit = newStartZeit,
             endZeit = newEndZeit,
             rezeptId = newRezeptId,
             behandlungsartId = null,
+            bemerkung = newBemerkung,
         )
 
         // Then - behandlung should be updated
@@ -110,6 +112,7 @@ class BehandlungAggregateTest {
         assertEquals(newStartZeit, updatedBehandlung.startZeit)
         assertEquals(newEndZeit, updatedBehandlung.endZeit)
         assertEquals(newRezeptId, updatedBehandlung.rezeptId)
+        assertEquals(newBemerkung, updatedBehandlung.bemerkung)
     }
 
     @Test
@@ -134,8 +137,54 @@ class BehandlungAggregateTest {
                 endZeit = invalidEndZeit,
                 rezeptId = null,
                 behandlungsartId = null,
+                bemerkung = null,
             )
         }
+    }
+
+    @Test
+    fun `should update bemerkung only`() {
+        // Given - existing behandlung without bemerkung
+        val patientId = PatientId(UUID.randomUUID())
+        val behandlung = BehandlungAggregate.create(
+            patientId = patientId,
+            startZeit = LocalDateTime.of(2024, 1, 15, 10, 0),
+            endZeit = LocalDateTime.of(2024, 1, 15, 11, 0),
+            rezeptId = null,
+            behandlungsartId = null,
+        )
+
+        // When - updating only bemerkung
+        val newBemerkung = "Neue Bemerkung"
+        val updatedBehandlung = behandlung.updateBemerkung(newBemerkung)
+
+        // Then - only bemerkung should be changed
+        assertEquals(behandlung.id, updatedBehandlung.id)
+        assertEquals(behandlung.startZeit, updatedBehandlung.startZeit)
+        assertEquals(behandlung.endZeit, updatedBehandlung.endZeit)
+        assertEquals(newBemerkung, updatedBehandlung.bemerkung)
+    }
+
+    @Test
+    fun `should create behandlung with bemerkung`() {
+        // Given - behandlung data with bemerkung
+        val patientId = PatientId(UUID.randomUUID())
+        val startZeit = LocalDateTime.of(2024, 1, 15, 10, 0)
+        val endZeit = LocalDateTime.of(2024, 1, 15, 11, 0)
+        val bemerkung = "Test Bemerkung"
+
+        // When - creating behandlung with bemerkung
+        val behandlung = BehandlungAggregate.create(
+            patientId = patientId,
+            startZeit = startZeit,
+            endZeit = endZeit,
+            rezeptId = null,
+            behandlungsartId = null,
+            bemerkung = bemerkung,
+        )
+
+        // Then - behandlung should have bemerkung
+        assertEquals(bemerkung, behandlung.bemerkung)
     }
 
     @Test

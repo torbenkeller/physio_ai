@@ -7,6 +7,7 @@ export interface BehandlungDto {
   endZeit: string
   rezeptId: string | null
   behandlungsartId: string | null
+  bemerkung: string | null
 }
 
 export interface BehandlungFormDto {
@@ -15,6 +16,7 @@ export interface BehandlungFormDto {
   endZeit: string
   rezeptId?: string | null
   behandlungsartId?: string | null
+  bemerkung?: string | null
 }
 
 export interface BehandlungKalenderDto {
@@ -22,7 +24,13 @@ export interface BehandlungKalenderDto {
   startZeit: string
   endZeit: string
   rezeptId: string | null
+  behandlungsartId: string | null
+  bemerkung: string | null
   patient: PatientSummaryDto
+}
+
+export interface UpdateBemerkungDto {
+  bemerkung: string | null
 }
 
 export interface VerschiebeBehandlungDto {
@@ -33,10 +41,10 @@ export type WeeklyCalendarResponse = Record<string, BehandlungKalenderDto[]>
 
 // Multi-Termin-Erstellung
 export interface SelectedTimeSlot {
-  id: string           // Temporäre Client-ID für UI
+  id: string // Temporäre Client-ID für UI
   date: Date
-  startZeit: string    // HH:mm Format
-  endZeit: string      // HH:mm Format
+  startZeit: string // HH:mm Format
+  endZeit: string // HH:mm Format
   hasConflict?: boolean
   conflictingWith?: ConflictingBehandlung[]
 }
@@ -45,21 +53,21 @@ export type SeriesPattern = 'weekly' | 'biweekly' | 'monthly' | 'twice-weekly'
 
 // Wochentag mit individueller Startzeit
 export interface DayTimeConfig {
-  dayIndex: number    // 0=Mo, 1=Di, ... 6=So
-  startZeit: string   // HH:mm Format
+  dayIndex: number // 0=Mo, 1=Di, ... 6=So
+  startZeit: string // HH:mm Format
 }
 
 // Flexible Serie-Konfiguration
 export interface SeriesConfig {
-  repeatEveryWeeks: number       // Wiederholung alle X Wochen
-  selectedDays: number[]         // Ausgewählte Wochentage (0=Mo, 1=Di, ... 6=So) - Rückwärtskompatibilität
-  dayTimeConfigs?: DayTimeConfig[]  // Wochentage mit individueller Startzeit
+  repeatEveryWeeks: number // Wiederholung alle X Wochen
+  selectedDays: number[] // Ausgewählte Wochentage (0=Mo, 1=Di, ... 6=So) - Rückwärtskompatibilität
+  dayTimeConfigs?: DayTimeConfig[] // Wochentage mit individueller Startzeit
 }
 
 // Konflikt-Prüfung
 export interface TimeSlotCheckDto {
-  startZeit: string  // ISO DateTime Format
-  endZeit: string    // ISO DateTime Format
+  startZeit: string // ISO DateTime Format
+  endZeit: string // ISO DateTime Format
 }
 
 export interface ConflictCheckRequest {

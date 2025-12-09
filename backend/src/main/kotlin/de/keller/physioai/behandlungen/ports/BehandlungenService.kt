@@ -36,6 +36,12 @@ interface BehandlungenService {
         endZeit: LocalDateTime,
         rezeptId: RezeptId?,
         behandlungsartId: BehandlungsartId?,
+        bemerkung: String?,
+    ): BehandlungAggregate
+
+    fun updateBemerkung(
+        id: BehandlungId,
+        bemerkung: String?,
     ): BehandlungAggregate
 
     fun deleteBehandlung(id: BehandlungId)

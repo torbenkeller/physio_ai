@@ -5,6 +5,7 @@ import { PatientenListe } from './features/patienten/components/PatientenListe'
 import { PatientDetail } from './features/patienten/components/PatientDetail'
 import { PatientNeu } from './features/patienten/components/PatientNeu'
 import { Kalender } from './features/behandlungen/components/Kalender'
+import { BehandlungDetailPage } from './features/behandlungen/components/BehandlungDetailPage'
 import { RezepteListe } from './features/rezepte/components/RezepteListe'
 import { RezeptDetail } from './features/rezepte/components/RezeptDetail'
 import { RezeptUpload } from './features/rezepte/components/RezeptUpload'
@@ -17,6 +18,7 @@ const App = () => {
       <Routes>
         <Route path="/" element={<Dashboard />} />
         <Route path="/kalender" element={<Kalender />} />
+        <Route path="/kalender/termin/:id" element={<BehandlungDetailPage />} />
         <Route path="/patienten" element={<PatientenListe />} />
         <Route path="/patienten/neu" element={<PatientNeu />} />
         <Route path="/patienten/:id" element={<PatientDetail />} />

@@ -1,3 +1,5 @@
+import type { BehandlungKalenderDto } from '../types/behandlung.types'
+
 // Kalender-Konfiguration
 export const HOUR_HEIGHT = 60 // Pixel pro Stunde
 
@@ -87,7 +89,10 @@ export const getWeekDays = (weekStart: Date, includeWeekend: boolean = false): D
 }
 
 // Position und Höhe eines Termins berechnen (0-24 Uhr)
-export const getTerminStyle = (startZeit: string, endZeit: string): { top: number; height: number } => {
+export const getTerminStyle = (
+  startZeit: string,
+  endZeit: string
+): { top: number; height: number } => {
   const start = new Date(startZeit)
   const end = new Date(endZeit)
 
@@ -102,7 +107,11 @@ export const getTerminStyle = (startZeit: string, endZeit: string): { top: numbe
 
 // Zeit aus Klick-Position berechnen (0-24 Uhr)
 // Klickposition = Mitte des Termins (nicht Anfang)
-export const getTimeFromPosition = (y: number, date: Date, duration: number = 90): { start: Date; end: Date } => {
+export const getTimeFromPosition = (
+  y: number,
+  date: Date,
+  duration: number = 90
+): { start: Date; end: Date } => {
   const totalMinutes = (y / HOUR_HEIGHT) * 60
 
   // Klickposition ist Mitte des Termins - berechne Startzeit
@@ -204,7 +213,7 @@ export const getISOWeekNumber = (date: Date): number => {
   const dayNum = d.getUTCDay() || 7
   d.setUTCDate(d.getUTCDate() + 4 - dayNum)
   const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1))
-  return Math.ceil((((d.getTime() - yearStart.getTime()) / 86400000) + 1) / 7)
+  return Math.ceil(((d.getTime() - yearStart.getTime()) / 86400000 + 1) / 7)
 }
 
 // Wochenbereich formatieren (z.B. "KW 49 · Dezember 2025")
@@ -213,4 +222,188 @@ export const formatWeekRange = (weekStart: Date, _includeWeekend: boolean = fals
   const month = new Intl.DateTimeFormat('de-DE', { month: 'long' }).format(weekStart)
   const year = weekStart.getFullYear()
   return `KW ${weekNumber} · ${month} ${year}`
+}
+
+// ============================================================================
+// Overlap-Visualisierung für überlappende Termine
+// ============================================================================
+
+/** Layout-Information für einen Termin innerhalb einer Kollisionsgruppe */
+export interface TerminLayoutInfo {
+  /** 0-basierte Spaltenposition innerhalb der Gruppe */
+  columnIndex: number
+  /** Gesamtanzahl Spalten in dieser Kollisionsgruppe */
+  totalColumns: number
+}
+
+/** Map von Termin-ID zu Layout-Information */
+export type TerminLayoutMap = Map<string, TerminLayoutInfo>
+
+/**
+ * Prüft ob zwei Termine sich zeitlich überlappen.
+ * Zwei Termine überlappen, wenn sie gemeinsame Zeitpunkte haben.
+ * Exakt angrenzende Termine (Ende A = Start B) überlappen NICHT.
+ */
+const overlaps = (a: BehandlungKalenderDto, b: BehandlungKalenderDto): boolean => {
+  const aStart = new Date(a.startZeit).getTime()
+  const aEnd = new Date(a.endZeit).getTime()
+  const bStart = new Date(b.startZeit).getTime()
+  const bEnd = new Date(b.endZeit).getTime()
+  return aStart < bEnd && bStart < aEnd
+}
+
+/**
+ * Gruppiert überlappende Termine in Kollisionsgruppen.
+ * Termine die sich (auch transitiv) überlappen, landen in derselben Gruppe.
+ */
+const buildCollisionGroups = (termine: BehandlungKalenderDto[]): BehandlungKalenderDto[][] => {
+  if (termine.length === 0) return []
+
+  // Nach Startzeit sortieren für effizientere Verarbeitung
+  const sorted = [...termine].sort(
+    (a, b) => new Date(a.startZeit).getTime() - new Date(b.startZeit).getTime()
+  )
+
+  const groups: BehandlungKalenderDto[][] = []
+
+  for (const termin of sorted) {
+    // Finde alle Gruppen, mit denen dieser Termin überlappt
+    const overlappingGroupIndices: number[] = []
+
+    for (let i = 0; i < groups.length; i++) {
+      if (groups[i].some((existing) => overlaps(existing, termin))) {
+        overlappingGroupIndices.push(i)
+      }
+    }
+
+    if (overlappingGroupIndices.length === 0) {
+      // Keine Überlappung → neue Gruppe
+      groups.push([termin])
+    } else if (overlappingGroupIndices.length === 1) {
+      // Überlappung mit genau einer Gruppe → hinzufügen
+      groups[overlappingGroupIndices[0]].push(termin)
+    } else {
+      // Überlappung mit mehreren Gruppen → Gruppen zusammenführen
+      const mergedGroup: BehandlungKalenderDto[] = [termin]
+      // Rückwärts iterieren um Indizes stabil zu halten
+      for (let i = overlappingGroupIndices.length - 1; i >= 0; i--) {
+        const groupIndex = overlappingGroupIndices[i]
+        mergedGroup.push(...groups[groupIndex])
+        groups.splice(groupIndex, 1)
+      }
+      groups.push(mergedGroup)
+    }
+  }
+
+  return groups
+}
+
+/**
+ * Weist Terminen innerhalb einer Kollisionsgruppe Spalten zu.
+ * Verwendet einen Greedy-Algorithmus: Erste freie Spalte wird belegt.
+ */
+const assignColumnsToGroup = (group: BehandlungKalenderDto[]): TerminLayoutMap => {
+  const result: TerminLayoutMap = new Map()
+
+  if (group.length === 0) return result
+
+  if (group.length === 1) {
+    result.set(group[0].id, { columnIndex: 0, totalColumns: 1 })
+    return result
+  }
+
+  // Nach Startzeit sortieren, bei Gleichheit: längere Termine zuerst
+  const sorted = [...group].sort((a, b) => {
+    const startDiff = new Date(a.startZeit).getTime() - new Date(b.startZeit).getTime()
+    if (startDiff !== 0) return startDiff
+    // Längere Termine zuerst für stabilere Layouts
+    const aDuration = new Date(a.endZeit).getTime() - new Date(a.startZeit).getTime()
+    const bDuration = new Date(b.endZeit).getTime() - new Date(b.startZeit).getTime()
+    return bDuration - aDuration
+  })
+
+  // Track Endzeiten pro Spalte
+  const columnEndTimes: number[] = []
+  const assignments = new Map<string, number>()
+
+  for (const termin of sorted) {
+    const startTime = new Date(termin.startZeit).getTime()
+
+    // Finde erste freie Spalte
+    let assignedColumn = -1
+    for (let col = 0; col < columnEndTimes.length; col++) {
+      if (columnEndTimes[col] <= startTime) {
+        assignedColumn = col
+        break
+      }
+    }
+
+    if (assignedColumn === -1) {
+      // Keine freie Spalte → neue Spalte erstellen
+      assignedColumn = columnEndTimes.length
+      columnEndTimes.push(0)
+    }
+
+    columnEndTimes[assignedColumn] = new Date(termin.endZeit).getTime()
+    assignments.set(termin.id, assignedColumn)
+  }
+
+  const totalColumns = columnEndTimes.length
+
+  for (const [id, columnIndex] of assignments) {
+    result.set(id, { columnIndex, totalColumns })
+  }
+
+  return result
+}
+
+/**
+ * Berechnet Layout-Informationen für alle Termine eines Tages.
+ * Gruppiert überlappende Termine und weist ihnen Spalten zu.
+ *
+ * @param termine - Alle Termine für einen Tag
+ * @returns Map von Termin-ID zu Layout-Information
+ */
+export const calculateTerminLayouts = (termine: BehandlungKalenderDto[]): TerminLayoutMap => {
+  const result: TerminLayoutMap = new Map()
+
+  const collisionGroups = buildCollisionGroups(termine)
+
+  for (const group of collisionGroups) {
+    const groupLayouts = assignColumnsToGroup(group)
+    for (const [id, layout] of groupLayouts) {
+      result.set(id, layout)
+    }
+  }
+
+  return result
+}
+
+/**
+ * Berechnet CSS-Style für einen Termin inklusive horizontaler Positionierung.
+ * Erweitert getTerminStyle um left/width basierend auf Layout-Information.
+ *
+ * @param startZeit - Start-Zeit im ISO-Format
+ * @param endZeit - End-Zeit im ISO-Format
+ * @param layout - Layout-Information aus calculateTerminLayouts
+ */
+export const getTerminStyleWithLayout = (
+  startZeit: string,
+  endZeit: string,
+  layout: TerminLayoutInfo
+): { top: number; height: number; left: string; width: string } => {
+  // Vertikale Positionierung wiederverwenden
+  const { top, height } = getTerminStyle(startZeit, endZeit)
+
+  // Horizontale Positionierung berechnen
+  const { columnIndex, totalColumns } = layout
+  const widthPercent = 100 / totalColumns
+  const leftPercent = columnIndex * widthPercent
+
+  return {
+    top,
+    height,
+    left: `${leftPercent}%`,
+    width: `${widthPercent}%`,
+  }
 }

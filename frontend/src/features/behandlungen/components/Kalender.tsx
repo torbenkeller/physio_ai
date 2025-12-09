@@ -32,7 +32,6 @@ import {
   getWeekStart,
   formatDateForApi,
   getWeekDays,
-  getTerminStyle,
   getTimeFromPosition,
   formatTimeInput,
   formatTime,
@@ -47,6 +46,8 @@ import {
   CONFLICT_COLORS,
   WEEKDAY_NAMES_SHORT,
   addMinutesToTime,
+  calculateTerminLayouts,
+  getTerminStyleWithLayout,
 } from '../utils/kalenderUtils'
 import type {
   BehandlungKalenderDto,
@@ -129,6 +130,20 @@ export const Kalender = () => {
     () => getWeekDays(currentWeekStart, settings.showWeekend),
     [currentWeekStart, settings.showWeekend]
   )
+
+  // Layout-Berechnung für überlappende Termine pro Tag
+  const terminLayoutsByDay = useMemo(() => {
+    const layouts = new Map<string, ReturnType<typeof calculateTerminLayouts>>()
+    if (!calendarData) return layouts
+
+    weekDays.forEach((date) => {
+      const dateKey = formatDateForApi(date)
+      const termine = calendarData[dateKey] || []
+      layouts.set(dateKey, calculateTerminLayouts(termine))
+    })
+
+    return layouts
+  }, [calendarData, weekDays])
 
   // Default count from patient or profile
   const selectedPatientData = patienten?.find((p) => p.id === selectedPatientId)
@@ -680,8 +695,10 @@ export const Kalender = () => {
 
               {/* Tages-Spalten */}
               {weekDays.map((date, dayIndex) => {
+                const dateKey = formatDateForApi(date)
                 const termine = getTermineForDay(date)
                 const daySlots = getSlotsForDay(date)
+                const terminLayouts = terminLayoutsByDay.get(dateKey)
                 return (
                   <div
                     key={dayIndex}
@@ -717,12 +734,25 @@ export const Kalender = () => {
 
                     {/* Bestehende Termine */}
                     {termine.map((termin) => {
-                      const style = getTerminStyle(termin.startZeit, termin.endZeit)
+                      const layout = terminLayouts?.get(termin.id) ?? {
+                        columnIndex: 0,
+                        totalColumns: 1,
+                      }
+                      const style = getTerminStyleWithLayout(
+                        termin.startZeit,
+                        termin.endZeit,
+                        layout
+                      )
                       return (
                         <div
                           key={termin.id}
-                          className="absolute left-1 right-1 rounded-md bg-primary text-primary-foreground p-2 overflow-hidden shadow-sm hover:shadow-md transition-shadow cursor-pointer"
-                          style={{ top: style.top, height: style.height - 4 }}
+                          className="absolute rounded-md bg-primary text-primary-foreground p-2 overflow-hidden shadow-sm hover:shadow-md transition-shadow cursor-pointer"
+                          style={{
+                            top: style.top,
+                            height: style.height - 4,
+                            left: `calc(${style.left} + 4px)`,
+                            width: `calc(${style.width} - 8px)`,
+                          }}
                           onClick={(e) => {
                             e.stopPropagation()
                             if (isMobile) {

@@ -11,6 +11,8 @@ data class BehandlungKalenderDto(
     val startZeit: LocalDateTime,
     val endZeit: LocalDateTime,
     val rezeptId: UUID?,
+    val behandlungsartId: UUID?,
+    val bemerkung: String?,
     val patient: PatientSummaryDto,
 ) {
     companion object {
@@ -20,6 +22,8 @@ data class BehandlungKalenderDto(
                 startZeit = response.behandlungAggregate.startZeit,
                 endZeit = response.behandlungAggregate.endZeit,
                 rezeptId = response.behandlungAggregate.rezeptId?.id,
+                behandlungsartId = response.behandlungAggregate.behandlungsartId?.id,
+                bemerkung = response.behandlungAggregate.bemerkung,
                 patient = PatientSummaryDto.fromDomain(response.patient),
             )
     }

@@ -36,6 +36,7 @@ class BehandlungenServiceImplCalendarTest {
             endZeit = LocalDateTime.of(2024, 1, 15, 11, 0),
             rezeptId = null,
             behandlungsartId = null,
+            bemerkung = null,
             version = 0,
         )
 
@@ -46,6 +47,7 @@ class BehandlungenServiceImplCalendarTest {
             endZeit = LocalDateTime.of(2024, 1, 17, 15, 0),
             rezeptId = null,
             behandlungsartId = null,
+            bemerkung = null,
             version = 0,
         )
 
@@ -56,6 +58,7 @@ class BehandlungenServiceImplCalendarTest {
             endZeit = LocalDateTime.of(2024, 1, 19, 10, 0),
             rezeptId = null,
             behandlungsartId = null,
+            bemerkung = null,
             version = 0,
         )
 
@@ -209,6 +212,7 @@ class BehandlungenServiceImplCalendarTest {
             endZeit = LocalDateTime.of(2024, 1, 15, 11, 0),
             rezeptId = null,
             behandlungsartId = null,
+            bemerkung = null,
             version = 0,
         )
 
@@ -219,6 +223,7 @@ class BehandlungenServiceImplCalendarTest {
             endZeit = LocalDateTime.of(2024, 1, 17, 15, 0),
             rezeptId = null,
             behandlungsartId = null,
+            bemerkung = null,
             version = 0,
         )
 

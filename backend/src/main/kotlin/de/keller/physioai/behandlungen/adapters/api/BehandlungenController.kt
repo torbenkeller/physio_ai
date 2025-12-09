@@ -9,10 +9,12 @@ import de.keller.physioai.shared.BehandlungId
 import de.keller.physioai.shared.BehandlungsartId
 import de.keller.physioai.shared.PatientId
 import de.keller.physioai.shared.RezeptId
+import jakarta.validation.Valid
 import org.jmolecules.architecture.hexagonal.PrimaryAdapter
 import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.PatchMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.PutMapping
@@ -145,6 +147,19 @@ class BehandlungenController(
             endZeit = formDto.endZeit,
             rezeptId = formDto.rezeptId?.let { RezeptId(it) },
             behandlungsartId = formDto.behandlungsartId?.let { BehandlungsartId(it) },
+            bemerkung = formDto.bemerkung,
+        )
+        return BehandlungDto.fromDomain(behandlung)
+    }
+
+    @PatchMapping("/{id}/bemerkung")
+    fun updateBemerkung(
+        @PathVariable id: UUID,
+        @Valid @RequestBody dto: UpdateBemerkungDto,
+    ): BehandlungDto {
+        val behandlung = behandlungenService.updateBemerkung(
+            id = BehandlungId(id),
+            bemerkung = dto.bemerkung,
         )
         return BehandlungDto.fromDomain(behandlung)
     }

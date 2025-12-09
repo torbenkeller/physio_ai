@@ -18,8 +18,8 @@ Each subdirectory contains its own `CLAUDE.md` with specific instructions:
 - **Backend tasks**: Navigate to `backend/` and follow `backend/CLAUDE.md`
 - **Frontend tasks**: Navigate to `frontend/` and follow `frontend/CLAUDE.md`
 - **Documentation**: The `docs/` folder contains project documentation
-  - Architecture docs: `docs/Architektur/`
-  - Product docs: `docs/Product/`
+  - Architecture docs: `docs/architektur/`
+  - Product docs: `docs/produkt/`
 - **Backlog & Issues**: Managed in GitHub Issues: https://github.com/torbenkeller/physio_ai/issues
 
 ## General Guidelines

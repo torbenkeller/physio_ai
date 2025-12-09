@@ -6,9 +6,9 @@ Produktvision, Zielgruppen und Nutzungsszenarien für PhysioAI.
 
 | Datei/Ordner                              | Beschreibung                                                   |
 |-------------------------------------------|----------------------------------------------------------------|
-| [Product-Vision.md](Product-Vision.md)    | Produktvision, Zielgruppen, Hauptfunktionen und Geschäftsziele |
-| [Personas](Personas/README.md)            | Detaillierte Nutzerprofile unserer Zielgruppen                 |
-| [User-Journeys/](User-Journeys/README.md) | End-to-End-Nutzungsszenarien als Mermaid-Diagramme             |
+| [produkt-vision.md](produkt-vision.md)    | Produktvision, Zielgruppen, Hauptfunktionen und Geschäftsziele |
+| [personas](personas/README.md)            | Detaillierte Nutzerprofile unserer Zielgruppen                 |
+| [user-journeys](user-journeys/README.md)  | End-to-End-Nutzungsszenarien als Mermaid-Diagramme             |
 
 ## Backlog
 

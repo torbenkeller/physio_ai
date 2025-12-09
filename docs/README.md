@@ -6,8 +6,8 @@ Willkommen zur Dokumentation von PhysioAI - einer intelligenten Physiotherapiepr
 
 | Datei/Ordner                                      | Beschreibung                                                               |
 |---------------------------------------------------|----------------------------------------------------------------------------|
-| [Architekturdokumentation](Architektur/README.md) | Arc42-Architekturdokumentation (technische Entscheidungen, Systemstruktur) |
-| [Produktdokumentation](Product/README.md)         | Produktdokumentation (Vision, Personas, User Journeys)                     |
+| [Architekturdokumentation](architektur/README.md) | Arc42-Architekturdokumentation (technische Entscheidungen, Systemstruktur) |
+| [Produktdokumentation](produkt/README.md)         | Produktdokumentation (Vision, Personas, User Journeys)                     |
 
 ## Schnelllinks
 

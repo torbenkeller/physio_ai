@@ -6,7 +6,7 @@ Detaillierte Nutzerprofile der PhysioAI-Zielgruppen.
 
 | Datei                    | Beschreibung                                                                                                                                         |
 |--------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------|
-| [Carsten.md](Carsten.md) | **Carsten Weber** - Selbstständiger Physiotherapeut, 42 Jahre, Einzelpraxis, behandelt ausschließlich Privatpatienten. Primäre Persona für PhysioAI. |
+| [carsten.md](carsten.md) | **Carsten Weber** - Selbstständiger Physiotherapeut, 42 Jahre, Einzelpraxis, behandelt ausschließlich Privatpatienten. Primäre Persona für PhysioAI. |
 
 ## Was ist eine Persona?
 

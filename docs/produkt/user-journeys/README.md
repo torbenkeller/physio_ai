@@ -6,7 +6,7 @@ End-to-End-Nutzungsszenarien für PhysioAI als Mermaid-Diagramme.
 
 | Datei                                | Beschreibung                                                                 |
 |--------------------------------------|------------------------------------------------------------------------------|
-| [Neuer-Patient.md](Neuer-Patient.md) | Vollständiger Behandlungsprozess vom ersten Anruf bis zur bezahlten Rechnung |
+| [neuer-patient.md](neuer-patient.md) | Vollständiger Behandlungsprozess vom ersten Anruf bis zur bezahlten Rechnung |
 
 ## Was ist eine User Journey?
 

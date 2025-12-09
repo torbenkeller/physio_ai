@@ -10,7 +10,7 @@ Entwickle folgendes Feature/behebe folgenden Bug: $ARGUMENTS
 
 ## Allgemeine Regeln
 
-- **Glossar beachten**: Halte dich immer an die Terminologie im Domain-Glossar (`docs/architektur/glossary.md`). Wenn du neue Begriffe einführst oder bestehende sich ändern, aktualisiere das Glossar entsprechend.
+- **Glossar beachten**: Halte dich immer an die Terminologie im Domain-Glossar (`docs/Architektur/12-Glossar.md`). Wenn du neue Begriffe einführst oder bestehende sich ändern, aktualisiere das Glossar entsprechend.
 - **Kleinteilig committen**: Erstelle nach jeder abgeschlossenen Teilaufgabe einen Commit mit aussagekräftiger Message.
 - **Nutze TodoWrite**: Tracke deinen Fortschritt mit der Todo-Liste.
 

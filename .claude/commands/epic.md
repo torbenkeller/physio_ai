@@ -7,22 +7,18 @@ You are an AI agent responsible for creating epics for the PhysioAI project. Fol
 1. **Naming Convention**: Use the pattern `PHSIOAI-<ticket_number>-EPIC-<epic_name>`
    - Example: `PHSIOAI-001-EPIC-patient-management`
 
-2. **Ticket Numbering**: 
-   - Search the `docs/product/backlog/` directory for existing tickets
-   - Find the highest ticket number by examining all files with pattern `PHSIOAI-*`
-   - Increment by 1 for the new epic ticket number
-   - Use 3-digit zero-padded format (001, 002, 003, etc.)
+2. **Ticket Numbering**:
+   - Use `gh issue list` to check existing issues
+   - Find the highest ticket number by examining all issues
+   - Use the GitHub Issue number as ticket number
 
-3. **File Location**: Create the epic file in `docs/product/backlog/`
+3. **Create GitHub Issue**: Create the epic as a GitHub Issue with label `epic`
+
 4. **Language**: Use German as the epic language
 
 ## Epic Structure Template
 
 ```markdown
----
-Ticket-ID: PHSIOAI-<TICKET_NUMBER>-EPIC-<EPIC_NAME>
-Created-At: <DATE (YYYY-MM-DD)>
----
 # <EPIC_NAME>
 
 ## Beschreibung
@@ -32,21 +28,18 @@ Brief description of what this epic aims to achieve and why it's valuable to the
 Clear statement of the business value this epic will deliver
 
 ## User Stories
-- [ ] [PHSIOAI-<TICKET_NUMBER>](./PHSIOAI-<TICKET_NUMBER>-STORY-<STORY_NAME>.md) Als <persona> möchte ich <funktionalität>, damit <benefit>
-- [ ] [PHSIOAI-<TICKET_NUMBER>](./PHSIOAI-<TICKET_NUMBER>-STORY-<STORY_NAME>.md) Als <persona> möchte ich <funktionalität>, damit <benefit>
-- [ ] [PHSIOAI-<TICKET_NUMBER>](./PHSIOAI-<TICKET_NUMBER>-STORY-<STORY_NAME>.md) Als <persona> möchte ich <funktionalität>, damit <benefit>
+- [ ] #<ISSUE_NUMBER> Als <persona> möchte ich <funktionalität>, damit <benefit>
+- [ ] #<ISSUE_NUMBER> Als <persona> möchte ich <funktionalität>, damit <benefit>
+- [ ] #<ISSUE_NUMBER> Als <persona> möchte ich <funktionalität>, damit <benefit>
 
 ```
 
 ## Process Steps
 
-1. **Numbering**: Determine next sequential ticket number by using:
-   ```bash
-   ./scripts/get-next-ticket-number.sh
-   ```
-3. **Creation**: Create the epic file with proper naming convention
-4. **Content**: Fill out all sections of the template
-5. **Validation**: Ensure all required fields are completed
+1. **Check existing issues**: Use `gh issue list --label epic` to see existing epics
+2. **Create epic issue**: Use `gh issue create --label epic --title "<EPIC_NAME>" --body "<BODY>"`
+3. **Content**: Fill out all sections of the template
+4. **Link user stories**: Reference user story issues using #<number>
 
 ## Concrete Epic
 

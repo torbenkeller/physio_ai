@@ -124,9 +124,10 @@ Components are added to `src/shared/components/ui/`.
 ## Documentation
 
 - **Architecture & Guidelines**: See `CLAUDE.md`
-- **Product Vision**: `../docs/product/product-vision.md`
-- **Glossary**: `../docs/architektur/12-glossar.md`
+- **Product Vision**: `../docs/Product/Product-Vision.md` (or [Wiki](https://github.com/torbenkeller/physio_ai/wiki/Product-Vision))
+- **Glossary**: `../docs/Architektur/12-Glossar.md` (or [Wiki](https://github.com/torbenkeller/physio_ai/wiki/Architektur/12-Glossar))
 - **Backend API**: `../backend/CLAUDE.md`
+- **Issues & Backlog**: [GitHub Issues](https://github.com/torbenkeller/physio_ai/issues)
 
 ## License
 

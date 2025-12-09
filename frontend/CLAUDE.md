@@ -138,7 +138,7 @@ import { patientenActions } from '@/features/patienten/slices/patientenSlice'
 
 ### German Domain Terms
 
-Follow the Glossar (`docs/architektur/12-glossar.md`):
+Follow the Glossar (`docs/Architektur/12-Glossar.md`):
 - **Patient** (not "user" for treated persons)
 - **Behandlung** (for treatment sessions)
 - **Rezept** (for medical prescriptions)

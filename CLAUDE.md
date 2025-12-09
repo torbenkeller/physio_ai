@@ -8,7 +8,7 @@ This is a monorepo containing backend, frontend, and documentation for the Physi
 physio_ai/
 ├── backend/  # Spring Boot backend → See backend/CLAUDE.md
 ├── frontend/ # React frontend → See frontend/CLAUDE.md
-└── docs/     # Project documentation → See docs/CLAUDE.md
+└── docs/     # GitHub Wiki (Git Submodule) → https://github.com/torbenkeller/physio_ai/wiki
 ```
 
 ## Working with this Monorepo
@@ -17,7 +17,11 @@ Each subdirectory contains its own `CLAUDE.md` with specific instructions:
 
 - **Backend tasks**: Navigate to `backend/` and follow `backend/CLAUDE.md`
 - **Frontend tasks**: Navigate to `frontend/` and follow `frontend/CLAUDE.md`
-- **Documentation**: See `docs/CLAUDE.md` for project documentation guidelines
+- **Documentation**: The `docs/` folder is a Git submodule containing the GitHub Wiki
+  - View online: https://github.com/torbenkeller/physio_ai/wiki
+  - Architecture docs: `docs/Architektur/`
+  - Product docs: `docs/Product/`
+- **Backlog & Issues**: Managed in GitHub Issues: https://github.com/torbenkeller/physio_ai/issues
 
 ## General Guidelines
 

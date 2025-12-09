@@ -18,9 +18,9 @@ Bevor du mit dem Benutzer interagierst, sammle Kontextinformationen.
 
 ### 1.1 Projektdokumentation einlesen
 Lies folgende Dateien, um den Projektkontext zu verstehen:
-- Domain-Glossar: `docs/Architektur/12-Glossar.md` (für ubiquitäre Sprache)
-- Product Vision: `docs/Product/Product-Vision.md`
-- Personas: `docs/Product/Personas/`
+- Domain-Glossar: @docs/Architektur/12-Glossar.md (für ubiquitäre Sprache)
+- Product Vision: @docs/Product/Product-Vision.md
+- Personas: @docs/Product/Personas/
 
 ### 1.2 Aktuelle GitHub-Situation prüfen
 Führe folgende Befehle aus, um den aktuellen Stand zu verstehen:
@@ -112,47 +112,10 @@ Bist du mit dieser Zuordnung einverstanden?
 
 ## Phase 4: Story-Formulierung
 
-### 4.1 Template laden
-Lies das User Story Template: @.claude/templates/user-story-template.md
+### 4.1 Story-Entwurf erstellen
+Erstelle einen vollständigen Entwurf basierend auf dem Template: @.claude/templates/user-story-template.md
 
-### 4.2 Story-Entwurf erstellen
-Erstelle einen vollständigen Entwurf basierend auf dem Template:
-
-```markdown
-## User Story
-Als [ROLLE] möchte ich [FUNKTIONALITÄT], damit [NUTZEN].
-
-## Persona
-[PERSONA_LINK zur Wiki-Seite]
-
-## Beschreibung
-[DETAILLIERTE_BESCHREIBUNG]
-
-## Akzeptanzkriterien
-- [ ] [KRITERIUM_1]
-- [ ] [KRITERIUM_2]
-- [ ] [KRITERIUM_3]
-...
-
-## Definition of Done
-- [ ] Akzeptanzkriterien erfüllt
-- [ ] Getestet (Unit/Integration)
-- [ ] Code Review durchgeführt
-- [ ] Dokumentation aktualisiert (falls nötig)
-```
-
-### 4.3 Story-Richtlinien
-Beim Erstellen der Story:
-- **User Story Satz**: Klar, prägnant, im Format "Als... möchte ich... damit..."
-- **Beschreibung**: Kontext und Details, die über den User Story Satz hinausgehen
-- **Akzeptanzkriterien**:
-  - Testbar und spezifisch
-  - 3-7 Kriterien
-  - Mit Checkbox-Format für GitHub
-- **Sprache**: Deutsch für alle Inhalte
-- **Terminologie**: Nur Begriffe aus dem Domain-Glossar verwenden
-
-### 4.4 Preview präsentieren
+### 4.2 Preview präsentieren
 Zeige dem Benutzer die vollständige Story-Preview:
 
 ```
@@ -203,38 +166,10 @@ Soll ich die Issue erstellen? (Ja/Nein)
 ## Phase 6: GitHub Issue erstellen
 
 ### 6.1 Issue erstellen
-Nach finaler Bestätigung, erstelle die Issue:
-
-```bash
-gh issue create \
-  --title "[STORY_TITEL]" \
-  --body "$(cat <<'EOF'
-## User Story
-Als [ROLLE] möchte ich [FUNKTIONALITÄT], damit [NUTZEN].
-
-## Persona
-[PERSONA_LINK]
-
-## Beschreibung
-[BESCHREIBUNG]
-
-## Akzeptanzkriterien
-- [ ] [KRITERIUM_1]
-- [ ] [KRITERIUM_2]
-- [ ] [KRITERIUM_3]
-
-## Definition of Done
-- [ ] Akzeptanzkriterien erfüllt
-- [ ] Getestet (Unit/Integration)
-- [ ] Code Review durchgeführt
-- [ ] Dokumentation aktualisiert (falls nötig)
-EOF
-)" \
-  --milestone "[EPIC_NAME]" \
-  --label "story"
-```
-
-**Hinweis**: Falls kein Milestone zugewiesen werden soll, lasse den `--milestone` Parameter weg.
+Nach finaler Bestätigung, erstelle die Issue mit `gh issue create`:
+- Verwende das ausgefüllte Template aus @.claude/templates/user-story-template.md als Body
+- Füge `--milestone "[EPIC_NAME]"` hinzu (falls zutreffend)
+- Füge `--label "story"` hinzu
 
 ### 6.2 Erfolgsbestätigung
 Nach erfolgreicher Erstellung:

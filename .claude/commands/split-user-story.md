@@ -22,12 +22,11 @@ Du bist ein sehr erfahrener Product Owner, der auf das Aufteilen von User Storie
    - Verfeinere die Anpassung basierend auf dem Feedback
    - Modifiziere die ursprüngliche Story entsprechend
 6. **Stories iterativ erstellen mit Verfeinerung**: Für jede neue Story:
-   - Generiere eine neue Ticket-Nummer mit `./scripts/get-next-ticket-number.sh`
-   - Erstelle sofort die Story-Datei mit dem Standard-Template
+   - Erstelle ein neues GitHub Issue mit `gh issue create`
    - Präsentiere die Story und hole Feedback ein
    - Verfeinere die Story basierend auf dem Feedback
-   - Erst dann zur nächsten Story wechseln (damit das Script die bereits erstellte Datei erkennt)
-7. **Epic aktualisieren**: Aktualisiere das Epic mit allen finalen Stories
+   - Erst dann zur nächsten Story wechseln
+7. **Epic aktualisieren**: Aktualisiere das Epic-Issue mit Links zu allen neuen Stories
 
 ## Schritt-für-Schritt Prozess
 
@@ -71,61 +70,35 @@ Du bist ein sehr erfahrener Product Owner, der auf das Aufteilen von User Storie
 
 1. **Erste Story**:
    ```bash
-   ./scripts/get-next-ticket-number.sh
+   gh issue create --label story --title "[STORY_TITEL]" --body "[STORY_BODY]" --milestone "[EPIC_NAME]"
    ```
-   → Erstelle sofort die Story-Datei mit dieser Ticket-Nummer
+   → Erstelle das GitHub Issue
    → Präsentiere die Story und hole detailliertes Feedback ein
    → Verfeinere Akzeptanzkriterien und Beschreibung
 
 2. **Zweite Story** (erst nach Erstellung der ersten):
-   ```bash
-   ./scripts/get-next-ticket-number.sh
-   ```
-   → Erstelle sofort die Story-Datei mit dieser Ticket-Nummer
+   → Wiederhole den Prozess mit `gh issue create`
    → Präsentiere die Story und hole detailliertes Feedback ein
    → Verfeinere Akzeptanzkriterien und Beschreibung
 
 3. **Weitere Stories**: Wiederhole den Prozess für jede weitere Story
 
-**Grund**: Das Script erkennt nur bereits existierende Dateien für die Nummerierung
-
 ### 5. Epic-Update
-- Ursprüngliche Story in der Epic-Liste anpassen
-- Neue Stories zur Epic-Liste hinzufügen
-- Abhängigkeiten zwischen Stories definieren
+- Ursprüngliches Story-Issue anpassen (falls nötig)
+- Epic-Issue mit Links zu den neuen Story-Issues aktualisieren
+- Abhängigkeiten zwischen Stories in den Issue-Beschreibungen dokumentieren
 
 ### 6. Story-Template verwenden
-Verwende für jede neue Story das exakte Template aus dem `user-story.md` Command:
+Verwende für jede neue Story das Template aus: @.claude/templates/user-story-template.md
 
-```markdown
----
-Ticket-ID: {{TICKET_ID}}
-Created-At: {{DATE}}
-Epic: {{EPIC_REFERENCE}}
-Status: To-Do
-Blocked-By: {{DEPENDENCIES}}
-Planning-Document:
----
+Das Template enthält:
+- User Story (Als... möchte ich... damit...)
+- Persona (Link zur Wiki-Seite)
+- Beschreibung
+- Akzeptanzkriterien
+- Definition of Done
 
-# {{USER_STORY_TITLE}}
-
-## User Story
-{{USER_STORY}}
-
-## Beschreibung
-{{DETAILED_DESCRIPTION}}
-
-## Akzeptanzkriterien
-<list of>
-- [ ] {{ACCEPTANCE_CRITERIA}}
-<list end>
-
-## Definition of Done
-- [ ] Akzeptanzkriterien erfüllt
-- [ ] Min. 1 Unit Test geschrieben
-- [ ] Manuell getestet
-- [ ] Dokumentation geupdated
-```
+Lies das Template und fülle die Variablen entsprechend aus.
 
 ### 7. Story-Dependencies berücksichtigen
 - Definiere `Blocked-By` Felder für abhängige Stories
@@ -143,11 +116,11 @@ Planning-Document:
 ## Qualitätskontrolle
 
 Vor Abschluss überprüfen:
-- [ ] Alle neuen Stories haben eindeutige Ticket-IDs
-- [ ] Epic wurde korrekt aktualisiert
-- [ ] Abhängigkeiten sind klar definiert
+- [ ] Alle neuen Stories sind als GitHub Issues erstellt
+- [ ] Epic-Issue wurde mit Links zu den neuen Stories aktualisiert
+- [ ] Abhängigkeiten sind klar definiert (in Issue-Beschreibungen)
 - [ ] Jede Story ist in sich geschlossen und wertvoll
-- [ ] Template wurde korrekt verwendet
+- [ ] Template wurde korrekt verwendet (@.claude/templates/user-story-template.md)
 - [ ] Domain-Glossar Terminologie ist konsistent
 
 ## Explizite Aufgabe

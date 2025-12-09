@@ -1,26 +1,20 @@
 # Epic Creation Template
 
-You are an AI agent responsible for creating epics for the PhysioAI project. Follow these instructions to create a well-structured epic.
+You are an AI agent responsible for creating epics for the PhysioAI project. Epics are managed as **GitHub Milestones**.
 
 ## Instructions
 
-1. **Naming Convention**: Use the pattern `PHSIOAI-<ticket_number>-EPIC-<epic_name>`
-   - Example: `PHSIOAI-001-EPIC-patient-management`
+1. **Check existing milestones**: Use `gh api repos/{owner}/{repo}/milestones` to see existing epics/milestones
 
-2. **Ticket Numbering**:
-   - Use `gh issue list` to check existing issues
-   - Find the highest ticket number by examining all issues
-   - Use the GitHub Issue number as ticket number
+2. **Create GitHub Milestone**: Create the epic as a GitHub Milestone using `gh api`
 
-3. **Create GitHub Issue**: Create the epic as a GitHub Issue with label `epic`
-
-4. **Language**: Use German as the epic language
+3. **Language**: Use German as the epic language
 
 ## Epic Structure Template
 
-```markdown
-# <EPIC_NAME>
+The milestone description should follow this format:
 
+```markdown
 ## Beschreibung
 Brief description of what this epic aims to achieve and why it's valuable to the business.
 
@@ -28,18 +22,34 @@ Brief description of what this epic aims to achieve and why it's valuable to the
 Clear statement of the business value this epic will deliver
 
 ## User Stories
-- [ ] #<ISSUE_NUMBER> Als <persona> möchte ich <funktionalität>, damit <benefit>
-- [ ] #<ISSUE_NUMBER> Als <persona> möchte ich <funktionalität>, damit <benefit>
-- [ ] #<ISSUE_NUMBER> Als <persona> möchte ich <funktionalität>, damit <benefit>
-
+User Stories für dieses Epic werden als Issues mit dem Milestone verknüpft.
 ```
 
 ## Process Steps
 
-1. **Check existing issues**: Use `gh issue list --label epic` to see existing epics
-2. **Create epic issue**: Use `gh issue create --label epic --title "<EPIC_NAME>" --body "<BODY>"`
-3. **Content**: Fill out all sections of the template
-4. **Link user stories**: Reference user story issues using #<number>
+1. **Check existing milestones**:
+   ```bash
+   gh api repos/torbenkeller/physio_ai/milestones --jq '.[].title'
+   ```
+
+2. **Create milestone** (epic):
+   ```bash
+   gh api repos/torbenkeller/physio_ai/milestones \
+     --method POST \
+     --field title="<EPIC_NAME>" \
+     --field description="<DESCRIPTION>" \
+     --field state="open"
+   ```
+
+3. **Create user stories**: Create issues and assign them to the milestone:
+   ```bash
+   gh issue create --title "<STORY_TITLE>" --body "<BODY>" --milestone "<EPIC_NAME>"
+   ```
+
+## Viewing Epics
+
+- All Milestones (Epics): https://github.com/torbenkeller/physio_ai/milestones
+- Issues for a Milestone: Click on the milestone to see all associated user stories
 
 ## Concrete Epic
 

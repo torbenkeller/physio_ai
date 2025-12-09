@@ -20,16 +20,17 @@ src/
 ├── app/                    # App-wide setup (store, router, base API)
 ├── features/              # Feature modules (patienten, behandlungen, rezepte, rechnungen)
 │   └── [feature]/
-│       ├── api/          # RTK Query endpoints
-│       ├── components/   # Feature-specific components
-│       ├── hooks/        # Feature-specific hooks
-│       ├── types/        # TypeScript types
+│       ├── api/          # RTK Query endpoints (PUBLIC - can be imported cross-feature)
+│       ├── components/   # Feature components (PUBLIC - can be imported cross-feature)
+│       ├── hooks/        # Feature-specific hooks (PRIVATE - internal only!)
+│       ├── utils/        # Feature-specific utils (PRIVATE - internal only!)
+│       ├── types/        # TypeScript types (PUBLIC - can be imported cross-feature)
 │       └── index.ts      # Public API exports
 ├── shared/                # Shared across features
-│   ├── components/ui/    # shadcn/ui components
-│   ├── hooks/
-│   ├── utils/
-│   └── types/
+│   ├── components/ui/    # shadcn/ui components (stateless UI primitives only!)
+│   ├── hooks/            # Generic hooks (useMediaQuery, useDebounce - no business logic!)
+│   ├── utils/            # Pure utility functions (cn, formatDate - no side effects!)
+│   └── types/            # Generic types only (no domain DTOs!)
 └── assets/
 ```
 
@@ -57,6 +58,46 @@ src/
 - **Colocate**: Keep components close to where they're used
 - **Feature isolation**: Features export only public API via `index.ts`
 - **Lazy loading**: Use `React.lazy` for route-based code splitting
+
+### Module Boundary Rules (enforced via ESLint)
+
+Cross-feature imports are allowed, but only for **loose coupling**. The goal is integration via UI composition, not shared state.
+
+**ALLOWED cross-feature imports (loose coupling):**
+```typescript
+// ✅ API hooks (RTK Query - read-only, cached, idempotent)
+import { useGetPatientenQuery } from '@/features/patienten/api/patientenApi'
+
+// ✅ Self-contained components (make their own API calls, no external state)
+import { PatientenSuche } from '@/features/patienten/components/PatientenSuche'
+
+// ✅ Type definitions (data structures only, no behavior)
+import type { PatientDto } from '@/features/patienten/types/patient.types'
+```
+
+**FORBIDDEN cross-feature imports (tight coupling):**
+```typescript
+// ❌ Internal hooks (would couple to another feature's state management)
+import { usePatientenFilter } from '@/features/patienten/hooks/usePatientenFilter'
+
+// ❌ Internal utilities (implementation details)
+import { formatPatientName } from '@/features/patienten/utils/patientUtils'
+
+// ❌ Redux slices/actions (would allow cross-feature state manipulation)
+import { patientenActions } from '@/features/patienten/slices/patientenSlice'
+```
+
+**Why this matters:**
+- Features remain independently testable and refactorable
+- No hidden state dependencies between features
+- Components are self-contained: they load their own data
+- Integration happens via UI composition (props, callbacks) not shared state
+- Prevents "Big Ball of Mud" where everything depends on everything
+
+**The shared/ folder is NOT a dumping ground!**
+- Only put truly generic, stateless utilities in shared/
+- Domain-specific components stay in their feature (e.g., PatientenSuche stays in patienten/)
+- If a component needs business logic, it belongs in a feature, not shared/
 
 ## Best Practices
 

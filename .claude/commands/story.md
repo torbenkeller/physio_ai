@@ -171,7 +171,13 @@ Nach finaler Bestätigung, erstelle die Issue mit `gh issue create`:
 - Füge `--milestone "[EPIC_NAME]"` hinzu (falls zutreffend)
 - Füge `--label "story"` hinzu
 
-### 6.2 Erfolgsbestätigung
+### 6.2 Issue zum GitHub Projekt hinzufügen
+Nach erfolgreicher Issue-Erstellung, füge die Issue zum GitHub Projekt hinzu:
+```bash
+gh project item-add 4 --owner torbenkeller --url [ISSUE_URL]
+```
+
+### 6.3 Erfolgsbestätigung
 Nach erfolgreicher Erstellung:
 ```
 ✅ **User Story erstellt!**
@@ -179,11 +185,12 @@ Nach erfolgreicher Erstellung:
 Issue: [ISSUE_URL]
 Titel: [STORY_TITEL]
 Milestone: [EPIC_NAME]
+Projekt: PhysioAI (Projekt 4)
 
-Die Story ist jetzt im Backlog und kann bearbeitet werden.
+Die Story ist jetzt im Backlog und auf dem Board sichtbar.
 ```
 
-### 6.3 Fehlerbehandlung
+### 6.4 Fehlerbehandlung
 Bei Fehlern:
 - Zeige die Fehlermeldung
 - Biete Lösungsvorschläge an (z.B. Milestone existiert nicht)

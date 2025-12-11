@@ -9,4 +9,5 @@ data class ProfileFormDto(
     val inhaberName: String,
     val profilePictureUrl: String?,
     val defaultBehandlungenProRezept: Int = 8,
+    val externalCalendarUrl: String? = null,
 )

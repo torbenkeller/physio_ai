@@ -26,6 +26,13 @@ export const CONFLICT_COLORS = {
   text: 'text-white',
 } as const
 
+// Externe Kalendertermine (lila/purple)
+export const EXTERNAL_EVENT_COLORS = {
+  bg: 'bg-purple-400/70',
+  border: 'border-purple-500',
+  text: 'text-purple-50',
+} as const
+
 export const WEEKDAY_NAMES_SHORT = ['Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa', 'So'] as const
 
 // Wochentag-Konfiguration für UI-Komponenten

@@ -10,6 +10,7 @@ data class ProfileDto(
     val profilePictureUrl: String?,
     val defaultBehandlungenProRezept: Int,
     val calenderUrl: String,
+    val externalCalendarUrl: String?,
 ) {
     companion object {
         fun fromProfile(
@@ -23,6 +24,7 @@ data class ProfileDto(
                 profilePictureUrl = profile.profilePictureUrl,
                 defaultBehandlungenProRezept = profile.defaultBehandlungenProRezept,
                 calenderUrl = profile.getCalenderUrl(host),
+                externalCalendarUrl = profile.externalCalendarUrl,
             )
     }
 }

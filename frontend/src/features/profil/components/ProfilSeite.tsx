@@ -1,12 +1,31 @@
 import { useState, useEffect } from 'react'
-import { useGetProfileQuery, useUpdateProfileMutation, useCreateProfileMutation } from '../api/profileApi'
+import {
+  useGetProfileQuery,
+  useUpdateProfileMutation,
+  useCreateProfileMutation,
+} from '../api/profileApi'
 import { PageHeader } from '@/shared/components/PageHeader'
 import { Button } from '@/shared/components/ui/button'
 import { Input } from '@/shared/components/ui/input'
 import { Label } from '@/shared/components/ui/label'
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/shared/components/ui/card'
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+} from '@/shared/components/ui/card'
 import { Separator } from '@/shared/components/ui/separator'
-import { Building2, User, Link as LinkIcon, Save, Copy, Check, CalendarDays } from 'lucide-react'
+import {
+  Building2,
+  User,
+  Link as LinkIcon,
+  Save,
+  Copy,
+  Check,
+  CalendarDays,
+  Calendar,
+} from 'lucide-react'
 import { toast } from 'sonner'
 
 export const ProfilSeite = () => {
@@ -19,6 +38,7 @@ export const ProfilSeite = () => {
   const [defaultBehandlungenProRezept, setDefaultBehandlungenProRezept] = useState(
     profile?.defaultBehandlungenProRezept ?? 8
   )
+  const [externalCalendarUrl, setExternalCalendarUrl] = useState(profile?.externalCalendarUrl || '')
   const [copied, setCopied] = useState(false)
 
   // Update state when profile loads
@@ -27,13 +47,19 @@ export const ProfilSeite = () => {
       setPraxisName(profile.praxisName)
       setInhaberName(profile.inhaberName)
       setDefaultBehandlungenProRezept(profile.defaultBehandlungenProRezept)
+      setExternalCalendarUrl(profile.externalCalendarUrl || '')
     }
   }, [profile])
 
   const handleSave = async () => {
     try {
       if (profile) {
-        await updateProfile({ praxisName, inhaberName, defaultBehandlungenProRezept }).unwrap()
+        await updateProfile({
+          praxisName,
+          inhaberName,
+          defaultBehandlungenProRezept,
+          externalCalendarUrl: externalCalendarUrl || null,
+        }).unwrap()
       } else {
         await createProfile({ praxisName, inhaberName, defaultBehandlungenProRezept }).unwrap()
       }
@@ -73,10 +99,7 @@ export const ProfilSeite = () => {
 
   return (
     <div>
-      <PageHeader
-        title="Profil"
-        description="Verwalten Sie Ihre Praxiseinstellungen"
-      />
+      <PageHeader title="Profil" description="Verwalten Sie Ihre Praxiseinstellungen" />
 
       <div className="grid gap-6 lg:grid-cols-2">
         {/* Praxisdaten */}
@@ -141,11 +164,7 @@ export const ProfilSeite = () => {
                       readOnly
                       className="flex-1 font-mono text-sm"
                     />
-                    <Button
-                      variant="outline"
-                      size="icon"
-                      onClick={handleCopyCalendarUrl}
-                    >
+                    <Button variant="outline" size="icon" onClick={handleCopyCalendarUrl}>
                       {copied ? (
                         <Check className="h-4 w-4 text-green-500" />
                       ) : (
@@ -161,10 +180,12 @@ export const ProfilSeite = () => {
                   <h4 className="font-medium">So fügen Sie den Kalender hinzu:</h4>
                   <ul className="list-inside list-disc space-y-1 text-sm text-muted-foreground">
                     <li>
-                      <strong>Apple Kalender:</strong> Ablage → Neues Kalenderabonnement → URL einfügen
+                      <strong>Apple Kalender:</strong> Ablage → Neues Kalenderabonnement → URL
+                      einfügen
                     </li>
                     <li>
-                      <strong>Google Kalender:</strong> Einstellungen → Kalender hinzufügen → Per URL
+                      <strong>Google Kalender:</strong> Einstellungen → Kalender hinzufügen → Per
+                      URL
                     </li>
                     <li>
                       <strong>Outlook:</strong> Kalender → Kalender hinzufügen → Aus dem Internet
@@ -187,15 +208,11 @@ export const ProfilSeite = () => {
               <CalendarDays className="h-5 w-5" />
               Behandlungs-Einstellungen
             </CardTitle>
-            <CardDescription>
-              Standard-Einstellungen für Behandlungstermine
-            </CardDescription>
+            <CardDescription>Standard-Einstellungen für Behandlungstermine</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="defaultBehandlungenProRezept">
-                Standard Behandlungen pro Rezept
-              </Label>
+              <Label htmlFor="defaultBehandlungenProRezept">Standard Behandlungen pro Rezept</Label>
               <Input
                 id="defaultBehandlungenProRezept"
                 type="number"
@@ -208,6 +225,55 @@ export const ProfilSeite = () => {
                 Diese Anzahl wird als Vorschlag bei der Erstellung mehrerer Termine verwendet.
               </p>
             </div>
+            <Button onClick={handleSave} disabled={isUpdating || isCreating}>
+              <Save className="mr-2 h-4 w-4" />
+              {isUpdating || isCreating ? 'Speichern...' : 'Speichern'}
+            </Button>
+          </CardContent>
+        </Card>
+
+        {/* Externer Kalender */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Calendar className="h-5 w-5" />
+              Externer Kalender
+            </CardTitle>
+            <CardDescription>
+              Importieren Sie Termine aus einem externen Kalender (z.B. iCloud, Google)
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="externalCalendarUrl">iCal-URL</Label>
+              <Input
+                id="externalCalendarUrl"
+                value={externalCalendarUrl}
+                onChange={(e) => setExternalCalendarUrl(e.target.value)}
+                placeholder="https://calendar.google.com/... oder webcal://..."
+              />
+              <p className="text-sm text-muted-foreground">
+                Private Termine werden im Kalender angezeigt, um Doppelbuchungen zu vermeiden.
+              </p>
+            </div>
+
+            <Separator />
+
+            <div className="space-y-2">
+              <h4 className="font-medium">So finden Sie die Kalender-URL:</h4>
+              <ul className="list-inside list-disc space-y-1 text-sm text-muted-foreground">
+                <li>
+                  <strong>iCloud:</strong> Kalender teilen (öffentlich) und Link kopieren
+                </li>
+                <li>
+                  <strong>Google:</strong> Kalender-Einstellungen → Geheime Adresse im iCal-Format
+                </li>
+                <li>
+                  <strong>Outlook:</strong> Kalender → Kalender freigeben → ICS Link
+                </li>
+              </ul>
+            </div>
+
             <Button onClick={handleSave} disabled={isUpdating || isCreating}>
               <Save className="mr-2 h-4 w-4" />
               {isUpdating || isCreating ? 'Speichern...' : 'Speichern'}

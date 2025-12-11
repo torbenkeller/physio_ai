@@ -11,7 +11,11 @@ import {
   useCreatePatientMutation,
 } from '@/features/patienten/api/patientenApi'
 import { useGetBehandlungsartenQuery } from '@/features/rezepte/api/rezepteApi'
-import { useGetProfileQuery } from '@/features/profil/api/profileApi'
+import {
+  useGetProfileQuery,
+  useGetExternalCalendarEventsQuery,
+} from '@/features/profil/api/profileApi'
+import type { ExternalCalendarEventDto } from '@/features/profil/types/profil.types'
 import { useMultiTerminSelection } from '../hooks/useMultiTerminSelection'
 import { useKalenderSettings } from '../hooks/useKalenderSettings'
 import { useIsMobile } from '@/shared/hooks/useIsMobile'
@@ -44,6 +48,7 @@ import {
   PATTERN_COLORS,
   SLOT_COLORS,
   CONFLICT_COLORS,
+  EXTERNAL_EVENT_COLORS,
   WEEKDAY_NAMES_SHORT,
   addMinutesToTime,
   calculateTerminLayouts,
@@ -111,6 +116,21 @@ export const Kalender = () => {
   const [createBatch, { isLoading: isCreating }] = useCreateBehandlungenBatchMutation()
   const [createPatient, { isLoading: isCreatingPatient }] = useCreatePatientMutation()
   const [checkConflicts] = useCheckConflictsMutation()
+
+  // Externe Kalendertermine abrufen
+  const weekEndDate = useMemo(() => {
+    const end = new Date(currentWeekStart)
+    end.setDate(end.getDate() + 6)
+    return end
+  }, [currentWeekStart])
+
+  const { data: externalEvents } = useGetExternalCalendarEventsQuery(
+    {
+      startDate: formatDateForApi(currentWeekStart),
+      endDate: formatDateForApi(weekEndDate),
+    },
+    { skip: !profile?.externalCalendarUrl }
+  )
 
   const {
     slots,
@@ -336,6 +356,16 @@ export const Kalender = () => {
     if (!calendarData) return []
     const dateKey = formatDateForApi(date)
     return calendarData[dateKey] || []
+  }
+
+  // Externe Kalendertermine für einen bestimmten Tag
+  const getExternalEventsForDay = (date: Date): ExternalCalendarEventDto[] => {
+    if (!externalEvents) return []
+    const dateStr = formatDateForApi(date)
+    return externalEvents.filter((event) => {
+      const eventDate = event.startZeit.split('T')[0]
+      return eventDate === dateStr
+    })
   }
 
   // Geplante Slots für einen bestimmten Tag
@@ -766,6 +796,36 @@ export const Kalender = () => {
                           <div className="font-medium text-sm truncate">{termin.patient.name}</div>
                           <div className="text-xs opacity-80">
                             {formatTime(termin.startZeit)} - {formatTime(termin.endZeit)}
+                          </div>
+                        </div>
+                      )
+                    })}
+
+                    {/* Externe Kalendertermine */}
+                    {getExternalEventsForDay(date).map((event) => {
+                      const eventStyle = getSlotStyle(
+                        date,
+                        event.startZeit.split('T')[1]?.substring(0, 5) || '00:00',
+                        event.endZeit.split('T')[1]?.substring(0, 5) || '01:00'
+                      )
+                      return (
+                        <div
+                          key={`ext-${event.id}`}
+                          className={cn(
+                            'absolute left-1 right-1 rounded-md p-2 overflow-hidden shadow-sm border-2 opacity-80',
+                            EXTERNAL_EVENT_COLORS.bg,
+                            EXTERNAL_EVENT_COLORS.border,
+                            EXTERNAL_EVENT_COLORS.text
+                          )}
+                          style={{
+                            top: eventStyle.top,
+                            height: Math.max(eventStyle.height - 4, 24),
+                          }}
+                          title={event.title}
+                        >
+                          <div className="font-medium text-sm truncate">{event.title}</div>
+                          <div className="text-xs opacity-80">
+                            {formatTime(event.startZeit)} - {formatTime(event.endZeit)}
                           </div>
                         </div>
                       )

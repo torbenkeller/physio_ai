@@ -1,11 +1,13 @@
 package de.keller.physioai.patienten.application
 
+import de.keller.physioai.patienten.PatientErstelltEvent
 import de.keller.physioai.patienten.domain.PatientAggregate
 import de.keller.physioai.patienten.ports.PatientenRepository
 import de.keller.physioai.patienten.ports.PatientenService
 import de.keller.physioai.shared.AggregateNotFoundException
 import de.keller.physioai.shared.PatientId
 import org.jmolecules.architecture.hexagonal.Application
+import org.springframework.context.ApplicationEventPublisher
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDate
@@ -14,6 +16,7 @@ import java.time.LocalDate
 @Service
 class PatientenServiceImpl(
     private val patientenRepository: PatientenRepository,
+    private val eventPublisher: ApplicationEventPublisher,
 ) : PatientenService {
     override fun createPatient(
         titel: String?,
@@ -47,7 +50,9 @@ class PatientenServiceImpl(
             behandlungenProRezept = behandlungenProRezept,
         )
 
-        return patientenRepository.save(p)
+        val saved = patientenRepository.save(p)
+        eventPublisher.publishEvent(PatientErstelltEvent(saved.id))
+        return saved
     }
 
     @Transactional

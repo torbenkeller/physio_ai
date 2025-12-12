@@ -1,19 +1,31 @@
 package de.keller.physioai.patienten.application
 
+import de.keller.physioai.patienten.PatientErstelltEvent
 import de.keller.physioai.patienten.domain.PatientAggregate
 import de.keller.physioai.patienten.ports.PatientenRepository
+import io.mockk.clearAllMocks
 import io.mockk.every
 import io.mockk.mockk
+import io.mockk.slot
 import io.mockk.verify
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
+import org.springframework.context.ApplicationEventPublisher
 import java.time.LocalDate
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 
 class PatientenServiceImplTest {
     private val patientenRepository: PatientenRepository = mockk()
-    private val patientenService = PatientenServiceImpl(patientenRepository)
+    private val eventPublisher: ApplicationEventPublisher = mockk(relaxed = true)
+    private lateinit var patientenService: PatientenServiceImpl
+
+    @BeforeEach
+    fun setUp() {
+        clearAllMocks()
+        patientenService = PatientenServiceImpl(patientenRepository, eventPublisher)
+    }
 
     @Test
     fun `should create patient with valid data`() {
@@ -166,5 +178,50 @@ class PatientenServiceImplTest {
                 behandlungenProRezept = null,
             )
         }
+    }
+
+    @Test
+    fun `should publish PatientErstelltEvent after patient is created`() {
+        // Arrange
+        val expectedPatient = PatientAggregate.create(
+            titel = null,
+            vorname = "Max",
+            nachname = "Mustermann",
+            strasse = null,
+            hausnummer = null,
+            plz = null,
+            stadt = null,
+            telMobil = null,
+            telFestnetz = null,
+            email = null,
+            geburtstag = null,
+            behandlungenProRezept = null,
+        )
+
+        every { patientenRepository.save(any()) } returns expectedPatient
+
+        val eventSlot = slot<PatientErstelltEvent>()
+        every { eventPublisher.publishEvent(capture(eventSlot)) } returns Unit
+
+        // Act
+        val result = patientenService.createPatient(
+            titel = null,
+            vorname = "Max",
+            nachname = "Mustermann",
+            strasse = null,
+            hausnummer = null,
+            plz = null,
+            stadt = null,
+            telMobil = null,
+            telFestnetz = null,
+            email = null,
+            geburtstag = null,
+            behandlungenProRezept = null,
+        )
+
+        // Assert
+        verify(exactly = 1) { patientenRepository.save(any()) }
+        verify(exactly = 1) { eventPublisher.publishEvent(any<PatientErstelltEvent>()) }
+        assertEquals(expectedPatient.id, eventSlot.captured.patientId)
     }
 }

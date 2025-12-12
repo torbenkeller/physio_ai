@@ -1,5 +1,8 @@
 package de.keller.physioai.behandlungen.application
 
+import de.keller.physioai.behandlungen.BehandlungGeaendertEvent
+import de.keller.physioai.behandlungen.BehandlungGeloeschtEvent
+import de.keller.physioai.behandlungen.BehandlungenGeaendertEvent
 import de.keller.physioai.behandlungen.domain.BehandlungAggregate
 import de.keller.physioai.behandlungen.ports.BehandlungenRepository
 import de.keller.physioai.behandlungen.ports.BehandlungenService
@@ -11,6 +14,7 @@ import de.keller.physioai.shared.BehandlungsartId
 import de.keller.physioai.shared.PatientId
 import de.keller.physioai.shared.RezeptId
 import org.jmolecules.architecture.hexagonal.Application
+import org.springframework.context.ApplicationEventPublisher
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.time.DayOfWeek
@@ -24,6 +28,7 @@ import java.time.temporal.TemporalAdjusters
 class BehandlungenServiceImpl(
     private val behandlungenRepository: BehandlungenRepository,
     private val patientenRepository: PatientenRepository,
+    private val eventPublisher: ApplicationEventPublisher,
 ) : BehandlungenService {
     override fun createBehandlung(
         patientId: PatientId,
@@ -39,13 +44,15 @@ class BehandlungenServiceImpl(
             rezeptId = rezeptId,
             behandlungsartId = behandlungsartId,
         )
-        return behandlungenRepository.save(behandlung)
+        val saved = behandlungenRepository.save(behandlung)
+        eventPublisher.publishEvent(BehandlungGeaendertEvent(saved.id, saved.patientId, saved.startZeit, saved.bemerkung))
+        return saved
     }
 
     override fun createBehandlungenBatch(behandlungen: List<BehandlungenService.CreateBehandlungCommand>): List<BehandlungAggregate> {
         require(behandlungen.isNotEmpty()) { "Mindestens eine Behandlung erforderlich" }
 
-        return behandlungen.map { cmd ->
+        val savedBehandlungen = behandlungen.map { cmd ->
             val behandlung = BehandlungAggregate.create(
                 patientId = cmd.patientId,
                 startZeit = cmd.startZeit,
@@ -55,6 +62,21 @@ class BehandlungenServiceImpl(
             )
             behandlungenRepository.save(behandlung)
         }
+
+        // Ein einzelnes Batch-Event publizieren statt viele einzelne Events
+        val batchEvent = BehandlungenGeaendertEvent(
+            behandlungen = savedBehandlungen.map { saved ->
+                BehandlungenGeaendertEvent.BehandlungData(
+                    behandlungId = saved.id,
+                    patientId = saved.patientId,
+                    startZeit = saved.startZeit,
+                    bemerkung = saved.bemerkung,
+                )
+            },
+        )
+        eventPublisher.publishEvent(batchEvent)
+
+        return savedBehandlungen
     }
 
     override fun updateBehandlung(
@@ -75,7 +97,9 @@ class BehandlungenServiceImpl(
             behandlungsartId = behandlungsartId,
             bemerkung = bemerkung,
         )
-        return behandlungenRepository.save(updatedBehandlung)
+        val saved = behandlungenRepository.save(updatedBehandlung)
+        eventPublisher.publishEvent(BehandlungGeaendertEvent(saved.id, saved.patientId, saved.startZeit, saved.bemerkung))
+        return saved
     }
 
     override fun updateBemerkung(
@@ -86,14 +110,17 @@ class BehandlungenServiceImpl(
             ?: throw AggregateNotFoundException()
 
         val updatedBehandlung = behandlung.updateBemerkung(bemerkung)
-        return behandlungenRepository.save(updatedBehandlung)
+        val saved = behandlungenRepository.save(updatedBehandlung)
+        eventPublisher.publishEvent(BehandlungGeaendertEvent(saved.id, saved.patientId, saved.startZeit, saved.bemerkung))
+        return saved
     }
 
     override fun deleteBehandlung(id: BehandlungId) {
         val behandlung = behandlungenRepository.findById(id)
             ?: throw AggregateNotFoundException()
 
-        return behandlungenRepository.delete(behandlung)
+        behandlungenRepository.delete(behandlung)
+        eventPublisher.publishEvent(BehandlungGeloeschtEvent(behandlung.id, behandlung.patientId))
     }
 
     override fun verschiebeBehandlung(
@@ -104,7 +131,9 @@ class BehandlungenServiceImpl(
             ?: throw AggregateNotFoundException()
 
         val verschobeneBehandlung = behandlung.verschiebe(nach)
-        return behandlungenRepository.save(verschobeneBehandlung)
+        val saved = behandlungenRepository.save(verschobeneBehandlung)
+        eventPublisher.publishEvent(BehandlungGeaendertEvent(saved.id, saved.patientId, saved.startZeit, saved.bemerkung))
+        return saved
     }
 
     override fun getWeeklyCalendar(date: LocalDate): Map<LocalDate, List<GetWeeklyCalendarBehandlungResponse>> {

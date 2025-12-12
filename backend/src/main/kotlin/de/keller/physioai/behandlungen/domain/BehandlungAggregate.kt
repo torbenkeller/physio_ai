@@ -15,16 +15,16 @@ import java.util.UUID
 @Table("behandlungen")
 data class BehandlungAggregate(
     @Id
-    val id: BehandlungId,
-    val patientId: PatientId,
-    val startZeit: LocalDateTime,
-    val endZeit: LocalDateTime,
-    val rezeptId: RezeptId?,
-    val behandlungsartId: BehandlungsartId?,
-    val bemerkung: String?,
+    override val id: BehandlungId,
+    override val patientId: PatientId,
+    override val startZeit: LocalDateTime,
+    override val endZeit: LocalDateTime,
+    override val rezeptId: RezeptId?,
+    override val behandlungsartId: BehandlungsartId?,
+    override val bemerkung: String?,
     @Version
     val version: Int = 0,
-) {
+) : de.keller.physioai.behandlungen.Behandlung {
     fun update(
         startZeit: LocalDateTime,
         endZeit: LocalDateTime,
@@ -63,8 +63,9 @@ data class BehandlungAggregate(
             bemerkung: String? = null,
         ): BehandlungAggregate {
             require(startZeit.isBefore(endZeit)) { "Start time must be before end time" }
+            val id = BehandlungId(UUID.randomUUID())
             return BehandlungAggregate(
-                id = BehandlungId(UUID.randomUUID()),
+                id = id,
                 patientId = patientId,
                 startZeit = startZeit,
                 endZeit = endZeit,

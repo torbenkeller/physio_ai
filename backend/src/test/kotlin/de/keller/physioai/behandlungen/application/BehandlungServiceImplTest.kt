@@ -18,6 +18,7 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
+import org.springframework.context.ApplicationEventPublisher
 import java.time.LocalDateTime
 import java.util.UUID
 import kotlin.test.assertEquals
@@ -33,12 +34,15 @@ class BehandlungServiceImplTest {
     @MockK
     private lateinit var patientenRepository: PatientenRepository
 
+    @MockK(relaxed = true)
+    private lateinit var eventPublisher: ApplicationEventPublisher
+
     private lateinit var behandlungenService: BehandlungenService
 
     @BeforeEach
     fun setUp() {
         clearAllMocks()
-        behandlungenService = BehandlungenServiceImpl(behandlungenRepository, patientenRepository)
+        behandlungenService = BehandlungenServiceImpl(behandlungenRepository, patientenRepository, eventPublisher)
     }
 
     @Nested

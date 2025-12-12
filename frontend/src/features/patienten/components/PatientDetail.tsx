@@ -1,20 +1,11 @@
 import { useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { useGetPatientQuery, useUpdatePatientMutation } from '../api/patientenApi'
-import { useGetBehandlungenByPatientQuery } from '@/features/behandlungen/api/behandlungenApi'
+import { BehandlungsverlaufTimeline } from '@/features/patientenakte'
 import { PageHeader } from '@/shared/components/PageHeader'
 import { PatientForm } from './PatientForm'
 import { Button } from '@/shared/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/shared/components/ui/card'
-import { Badge } from '@/shared/components/ui/badge'
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/shared/components/ui/table'
 import { ArrowLeft, Edit, X } from 'lucide-react'
 import { toast } from 'sonner'
 import type { PatientFormDto } from '../types/patient.types'
@@ -25,7 +16,6 @@ export const PatientDetail = () => {
   const [isEditing, setIsEditing] = useState(false)
 
   const { data: patient, isLoading, error } = useGetPatientQuery(id!)
-  const { data: behandlungen } = useGetBehandlungenByPatientQuery(id!)
   const [updatePatient, { isLoading: isUpdating }] = useUpdatePatientMutation()
 
   const handleUpdate = async (data: PatientFormDto) => {
@@ -41,16 +31,6 @@ export const PatientDetail = () => {
   const formatDate = (dateString: string | null) => {
     if (!dateString) return '-'
     return new Date(dateString).toLocaleDateString('de-DE')
-  }
-
-  const formatDateTime = (dateString: string) => {
-    return new Date(dateString).toLocaleString('de-DE', {
-      day: '2-digit',
-      month: '2-digit',
-      year: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit',
-    })
   }
 
   if (isLoading) {
@@ -146,10 +126,14 @@ export const PatientDetail = () => {
                 {patient.strasse || patient.stadt ? (
                   <address className="not-italic">
                     {patient.strasse && patient.hausnummer && (
-                      <div>{patient.strasse} {patient.hausnummer}</div>
+                      <div>
+                        {patient.strasse} {patient.hausnummer}
+                      </div>
                     )}
                     {patient.plz && patient.stadt && (
-                      <div>{patient.plz} {patient.stadt}</div>
+                      <div>
+                        {patient.plz} {patient.stadt}
+                      </div>
                     )}
                   </address>
                 ) : (
@@ -159,44 +143,8 @@ export const PatientDetail = () => {
             </Card>
           </div>
 
-          {/* Behandlungshistorie */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Behandlungshistorie</CardTitle>
-            </CardHeader>
-            <CardContent>
-              {behandlungen && behandlungen.length > 0 ? (
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Datum</TableHead>
-                      <TableHead>Uhrzeit</TableHead>
-                      <TableHead>Status</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {behandlungen.map((behandlung) => (
-                      <TableRow key={behandlung.id}>
-                        <TableCell>
-                          {new Date(behandlung.startZeit).toLocaleDateString('de-DE')}
-                        </TableCell>
-                        <TableCell>
-                          {formatDateTime(behandlung.startZeit).split(', ')[1]} - {formatDateTime(behandlung.endZeit).split(', ')[1]}
-                        </TableCell>
-                        <TableCell>
-                          <Badge variant={behandlung.rezeptId ? 'default' : 'secondary'}>
-                            {behandlung.rezeptId ? 'Mit Rezept' : 'Ohne Rezept'}
-                          </Badge>
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              ) : (
-                <p className="text-muted-foreground">Keine Behandlungen vorhanden</p>
-              )}
-            </CardContent>
-          </Card>
+          {/* Behandlungsverlauf */}
+          <BehandlungsverlaufTimeline patientId={id!} />
         </div>
       )}
     </div>

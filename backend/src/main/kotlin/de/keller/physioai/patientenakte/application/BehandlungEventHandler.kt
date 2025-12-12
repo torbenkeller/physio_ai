@@ -2,21 +2,22 @@ package de.keller.physioai.patientenakte.application
 
 import de.keller.physioai.behandlungen.Behandlung
 import de.keller.physioai.patientenakte.ports.PatientenakteService
+import org.springframework.data.relational.core.mapping.event.AbstractRelationalEventListener
 import org.springframework.data.relational.core.mapping.event.AfterDeleteEvent
 import org.springframework.data.relational.core.mapping.event.AfterSaveEvent
-import org.springframework.modulith.events.ApplicationModuleListener
 import org.springframework.stereotype.Component
 
 /**
  * Event-Handler, der auf Spring Data JDBC Events von Behandlung lauscht
  * und die Patientenakte entsprechend synchronisiert.
+ *
+ * Verwendet AbstractRelationalEventListener<Behandlung> für type-safe Event-Handling.
  */
 @Component
 class BehandlungEventHandler(
     private val patientenakteService: PatientenakteService,
-) {
-    @ApplicationModuleListener
-    fun onBehandlungGespeichert(event: AfterSaveEvent<Behandlung>) {
+) : AbstractRelationalEventListener<Behandlung>() {
+    override fun onAfterSave(event: AfterSaveEvent<Behandlung>) {
         val behandlung = event.entity
         patientenakteService.synchronisiereBehandlungsEintrag(
             behandlungId = behandlung.id,
@@ -26,8 +27,7 @@ class BehandlungEventHandler(
         )
     }
 
-    @ApplicationModuleListener
-    fun onBehandlungGeloescht(event: AfterDeleteEvent<Behandlung>) {
+    override fun onAfterDelete(event: AfterDeleteEvent<Behandlung>) {
         val behandlung = event.entity ?: return
         patientenakteService.loescheBehandlungsEintrag(
             behandlungId = behandlung.id,

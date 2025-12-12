@@ -85,15 +85,23 @@ data class PatientenakteAggregate(
 
     // --- Freie Notizen ---
 
+    data class ErstelleFreieNotizResult(
+        val aktualisierteAkte: PatientenakteAggregate,
+        val erstellteNotiz: FreieNotiz,
+    )
+
     fun erstelleFreieNotiz(
         kategorie: NotizKategorie,
         inhalt: String,
-    ): PatientenakteAggregate {
+    ): ErstelleFreieNotizResult {
         val notiz = FreieNotiz.create(
             kategorie = kategorie,
             inhalt = inhalt,
         )
-        return copy(freieNotizen = freieNotizen + notiz)
+        return ErstelleFreieNotizResult(
+            aktualisierteAkte = copy(freieNotizen = freieNotizen + notiz),
+            erstellteNotiz = notiz,
+        )
     }
 
     fun loescheFreieNotiz(eintragId: EintragId): PatientenakteAggregate {

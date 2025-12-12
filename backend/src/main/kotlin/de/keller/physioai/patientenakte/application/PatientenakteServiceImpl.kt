@@ -78,14 +78,9 @@ class PatientenakteServiceImpl(
         inhalt: String,
     ): FreieNotiz {
         val akte = getOrCreatePatientenakte(patientId)
-        val aktualisierteAkte = akte.erstelleFreieNotiz(kategorie, inhalt)
-        val gespeicherteAkte = patientenakteRepository.save(aktualisierteAkte)
-
-        // Die neu erstellte Notiz finden (die neueste mit diesem Inhalt)
-        return gespeicherteAkte.freieNotizen
-            .filter { it.inhalt == inhalt && it.kategorie == kategorie }
-            .maxByOrNull { it.erstelltAm }
-            ?: throw IllegalStateException("Notiz konnte nicht gefunden werden")
+        val (aktualisierteAkte, erstellteNotiz) = akte.erstelleFreieNotiz(kategorie, inhalt)
+        patientenakteRepository.save(aktualisierteAkte)
+        return erstellteNotiz
     }
 
     override fun loescheFreieNotiz(
@@ -107,7 +102,8 @@ class PatientenakteServiceImpl(
             ?: throw AggregateNotFoundException()
         val aktualisierteAkte = akte.aktualisiereBehandlungsNotiz(eintragId, neuerInhalt)
         val gespeicherteAkte = patientenakteRepository.save(aktualisierteAkte)
-        return gespeicherteAkte.findBehandlungsEintrag(eintragId)!!
+        return gespeicherteAkte.findBehandlungsEintrag(eintragId)
+            ?: throw AggregateNotFoundException("BehandlungsEintrag nicht gefunden: $eintragId")
     }
 
     override fun aktualisiereFreieNotiz(
@@ -119,7 +115,8 @@ class PatientenakteServiceImpl(
             ?: throw AggregateNotFoundException()
         val aktualisierteAkte = akte.aktualisiereFreieNotiz(eintragId, neuerInhalt)
         val gespeicherteAkte = patientenakteRepository.save(aktualisierteAkte)
-        return gespeicherteAkte.findFreieNotiz(eintragId)!!
+        return gespeicherteAkte.findFreieNotiz(eintragId)
+            ?: throw AggregateNotFoundException("FreieNotiz nicht gefunden: $eintragId")
     }
 
     override fun pinneBehandlungsEintrag(
@@ -131,7 +128,8 @@ class PatientenakteServiceImpl(
             ?: throw AggregateNotFoundException()
         val aktualisierteAkte = akte.pinneBehandlungsEintrag(eintragId, angepinnt)
         val gespeicherteAkte = patientenakteRepository.save(aktualisierteAkte)
-        return gespeicherteAkte.findBehandlungsEintrag(eintragId)!!
+        return gespeicherteAkte.findBehandlungsEintrag(eintragId)
+            ?: throw AggregateNotFoundException("BehandlungsEintrag nicht gefunden: $eintragId")
     }
 
     override fun pinneFreieNotiz(
@@ -143,7 +141,8 @@ class PatientenakteServiceImpl(
             ?: throw AggregateNotFoundException()
         val aktualisierteAkte = akte.pinneFreieNotiz(eintragId, angepinnt)
         val gespeicherteAkte = patientenakteRepository.save(aktualisierteAkte)
-        return gespeicherteAkte.findFreieNotiz(eintragId)!!
+        return gespeicherteAkte.findFreieNotiz(eintragId)
+            ?: throw AggregateNotFoundException("FreieNotiz nicht gefunden: $eintragId")
     }
 
     @Transactional(readOnly = true)

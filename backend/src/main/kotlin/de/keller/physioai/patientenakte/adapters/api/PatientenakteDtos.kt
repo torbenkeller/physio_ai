@@ -4,6 +4,8 @@ import de.keller.physioai.patientenakte.domain.BehandlungsEintrag
 import de.keller.physioai.patientenakte.domain.FreieNotiz
 import de.keller.physioai.patientenakte.domain.NotizKategorie
 import de.keller.physioai.patientenakte.ports.PatientenakteService
+import jakarta.validation.constraints.NotBlank
+import jakarta.validation.constraints.Size
 import java.time.LocalDateTime
 import java.util.UUID
 
@@ -110,13 +112,18 @@ data class NotizDto(
 // Request DTOs
 
 data class FreieNotizFormDto(
+    @field:NotBlank(message = "Kategorie darf nicht leer sein")
     val kategorie: String,
+    @field:NotBlank(message = "Inhalt darf nicht leer sein")
+    @field:Size(max = 10000, message = "Inhalt darf maximal 10000 Zeichen haben")
     val inhalt: String,
 ) {
     fun toKategorie(): NotizKategorie = NotizKategorie.valueOf(kategorie)
 }
 
 data class NotizUpdateDto(
+    @field:NotBlank(message = "Inhalt darf nicht leer sein")
+    @field:Size(max = 10000, message = "Inhalt darf maximal 10000 Zeichen haben")
     val inhalt: String,
 )
 

@@ -9,7 +9,7 @@ import org.springframework.modulith.PackageInfo
  * copy of treatment data for the patient's medical record.
  */
 @ApplicationModule(
-    allowedDependencies = ["shared", "behandlungen"],
+    allowedDependencies = ["shared", "behandlungen", "patienten"],
 )
 @PackageInfo
 class PatientenakteModule

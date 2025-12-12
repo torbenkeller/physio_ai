@@ -3,7 +3,6 @@ package de.keller.physioai.patientenakte.application
 import de.keller.physioai.patientenakte.domain.BehandlungsEintrag
 import de.keller.physioai.patientenakte.domain.FreieNotiz
 import de.keller.physioai.patientenakte.domain.NotizKategorie
-import de.keller.physioai.patientenakte.domain.PatientenakteAggregate
 import de.keller.physioai.patientenakte.ports.PatientenakteRepository
 import de.keller.physioai.patientenakte.ports.PatientenakteService
 import de.keller.physioai.shared.AggregateNotFoundException
@@ -28,7 +27,7 @@ class PatientenakteServiceImpl(
         bemerkung: String?,
     ) {
         val akte = patientenakteRepository.findByPatientId(patientId)
-            ?: patientenakteRepository.save(PatientenakteAggregate.create(patientId))
+            ?: throw AggregateNotFoundException("Patientenakte nicht gefunden für Patient: $patientId")
 
         val aktualisierteAkte = akte.synchronisiereBehandlungsEintrag(
             behandlungId = behandlungId,
@@ -45,9 +44,9 @@ class PatientenakteServiceImpl(
         val eintraegeNachPatient = eintraege.groupBy { it.patientId }
 
         eintraegeNachPatient.forEach { (patientId, patientEintraege) ->
-            // Akte holen oder erstellen
+            // Akte holen
             var akte = patientenakteRepository.findByPatientId(patientId)
-                ?: patientenakteRepository.save(PatientenakteAggregate.create(patientId))
+                ?: throw AggregateNotFoundException("Patientenakte nicht gefunden für Patient: $patientId")
 
             // Alle Einträge dieses Patienten sequenziell zur Akte hinzufügen
             patientEintraege.forEach { eintrag ->
@@ -77,7 +76,8 @@ class PatientenakteServiceImpl(
         kategorie: NotizKategorie,
         inhalt: String,
     ): FreieNotiz {
-        val akte = getOrCreatePatientenakte(patientId)
+        val akte = patientenakteRepository.findByPatientId(patientId)
+            ?: throw AggregateNotFoundException("Patientenakte nicht gefunden für Patient: $patientId")
         val (aktualisierteAkte, erstellteNotiz) = akte.erstelleFreieNotiz(kategorie, inhalt)
         patientenakteRepository.save(aktualisierteAkte)
         return erstellteNotiz
@@ -163,15 +163,5 @@ class PatientenakteServiceImpl(
                 freieNotizen = akte.freieNotizen.toList(),
             )
         }
-    }
-
-    private fun getOrCreatePatientenakte(patientId: PatientId): PatientenakteAggregate {
-        val bestehende = patientenakteRepository.findByPatientId(patientId)
-        if (bestehende != null) {
-            return bestehende
-        }
-
-        val neueAkte = PatientenakteAggregate.create(patientId)
-        return patientenakteRepository.save(neueAkte)
     }
 }

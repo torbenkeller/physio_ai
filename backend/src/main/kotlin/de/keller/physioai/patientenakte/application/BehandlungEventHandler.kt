@@ -1,45 +1,52 @@
 package de.keller.physioai.patientenakte.application
 
-import de.keller.physioai.behandlungen.Behandlung
+import de.keller.physioai.behandlungen.BehandlungGeaendertEvent
+import de.keller.physioai.behandlungen.BehandlungGeloeschtEvent
+import de.keller.physioai.behandlungen.BehandlungenGeaendertEvent
 import de.keller.physioai.patientenakte.ports.PatientenakteService
-import org.springframework.context.event.EventListener
-import org.springframework.data.relational.core.mapping.event.AfterDeleteEvent
-import org.springframework.data.relational.core.mapping.event.AfterSaveEvent
+import org.springframework.modulith.events.ApplicationModuleListener
 import org.springframework.stereotype.Component
 
 /**
- * Event-Handler, der auf Spring Data JDBC Events von Behandlung lauscht
+ * Event-Handler, der auf Domain Events aus dem Behandlungen-Modul lauscht
  * und die Patientenakte entsprechend synchronisiert.
  *
- * Verwendet @EventListener mit manueller Typprüfung, da Spring Data JDBC Events
- * mit dem konkreten Entity-Typ gefeuert werden und AbstractRelationalEventListener
- * mit dem Interface nicht funktioniert.
+ * Verwendet @ApplicationModuleListener von Spring Modulith für garantierte
+ * Event-Auslieferung und saubere Modul-Grenzen.
  */
 @Component
 class BehandlungEventHandler(
     private val patientenakteService: PatientenakteService,
 ) {
-    @EventListener
-    fun onAfterSave(event: AfterSaveEvent<*>) {
-        val entity = event.entity
-        if (entity is Behandlung) {
-            patientenakteService.synchronisiereBehandlungsEintrag(
-                behandlungId = entity.id,
-                patientId = entity.patientId,
-                behandlungsDatum = entity.startZeit,
-                bemerkung = entity.bemerkung,
-            )
-        }
+    @ApplicationModuleListener
+    fun on(event: BehandlungGeaendertEvent) {
+        patientenakteService.synchronisiereBehandlungsEintrag(
+            behandlungId = event.behandlungId,
+            patientId = event.patientId,
+            behandlungsDatum = event.startZeit,
+            bemerkung = event.bemerkung,
+        )
     }
 
-    @EventListener
-    fun onAfterDelete(event: AfterDeleteEvent<*>) {
-        val entity = event.entity
-        if (entity is Behandlung) {
-            patientenakteService.loescheBehandlungsEintrag(
-                behandlungId = entity.id,
-                patientId = entity.patientId,
-            )
-        }
+    @ApplicationModuleListener
+    fun on(event: BehandlungenGeaendertEvent) {
+        patientenakteService.synchronisiereBehandlungsEintraegeBatch(
+            eintraege = event.behandlungen.map { behandlung ->
+                PatientenakteService.BehandlungsEintragData(
+                    behandlungId = behandlung.behandlungId,
+                    patientId = behandlung.patientId,
+                    behandlungsDatum = behandlung.startZeit,
+                    bemerkung = behandlung.bemerkung,
+                )
+            },
+        )
+    }
+
+    @ApplicationModuleListener
+    fun on(event: BehandlungGeloeschtEvent) {
+        patientenakteService.loescheBehandlungsEintrag(
+            behandlungId = event.behandlungId,
+            patientId = event.patientId,
+        )
     }
 }

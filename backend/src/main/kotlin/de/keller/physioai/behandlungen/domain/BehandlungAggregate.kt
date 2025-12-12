@@ -63,8 +63,9 @@ data class BehandlungAggregate(
             bemerkung: String? = null,
         ): BehandlungAggregate {
             require(startZeit.isBefore(endZeit)) { "Start time must be before end time" }
+            val id = BehandlungId(UUID.randomUUID())
             return BehandlungAggregate(
-                id = BehandlungId(UUID.randomUUID()),
+                id = id,
                 patientId = patientId,
                 startZeit = startZeit,
                 endZeit = endZeit,

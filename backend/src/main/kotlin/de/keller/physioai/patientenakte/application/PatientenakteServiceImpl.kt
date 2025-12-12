@@ -27,13 +27,40 @@ class PatientenakteServiceImpl(
         behandlungsDatum: LocalDateTime,
         bemerkung: String?,
     ) {
-        val akte = getOrCreatePatientenakte(patientId)
+        val akte = patientenakteRepository.findByPatientId(patientId)
+            ?: patientenakteRepository.save(PatientenakteAggregate.create(patientId))
+
         val aktualisierteAkte = akte.synchronisiereBehandlungsEintrag(
             behandlungId = behandlungId,
             behandlungsDatum = behandlungsDatum,
             bemerkung = bemerkung,
         )
         patientenakteRepository.save(aktualisierteAkte)
+    }
+
+    override fun synchronisiereBehandlungsEintraegeBatch(eintraege: List<PatientenakteService.BehandlungsEintragData>) {
+        if (eintraege.isEmpty()) return
+
+        // Gruppiere nach Patient, um alle Einträge eines Patienten sequenziell zu verarbeiten
+        val eintraegeNachPatient = eintraege.groupBy { it.patientId }
+
+        eintraegeNachPatient.forEach { (patientId, patientEintraege) ->
+            // Akte holen oder erstellen
+            var akte = patientenakteRepository.findByPatientId(patientId)
+                ?: patientenakteRepository.save(PatientenakteAggregate.create(patientId))
+
+            // Alle Einträge dieses Patienten sequenziell zur Akte hinzufügen
+            patientEintraege.forEach { eintrag ->
+                akte = akte.synchronisiereBehandlungsEintrag(
+                    behandlungId = eintrag.behandlungId,
+                    behandlungsDatum = eintrag.behandlungsDatum,
+                    bemerkung = eintrag.bemerkung,
+                )
+            }
+
+            // Einmal speichern mit allen Einträgen
+            patientenakteRepository.save(akte)
+        }
     }
 
     override fun loescheBehandlungsEintrag(

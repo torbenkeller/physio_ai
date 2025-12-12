@@ -19,6 +19,15 @@ interface PatientenakteService {
         bemerkung: String?,
     )
 
+    fun synchronisiereBehandlungsEintraegeBatch(eintraege: List<BehandlungsEintragData>)
+
+    data class BehandlungsEintragData(
+        val behandlungId: BehandlungId,
+        val patientId: PatientId,
+        val behandlungsDatum: LocalDateTime,
+        val bemerkung: String?,
+    )
+
     fun loescheBehandlungsEintrag(
         behandlungId: BehandlungId,
         patientId: PatientId,

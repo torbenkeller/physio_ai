@@ -7,10 +7,13 @@ import de.keller.physioai.patienten.PatientenRepository
 import de.keller.physioai.shared.BehandlungId
 import de.keller.physioai.shared.PatientId
 import io.mockk.every
+import io.mockk.just
 import io.mockk.mockk
+import io.mockk.runs
 import io.mockk.verify
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
+import org.springframework.context.ApplicationEventPublisher
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.util.UUID
@@ -18,7 +21,10 @@ import java.util.UUID
 class BehandlungenServiceImplCalendarTest {
     private val behandlungenRepository = mockk<BehandlungenRepository>()
     private val patientenRepository = mockk<PatientenRepository>()
-    private val service = BehandlungenServiceImpl(behandlungenRepository, patientenRepository)
+    private val eventPublisher = mockk<ApplicationEventPublisher> {
+        every { publishEvent(any()) } just runs
+    }
+    private val service = BehandlungenServiceImpl(behandlungenRepository, patientenRepository, eventPublisher)
 
     @Test
     fun `should group treatments correctly by dates with LocalDate keys`() {

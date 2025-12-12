@@ -5,14 +5,7 @@ import { useGetPatientenQuery } from '@/features/patienten/api/patientenApi'
 import { PageHeader } from '@/shared/components/PageHeader'
 import { Card, CardContent, CardHeader, CardTitle } from '@/shared/components/ui/card'
 import { Button } from '@/shared/components/ui/button'
-import {
-  Users,
-  Calendar,
-  FileText,
-  Clock,
-  ArrowRight,
-  TrendingUp,
-} from 'lucide-react'
+import { Users, Calendar, FileText, Clock, ArrowRight, TrendingUp } from 'lucide-react'
 
 const formatDateForApi = (date: Date) => {
   return date.toISOString().split('T')[0]
@@ -27,7 +20,7 @@ export const Dashboard = () => {
   const { data: patienten } = useGetPatientenQuery()
 
   // Heute Termine
-  const heuteTermine = calendarData?.[dateStr] || []
+  const heuteTermine = calendarData?.behandlungen[dateStr] || []
 
   // Offene Rezepte (ohne Rechnung)
   const offeneRezepte = rezepte?.filter((r) => !r.rechnung) || []
@@ -144,9 +137,7 @@ export const Dashboard = () => {
                       </p>
                     </div>
                     <Button variant="outline" size="sm" asChild>
-                      <Link to={`/patienten/${termin.patient.id}`}>
-                        Details
-                      </Link>
+                      <Link to={`/patienten/${termin.patient.id}`}>Details</Link>
                     </Button>
                   </div>
                 ))}
@@ -190,9 +181,7 @@ export const Dashboard = () => {
                     <div className="text-right">
                       <p className="font-medium">{formatCurrency(rezept.preisGesamt)}</p>
                       <Button variant="outline" size="sm" asChild className="mt-1">
-                        <Link to={`/rezepte/${rezept.id}`}>
-                          Details
-                        </Link>
+                        <Link to={`/rezepte/${rezept.id}`}>Details</Link>
                       </Button>
                     </div>
                   </div>

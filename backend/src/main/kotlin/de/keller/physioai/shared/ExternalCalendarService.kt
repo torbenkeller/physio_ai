@@ -1,6 +1,5 @@
-package de.keller.physioai.profile.ports
+package de.keller.physioai.shared
 
-import de.keller.physioai.shared.ProfileId
 import org.jmolecules.architecture.hexagonal.PrimaryPort
 import java.time.LocalDate
 import java.time.LocalDateTime

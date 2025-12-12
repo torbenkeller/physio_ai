@@ -1,9 +1,9 @@
 package de.keller.physioai.profile.application
 
 import de.keller.physioai.profile.domain.Profile
-import de.keller.physioai.profile.ports.ExternalCalendarService
 import de.keller.physioai.profile.ports.ProfileRepository
 import de.keller.physioai.shared.AggregateNotFoundException
+import de.keller.physioai.shared.ExternalCalendarService
 import de.keller.physioai.shared.ProfileId
 import io.mockk.clearAllMocks
 import io.mockk.every

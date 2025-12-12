@@ -11,10 +11,7 @@ import {
   useCreatePatientMutation,
 } from '@/features/patienten/api/patientenApi'
 import { useGetBehandlungsartenQuery } from '@/features/rezepte/api/rezepteApi'
-import {
-  useGetProfileQuery,
-  useGetExternalCalendarEventsQuery,
-} from '@/features/profil/api/profileApi'
+import { useGetProfileQuery } from '@/features/profil/api/profileApi'
 import type { ExternalCalendarEventDto } from '@/features/profil/types/profil.types'
 import { useMultiTerminSelection } from '../hooks/useMultiTerminSelection'
 import { useKalenderSettings } from '../hooks/useKalenderSettings'
@@ -117,21 +114,6 @@ export const Kalender = () => {
   const [createPatient, { isLoading: isCreatingPatient }] = useCreatePatientMutation()
   const [checkConflicts] = useCheckConflictsMutation()
 
-  // Externe Kalendertermine abrufen
-  const weekEndDate = useMemo(() => {
-    const end = new Date(currentWeekStart)
-    end.setDate(end.getDate() + 6)
-    return end
-  }, [currentWeekStart])
-
-  const { data: externalEvents } = useGetExternalCalendarEventsQuery(
-    {
-      startDate: formatDateForApi(currentWeekStart),
-      endDate: formatDateForApi(weekEndDate),
-    },
-    { skip: !profile?.externalCalendarUrl }
-  )
-
   const {
     slots,
     addSlot,
@@ -154,11 +136,11 @@ export const Kalender = () => {
   // Layout-Berechnung für überlappende Termine pro Tag
   const terminLayoutsByDay = useMemo(() => {
     const layouts = new Map<string, ReturnType<typeof calculateTerminLayouts>>()
-    if (!calendarData) return layouts
+    if (!calendarData?.behandlungen) return layouts
 
     weekDays.forEach((date) => {
       const dateKey = formatDateForApi(date)
-      const termine = calendarData[dateKey] || []
+      const termine = calendarData.behandlungen[dateKey] || []
       layouts.set(dateKey, calculateTerminLayouts(termine))
     })
 
@@ -353,16 +335,16 @@ export const Kalender = () => {
   )
 
   const getTermineForDay = (date: Date): BehandlungKalenderDto[] => {
-    if (!calendarData) return []
+    if (!calendarData?.behandlungen) return []
     const dateKey = formatDateForApi(date)
-    return calendarData[dateKey] || []
+    return calendarData.behandlungen[dateKey] || []
   }
 
   // Externe Kalendertermine für einen bestimmten Tag
   const getExternalEventsForDay = (date: Date): ExternalCalendarEventDto[] => {
-    if (!externalEvents) return []
+    if (!calendarData?.externeTermine) return []
     const dateStr = formatDateForApi(date)
-    return externalEvents.filter((event) => {
+    return calendarData.externeTermine.filter((event) => {
       const eventDate = event.startZeit.split('T')[0]
       return eventDate === dateStr
     })

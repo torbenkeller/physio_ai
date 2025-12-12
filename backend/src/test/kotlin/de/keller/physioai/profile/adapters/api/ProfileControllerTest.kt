@@ -2,11 +2,11 @@ package de.keller.physioai.profile.adapters.api
 
 import com.ninjasquad.springmockk.MockkBean
 import de.keller.physioai.profile.domain.Profile
-import de.keller.physioai.profile.ports.ExternalCalendarService
 import de.keller.physioai.profile.ports.KalenderService
 import de.keller.physioai.profile.ports.ProfileRepository
 import de.keller.physioai.profile.ports.ProfileService
 import de.keller.physioai.shared.AggregateNotFoundException
+import de.keller.physioai.shared.ExternalCalendarService
 import de.keller.physioai.shared.ProfileId
 import de.keller.physioai.shared.anyValue
 import de.keller.physioai.shared.config.SecurityConfig

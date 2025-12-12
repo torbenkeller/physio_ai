@@ -1,4 +1,4 @@
-package de.keller.physioai.profile.adapters.api
+package de.keller.physioai.shared
 
 import java.time.LocalDateTime
 

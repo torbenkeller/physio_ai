@@ -2,6 +2,7 @@ package de.keller.physioai.patienten.adapters.api
 
 import de.keller.physioai.patienten.ports.PatientenRepository
 import de.keller.physioai.patienten.ports.PatientenService
+import de.keller.physioai.shared.AggregateNotFoundException
 import de.keller.physioai.shared.PatientId
 import org.jmolecules.architecture.hexagonal.PrimaryAdapter
 import org.springframework.web.bind.annotation.DeleteMapping
@@ -27,6 +28,15 @@ class PatientenController(
             .findAll()
             .map { PatientDto.fromPatient(it) }
             .sortedBy { it.nachname }
+
+    @GetMapping("/{id}")
+    fun getPatient(
+        @PathVariable id: UUID,
+    ): PatientDto =
+        repository
+            .findById(PatientId(id))
+            ?.let { PatientDto.fromPatient(it) }
+            ?: throw AggregateNotFoundException()
 
     @PostMapping
     fun createPatient(

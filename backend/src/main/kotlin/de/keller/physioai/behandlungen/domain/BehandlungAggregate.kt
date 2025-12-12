@@ -15,16 +15,16 @@ import java.util.UUID
 @Table("behandlungen")
 data class BehandlungAggregate(
     @Id
-    val id: BehandlungId,
-    val patientId: PatientId,
-    val startZeit: LocalDateTime,
-    val endZeit: LocalDateTime,
-    val rezeptId: RezeptId?,
-    val behandlungsartId: BehandlungsartId?,
-    val bemerkung: String?,
+    override val id: BehandlungId,
+    override val patientId: PatientId,
+    override val startZeit: LocalDateTime,
+    override val endZeit: LocalDateTime,
+    override val rezeptId: RezeptId?,
+    override val behandlungsartId: BehandlungsartId?,
+    override val bemerkung: String?,
     @Version
     val version: Int = 0,
-) {
+) : de.keller.physioai.behandlungen.Behandlung {
     fun update(
         startZeit: LocalDateTime,
         endZeit: LocalDateTime,

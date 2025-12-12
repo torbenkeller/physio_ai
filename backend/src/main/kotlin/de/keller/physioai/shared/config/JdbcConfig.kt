@@ -10,7 +10,10 @@ import java.util.UUID
 @EnableJdbcAuditing
 @Configuration
 class JdbcConfig : AbstractJdbcConfiguration() {
-    override fun userConverters(): List<*> = listOf(PatientIdCollectionConverter())
+    override fun userConverters(): List<*> =
+        listOf(
+            PatientIdCollectionConverter(),
+        )
 }
 
 class PatientIdCollectionConverter : Converter<Collection<PatientId>, Collection<UUID>> {

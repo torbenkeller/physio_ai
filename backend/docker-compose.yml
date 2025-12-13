@@ -1,8 +1,10 @@
 services:
 
   postgres:
+    env_file:
+      - ../.env
     image: postgres
-    # container_name entfernt - wird automatisch aus COMPOSE_PROJECT_NAME generiert
+    container_name: ${COMPOSE_PROJECT_NAME:-physio}_postgres
     restart: unless-stopped
     environment:
       - POSTGRES_USER=${PHYSIO_DB_USER:-postgres}
@@ -17,6 +19,12 @@ services:
       interval: 5s
       timeout: 5s
       retries: 5
+    networks:
+      - backend
 
 volumes:
   postgres_data:
+
+networks:
+  backend:
+    name: ${COMPOSE_PROJECT_NAME:-physio}_network

@@ -5,6 +5,7 @@ import {
   useGetWeeklyCalendarQuery,
   useCreateBehandlungenBatchMutation,
   useCheckConflictsMutation,
+  useVerschiebeBehandlungMutation,
 } from '../api/behandlungenApi'
 import {
   useGetPatientenQuery,
@@ -63,8 +64,9 @@ const SNAP_MINUTES = 15
 const SNAP_HEIGHT = (SNAP_MINUTES / 60) * HOUR_HEIGHT
 
 interface DragState {
-  type: 'slot' | 'pattern'
+  type: 'slot' | 'pattern' | 'behandlung'
   slotId?: string // Für konkrete Slots
+  behandlungId?: string // Für bestehende Behandlungen
   dayIndex?: number // Für Muster-Previews
   offsetY: number // Offset vom Element-Top zur Maus-Start-Position
   originalDayIndex: number
@@ -100,10 +102,25 @@ export const Kalender = () => {
 
   // Drag & Drop State
   const [dragState, setDragState] = useState<DragState | null>(null)
-  const [dragPreview, setDragPreview] = useState<{ dayIndex: number; top: number } | null>(null)
+  const [dragPreview, setDragPreview] = useState<{
+    dayIndex: number
+    top: number
+    hasOverlap?: boolean
+  } | null>(null)
   const columnRefsRef = useRef<(HTMLDivElement | null)[]>([])
   const prevSelectedSlotIdRef = useRef<string | null>(null)
   const dragJustEndedRef = useRef(false)
+
+  // Pending-Drag für Behandlungen (um Click von Drag zu unterscheiden)
+  const pendingDragRef = useRef<{
+    termin: BehandlungKalenderDto
+    dayIndex: number
+    startX: number
+    startY: number
+    elementTop: number
+    offsetY: number
+  } | null>(null)
+  const DRAG_THRESHOLD = 5 // Pixel, die die Maus bewegt werden muss, um Drag zu starten
 
   const dateStr = formatDateForApi(currentWeekStart)
   const { data: calendarData, isLoading, refetch } = useGetWeeklyCalendarQuery(dateStr)
@@ -113,6 +130,7 @@ export const Kalender = () => {
   const [createBatch, { isLoading: isCreating }] = useCreateBehandlungenBatchMutation()
   const [createPatient, { isLoading: isCreatingPatient }] = useCreatePatientMutation()
   const [checkConflicts] = useCheckConflictsMutation()
+  const [verschiebeBehandlung] = useVerschiebeBehandlungMutation()
 
   const {
     slots,
@@ -454,6 +472,96 @@ export const Kalender = () => {
     [dayTimeConfigs, duration, weekDays, snapToGrid]
   )
 
+  // Überlappungs-Prüfung für bestehende Behandlungen während Drag
+  const checkBehandlungOverlap = useCallback(
+    (dayIndex: number, startMinutes: number, endMinutes: number, excludeId: string): boolean => {
+      const date = weekDays[dayIndex]
+      const termine = getTermineForDay(date)
+      return termine.some((termin) => {
+        if (termin.id === excludeId) return false
+        const tStart = new Date(termin.startZeit)
+        const tEnd = new Date(termin.endZeit)
+        const tStartMinutes = tStart.getHours() * 60 + tStart.getMinutes()
+        const tEndMinutes = tEnd.getHours() * 60 + tEnd.getMinutes()
+        return startMinutes < tEndMinutes && endMinutes > tStartMinutes
+      })
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [weekDays, calendarData]
+  )
+
+  // Drag für bestehende Behandlungen starten (mit Threshold für Click-Unterscheidung)
+  const handleBehandlungMouseDown = useCallback(
+    (e: React.MouseEvent, termin: BehandlungKalenderDto, dayIndex: number) => {
+      // Nur linke Maustaste
+      if (e.button !== 0) return
+
+      const col = columnRefsRef.current[dayIndex]
+      if (!col) return
+
+      const colRect = col.getBoundingClientRect()
+      const scrollTop = scrollContainerRef.current?.scrollTop || 0
+      const mouseY = e.clientY - colRect.top + scrollTop
+
+      // Element-Position berechnen (Top-Position des Termins)
+      const startDate = new Date(termin.startZeit)
+      const startMinutes = startDate.getHours() * 60 + startDate.getMinutes()
+      const elementTop = (startMinutes / 60) * HOUR_HEIGHT
+
+      // Nur pending-State setzen, echter Drag startet erst bei Bewegung
+      pendingDragRef.current = {
+        termin,
+        dayIndex,
+        startX: e.clientX,
+        startY: e.clientY,
+        elementTop,
+        offsetY: mouseY - elementTop,
+      }
+    },
+    []
+  )
+
+  // Global Mouse Events für pending-Drag (Behandlung-Drag Threshold)
+  useEffect(() => {
+    const handlePendingDragMove = (e: MouseEvent) => {
+      const pending = pendingDragRef.current
+      if (!pending) return
+
+      const dx = Math.abs(e.clientX - pending.startX)
+      const dy = Math.abs(e.clientY - pending.startY)
+
+      // Nur Drag starten, wenn Threshold überschritten
+      if (dx > DRAG_THRESHOLD || dy > DRAG_THRESHOLD) {
+        // Jetzt echten Drag starten
+        setDragState({
+          type: 'behandlung',
+          behandlungId: pending.termin.id,
+          offsetY: pending.offsetY,
+          originalDayIndex: pending.dayIndex,
+        })
+        setDragPreview({
+          dayIndex: pending.dayIndex,
+          top: snapToGrid(pending.elementTop),
+          hasOverlap: false,
+        })
+        pendingDragRef.current = null
+      }
+    }
+
+    const handlePendingDragUp = () => {
+      // Kein Drag gestartet, pending zurücksetzen (Click wird normal ausgelöst)
+      pendingDragRef.current = null
+    }
+
+    document.addEventListener('mousemove', handlePendingDragMove)
+    document.addEventListener('mouseup', handlePendingDragUp)
+
+    return () => {
+      document.removeEventListener('mousemove', handlePendingDragMove)
+      document.removeEventListener('mouseup', handlePendingDragUp)
+    }
+  }, [snapToGrid])
+
   // Global Mouse Events für Drag (Slot und Pattern)
   useEffect(() => {
     if (!dragState) return
@@ -472,6 +580,49 @@ export const Kalender = () => {
         setDragPreview({
           dayIndex: dragState.dayIndex!,
           top: newTop,
+        })
+      } else if (dragState.type === 'behandlung') {
+        // Behandlung-Drag: Kann zwischen Spalten wechseln + Überlappungs-Prüfung
+        const dayIndex = getDayIndexFromX(e.clientX)
+        if (dayIndex === -1) return
+
+        const col = columnRefsRef.current[dayIndex]
+        if (!col) return
+
+        const colRect = col.getBoundingClientRect()
+        const scrollTop = scrollContainerRef.current?.scrollTop || 0
+        const mouseY = e.clientY - colRect.top + scrollTop
+        const newTop = snapToGrid(mouseY - dragState.offsetY)
+
+        // Überlappungs-Prüfung für Behandlungen
+        const draggingBehandlung = calendarData
+          ? Object.values(calendarData)
+              .flat()
+              .find((b) => b.id === dragState.behandlungId)
+          : null
+
+        let hasOverlap = false
+        if (draggingBehandlung) {
+          const startDate = new Date(draggingBehandlung.startZeit)
+          const endDate = new Date(draggingBehandlung.endZeit)
+          const behandlungDuration =
+            endDate.getHours() * 60 +
+            endDate.getMinutes() -
+            (startDate.getHours() * 60 + startDate.getMinutes())
+          const newStartMinutes = getMinutesFromY(newTop)
+          const newEndMinutes = newStartMinutes + behandlungDuration
+          hasOverlap = checkBehandlungOverlap(
+            dayIndex,
+            newStartMinutes,
+            newEndMinutes,
+            dragState.behandlungId!
+          )
+        }
+
+        setDragPreview({
+          dayIndex,
+          top: newTop,
+          hasOverlap,
         })
       } else {
         // Slot-Drag: Kann zwischen Spalten wechseln
@@ -493,7 +644,7 @@ export const Kalender = () => {
       }
     }
 
-    const handleGlobalMouseUp = () => {
+    const handleGlobalMouseUp = async () => {
       if (!dragState || !dragPreview) {
         setDragState(null)
         setDragPreview(null)
@@ -505,6 +656,41 @@ export const Kalender = () => {
         const newStartMinutes = getMinutesFromY(dragPreview.top)
         const newStartZeit = formatMinutesToTime(newStartMinutes)
         handleDayTimeChange(dragState.dayIndex!, newStartZeit)
+      } else if (dragState.type === 'behandlung') {
+        // Behandlung-Drag: Backend-Mutation aufrufen
+        const draggingBehandlung = calendarData
+          ? Object.values(calendarData)
+              .flat()
+              .find((b) => b.id === dragState.behandlungId)
+          : null
+
+        if (!draggingBehandlung) {
+          setDragState(null)
+          setDragPreview(null)
+          return
+        }
+
+        // Neue Zeit berechnen
+        const newStartMinutes = getMinutesFromY(dragPreview.top)
+        const newDate = weekDays[dragPreview.dayIndex]
+
+        // ISO DateTime für Backend erstellen
+        const year = newDate.getFullYear()
+        const month = String(newDate.getMonth() + 1).padStart(2, '0')
+        const day = String(newDate.getDate()).padStart(2, '0')
+        const hours = String(Math.floor(newStartMinutes / 60)).padStart(2, '0')
+        const minutes = String(newStartMinutes % 60).padStart(2, '0')
+        const newStartZeit = `${year}-${month}-${day}T${hours}:${minutes}:00`
+
+        try {
+          await verschiebeBehandlung({
+            id: dragState.behandlungId!,
+            data: { nach: newStartZeit },
+          }).unwrap()
+          toast.success('Termin verschoben')
+        } catch {
+          toast.error('Fehler beim Verschieben des Termins')
+        }
       } else {
         // Slot-Drag: Slot aktualisieren
         const slot = slots.find((s) => s.id === dragState.slotId)
@@ -558,6 +744,9 @@ export const Kalender = () => {
     getMinutesFromY,
     formatMinutesToTime,
     handleDayTimeChange,
+    calendarData,
+    verschiebeBehandlung,
+    checkBehandlungOverlap,
   ])
 
   if (isLoading) {
@@ -755,18 +944,25 @@ export const Kalender = () => {
                         termin.endZeit,
                         layout
                       )
+                      const isBeingDragged =
+                        dragState?.type === 'behandlung' && dragState.behandlungId === termin.id
                       return (
                         <div
                           key={termin.id}
-                          className="absolute rounded-md bg-primary text-primary-foreground p-2 overflow-hidden shadow-sm hover:shadow-md transition-shadow cursor-pointer"
+                          className={cn(
+                            'absolute rounded-md bg-primary text-primary-foreground p-2 overflow-hidden shadow-sm hover:shadow-md transition-shadow select-none',
+                            isBeingDragged ? 'cursor-grabbing opacity-50' : 'cursor-grab'
+                          )}
                           style={{
                             top: style.top,
                             height: style.height - 4,
                             left: `calc(${style.left} + 4px)`,
                             width: `calc(${style.width} - 8px)`,
                           }}
+                          onMouseDown={(e) => handleBehandlungMouseDown(e, termin, dayIndex)}
                           onClick={(e) => {
                             e.stopPropagation()
+                            if (dragState || dragJustEndedRef.current) return
                             if (isMobile) {
                               navigate(`/kalender/termin/${termin.id}`)
                             } else {
@@ -947,6 +1143,49 @@ export const Kalender = () => {
                             <div className="text-xs text-blue-500">
                               {formatMinutesToTime(getMinutesFromY(dragPreview.top))} -{' '}
                               {formatMinutesToTime(getMinutesFromY(dragPreview.top) + duration)}
+                            </div>
+                          </div>
+                        )
+                      })()}
+
+                    {/* Drag Preview Ghost Element für Behandlungen */}
+                    {dragState?.type === 'behandlung' &&
+                      dragPreview &&
+                      dragPreview.dayIndex === dayIndex &&
+                      (() => {
+                        const draggingBehandlung = calendarData
+                          ? Object.values(calendarData)
+                              .flat()
+                              .find((b) => b.id === dragState.behandlungId)
+                          : null
+                        if (!draggingBehandlung) return null
+
+                        const startDate = new Date(draggingBehandlung.startZeit)
+                        const endDate = new Date(draggingBehandlung.endZeit)
+                        const behandlungDuration =
+                          endDate.getHours() * 60 +
+                          endDate.getMinutes() -
+                          (startDate.getHours() * 60 + startDate.getMinutes())
+                        const height = (behandlungDuration / 60) * HOUR_HEIGHT
+
+                        return (
+                          <div
+                            className={cn(
+                              'absolute left-1 right-1 rounded-md p-2 overflow-hidden shadow-lg border-2 pointer-events-none z-20',
+                              dragPreview.hasOverlap
+                                ? 'bg-amber-500/80 border-amber-600 text-white'
+                                : 'bg-primary/80 border-primary text-primary-foreground'
+                            )}
+                            style={{ top: dragPreview.top, height: height - 4 }}
+                          >
+                            <div className="font-medium text-sm truncate">
+                              {draggingBehandlung.patient.name}
+                            </div>
+                            <div className="text-xs opacity-80">
+                              {formatMinutesToTime(getMinutesFromY(dragPreview.top))} -{' '}
+                              {formatMinutesToTime(
+                                getMinutesFromY(dragPreview.top) + behandlungDuration
+                              )}
                             </div>
                           </div>
                         )

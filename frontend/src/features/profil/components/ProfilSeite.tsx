@@ -4,6 +4,10 @@ import {
   useUpdateProfileMutation,
   useCreateProfileMutation,
 } from '../api/profileApi'
+import {
+  useGetKalenderEinstellungenQuery,
+  useUpdateKalenderEinstellungenMutation,
+} from '@/features/behandlungen/api/behandlungenApi'
 import { PageHeader } from '@/shared/components/PageHeader'
 import { Button } from '@/shared/components/ui/button'
 import { Input } from '@/shared/components/ui/input'
@@ -33,12 +37,19 @@ export const ProfilSeite = () => {
   const [updateProfile, { isLoading: isUpdating }] = useUpdateProfileMutation()
   const [createProfile, { isLoading: isCreating }] = useCreateProfileMutation()
 
+  // Kalender-Einstellungen aus dem behandlungen-Kontext
+  const { data: kalenderEinstellungen } = useGetKalenderEinstellungenQuery()
+  const [updateKalenderEinstellungen, { isLoading: isUpdatingKalender }] =
+    useUpdateKalenderEinstellungenMutation()
+
   const [praxisName, setPraxisName] = useState(profile?.praxisName || '')
   const [inhaberName, setInhaberName] = useState(profile?.inhaberName || '')
   const [defaultBehandlungenProRezept, setDefaultBehandlungenProRezept] = useState(
     profile?.defaultBehandlungenProRezept ?? 8
   )
-  const [externalCalendarUrl, setExternalCalendarUrl] = useState(profile?.externalCalendarUrl || '')
+  const [externalCalendarUrl, setExternalCalendarUrl] = useState(
+    kalenderEinstellungen?.externalCalendarUrl || ''
+  )
   const [copied, setCopied] = useState(false)
 
   // Update state when profile loads
@@ -47,9 +58,15 @@ export const ProfilSeite = () => {
       setPraxisName(profile.praxisName)
       setInhaberName(profile.inhaberName)
       setDefaultBehandlungenProRezept(profile.defaultBehandlungenProRezept)
-      setExternalCalendarUrl(profile.externalCalendarUrl || '')
     }
   }, [profile])
+
+  // Update state when kalenderEinstellungen loads
+  useEffect(() => {
+    if (kalenderEinstellungen) {
+      setExternalCalendarUrl(kalenderEinstellungen.externalCalendarUrl || '')
+    }
+  }, [kalenderEinstellungen])
 
   const handleSave = async () => {
     try {
@@ -58,7 +75,6 @@ export const ProfilSeite = () => {
           praxisName,
           inhaberName,
           defaultBehandlungenProRezept,
-          externalCalendarUrl: externalCalendarUrl || null,
         }).unwrap()
       } else {
         await createProfile({ praxisName, inhaberName, defaultBehandlungenProRezept }).unwrap()
@@ -66,6 +82,17 @@ export const ProfilSeite = () => {
       toast.success('Profil erfolgreich gespeichert')
     } catch {
       toast.error('Fehler beim Speichern des Profils')
+    }
+  }
+
+  const handleSaveKalenderEinstellungen = async () => {
+    try {
+      await updateKalenderEinstellungen({
+        externalCalendarUrl: externalCalendarUrl || null,
+      }).unwrap()
+      toast.success('Kalender-Einstellungen erfolgreich gespeichert')
+    } catch {
+      toast.error('Fehler beim Speichern der Kalender-Einstellungen')
     }
   }
 
@@ -274,9 +301,9 @@ export const ProfilSeite = () => {
               </ul>
             </div>
 
-            <Button onClick={handleSave} disabled={isUpdating || isCreating}>
+            <Button onClick={handleSaveKalenderEinstellungen} disabled={isUpdatingKalender}>
               <Save className="mr-2 h-4 w-4" />
-              {isUpdating || isCreating ? 'Speichern...' : 'Speichern'}
+              {isUpdatingKalender ? 'Speichern...' : 'Speichern'}
             </Button>
           </CardContent>
         </Card>

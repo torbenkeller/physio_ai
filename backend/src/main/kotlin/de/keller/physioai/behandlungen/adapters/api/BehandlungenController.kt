@@ -3,14 +3,12 @@ package de.keller.physioai.behandlungen.adapters.api
 import de.keller.physioai.behandlungen.ports.BehandlungenRepository
 import de.keller.physioai.behandlungen.ports.BehandlungenService
 import de.keller.physioai.behandlungen.ports.GetWeeklyCalendarBehandlungResponse
+import de.keller.physioai.behandlungen.ports.KalenderAnsichtService
 import de.keller.physioai.patienten.PatientenRepository
 import de.keller.physioai.shared.AggregateNotFoundException
 import de.keller.physioai.shared.BehandlungId
 import de.keller.physioai.shared.BehandlungsartId
-import de.keller.physioai.shared.ExternalCalendarEventDto
-import de.keller.physioai.shared.ExternalCalendarService
 import de.keller.physioai.shared.PatientId
-import de.keller.physioai.shared.ProfileId
 import de.keller.physioai.shared.RezeptId
 import jakarta.validation.Valid
 import org.jmolecules.architecture.hexagonal.PrimaryAdapter
@@ -37,7 +35,7 @@ class BehandlungenController(
     private val behandlungenService: BehandlungenService,
     private val behandlungenRepository: BehandlungenRepository,
     private val patientenRepository: PatientenRepository,
-    private val externalCalendarService: ExternalCalendarService,
+    private val kalenderAnsichtService: KalenderAnsichtService,
 ) {
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
@@ -187,39 +185,39 @@ class BehandlungenController(
         @RequestParam date: String,
     ): WeeklyCalendarResponseDto {
         val parsedDate = LocalDate.parse(date)
-        val weeklyCalendar = behandlungenService.getWeeklyCalendar(parsedDate)
+        val wochenkalender = kalenderAnsichtService.getWochenkalender(parsedDate)
 
-        val behandlungen = weeklyCalendar
-            .mapValues { (_, behandlungen) ->
-                behandlungen.map { BehandlungKalenderDto.fromDomain(it) }
+        val behandlungen = wochenkalender.behandlungen.mapValues { (_, termine) ->
+            termine.map { termin ->
+                BehandlungKalenderDto(
+                    id = termin.id,
+                    startZeit = termin.startZeit,
+                    endZeit = termin.endZeit,
+                    rezeptId = termin.rezeptId,
+                    behandlungsartId = termin.behandlungsartId,
+                    bemerkung = termin.bemerkung,
+                    patient = PatientSummaryDto(
+                        id = termin.patientId,
+                        name = "${termin.patientVorname} ${termin.patientNachname}",
+                        birthday = termin.patientGeburtstag,
+                    ),
+                )
             }
+        }
 
-        // Calculate week start (Monday) and end (Sunday)
-        val weekStart = parsedDate.minusDays(parsedDate.dayOfWeek.value.toLong() - 1)
-        val weekEnd = weekStart.plusDays(6)
-
-        // Fixed profile ID (same as in ProfileController)
-        val profileId = ProfileId(java.util.UUID.fromString("d7e8f9a0-b1c2-3d4e-5f6a-7b8c9d0e1f2a"))
-
-        val externalEvents = try {
-            externalCalendarService
-                .getExternalEvents(profileId, weekStart, weekEnd)
-                .map { event ->
-                    ExternalCalendarEventDto(
-                        id = event.uid,
-                        title = event.title,
-                        startZeit = event.startZeit,
-                        endZeit = event.endZeit,
-                        isAllDay = event.isAllDay,
-                    )
-                }
-        } catch (e: Exception) {
-            emptyList()
+        val externeTermine = wochenkalender.externeTermine.map { termin ->
+            ExternalCalendarEventDto(
+                id = termin.uid,
+                title = termin.title,
+                startZeit = termin.startZeit,
+                endZeit = termin.endZeit,
+                isAllDay = termin.isAllDay,
+            )
         }
 
         return WeeklyCalendarResponseDto(
             behandlungen = behandlungen,
-            externeTermine = externalEvents,
+            externeTermine = externeTermine,
         )
     }
 

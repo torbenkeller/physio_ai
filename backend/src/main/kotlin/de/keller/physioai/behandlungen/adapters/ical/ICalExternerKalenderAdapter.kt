@@ -1,18 +1,16 @@
-package de.keller.physioai.profile.application
+package de.keller.physioai.behandlungen.adapters.ical
 
-import de.keller.physioai.profile.ports.ProfileRepository
-import de.keller.physioai.shared.AggregateNotFoundException
-import de.keller.physioai.shared.ExternalCalendarService
-import de.keller.physioai.shared.ExternalCalendarService.ExternalCalendarEvent
-import de.keller.physioai.shared.ProfileId
+import de.keller.physioai.behandlungen.ports.ExternerKalenderPort
+import de.keller.physioai.behandlungen.ports.ExternerKalenderPort.ExternerTermin
 import net.fortuna.ical4j.data.CalendarBuilder
 import net.fortuna.ical4j.model.Calendar
 import net.fortuna.ical4j.model.Period
 import net.fortuna.ical4j.model.component.VEvent
-import org.jmolecules.architecture.hexagonal.Application
+import org.jmolecules.architecture.hexagonal.SecondaryAdapter
 import org.slf4j.LoggerFactory
-import org.springframework.stereotype.Service
+import org.springframework.stereotype.Component
 import java.net.URI
+import java.time.Duration
 import java.time.Instant
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -20,12 +18,10 @@ import java.time.ZoneId
 import java.time.temporal.Temporal
 import java.util.concurrent.ConcurrentHashMap
 
-@Application
-@Service
-class ExternalCalendarServiceImpl(
-    private val profileRepository: ProfileRepository,
-) : ExternalCalendarService {
-    private val logger = LoggerFactory.getLogger(ExternalCalendarServiceImpl::class.java)
+@SecondaryAdapter
+@Component
+class ICalExternerKalenderAdapter : ExternerKalenderPort {
+    private val logger = LoggerFactory.getLogger(ICalExternerKalenderAdapter::class.java)
     private val berlinZone = ZoneId.of("Europe/Berlin")
 
     // Cache for parsed calendars: URL -> (Calendar, FetchTime)
@@ -37,26 +33,18 @@ class ExternalCalendarServiceImpl(
     private val calendarCache = ConcurrentHashMap<String, CachedCalendar>()
     private val cacheTtlMinutes = 5L
 
-    override fun getExternalEvents(
-        profileId: ProfileId,
+    override fun getExterneTermine(
+        calendarUrl: String,
         startDate: LocalDate,
         endDate: LocalDate,
-    ): List<ExternalCalendarEvent> {
-        val profile = profileRepository.findById(profileId)
-            ?: throw AggregateNotFoundException()
-
-        val calendarUrl = profile.externalCalendarUrl
-        if (calendarUrl.isNullOrBlank()) {
-            return emptyList()
-        }
-
-        return try {
-            fetchAndParseCalendar(calendarUrl, startDate, endDate)
+    ): List<ExternerTermin> =
+        try {
+            val calendar = getOrFetchCalendar(calendarUrl)
+            parseCalendarEvents(calendar, startDate, endDate)
         } catch (e: Exception) {
-            logger.warn("Failed to fetch external calendar for profile ${profileId.id}: ${e.message}")
+            logger.warn("Failed to fetch external calendar from $calendarUrl: ${e.message}")
             emptyList()
         }
-    }
 
     private fun getOrFetchCalendar(url: String): Calendar {
         val now = Instant.now()
@@ -64,7 +52,7 @@ class ExternalCalendarServiceImpl(
 
         // Return cached calendar if still valid
         if (cached != null) {
-            val age = java.time.Duration.between(cached.fetchedAt, now)
+            val age = Duration.between(cached.fetchedAt, now)
             if (age.toMinutes() < cacheTtlMinutes) {
                 logger.debug("Using cached calendar for URL: $url (age: ${age.toSeconds()}s)")
                 return cached.calendar
@@ -83,23 +71,20 @@ class ExternalCalendarServiceImpl(
         return calendar
     }
 
-    private fun fetchAndParseCalendar(
-        url: String,
+    private fun parseCalendarEvents(
+        calendar: Calendar,
         startDate: LocalDate,
         endDate: LocalDate,
-    ): List<ExternalCalendarEvent> {
-        val calendar = getOrFetchCalendar(url)
-
+    ): List<ExternerTermin> {
         val startDateTime = startDate.atStartOfDay()
         val endDateTime = endDate.plusDays(1).atStartOfDay()
 
         // Create a period for the date range to expand recurring events
-        // Use Temporal to handle both LocalDateTime and ZonedDateTime results from iCal4j
         val periodStart: Temporal = startDate.atStartOfDay()
         val periodEnd: Temporal = endDate.plusDays(1).atStartOfDay()
         val period = Period<Temporal>(periodStart, periodEnd)
 
-        val events = mutableListOf<ExternalCalendarEvent>()
+        val events = mutableListOf<ExternerTermin>()
 
         for (event in calendar.getComponents<VEvent>(VEvent.VEVENT)) {
             // Check if this is a recurring event
@@ -124,7 +109,7 @@ class ExternalCalendarServiceImpl(
     private fun expandRecurringEvent(
         event: VEvent,
         period: Period<Temporal>,
-    ): List<ExternalCalendarEvent> {
+    ): List<ExternerTermin> {
         val uidProperty = event.getProperty<net.fortuna.ical4j.model.property.Uid>("UID").orElse(null)
             ?: return emptyList()
         val uid = uidProperty.value
@@ -150,7 +135,7 @@ class ExternalCalendarServiceImpl(
         } else {
             if (isAllDay) eventStart.plusDays(1) else eventStart.plusHours(1)
         }
-        val durationMinutes = java.time.Duration
+        val durationMinutes = Duration
             .between(eventStart, eventEnd)
             .toMinutes()
 
@@ -171,8 +156,8 @@ class ExternalCalendarServiceImpl(
             recurrenceSet
                 .mapNotNull { occurrence ->
                     @Suppress("UNCHECKED_CAST")
-                    val startTemporal = occurrence.start as? Temporal ?: return@mapNotNull null
-                    val occurrenceStart = temporalToLocalDateTime(startTemporal)
+                    val occurrenceStartTemporal = occurrence.start as? Temporal ?: return@mapNotNull null
+                    val occurrenceStart = temporalToLocalDateTime(occurrenceStartTemporal)
 
                     // Filter out excluded dates
                     if (exdates.contains(occurrenceStart.toLocalDate())) {
@@ -181,7 +166,7 @@ class ExternalCalendarServiceImpl(
 
                     val occurrenceEnd = occurrenceStart.plusMinutes(durationMinutes)
 
-                    ExternalCalendarEvent(
+                    ExternerTermin(
                         uid = "$uid-$occurrenceStart",
                         title = summary,
                         startZeit = occurrenceStart,
@@ -199,7 +184,7 @@ class ExternalCalendarServiceImpl(
         event: VEvent,
         rangeStart: LocalDateTime,
         rangeEnd: LocalDateTime,
-    ): ExternalCalendarEvent? {
+    ): ExternerTermin? {
         val uidProperty = event.getProperty<net.fortuna.ical4j.model.property.Uid>("UID").orElse(null)
             ?: return null
         val uid = uidProperty.value
@@ -235,7 +220,7 @@ class ExternalCalendarServiceImpl(
             return null
         }
 
-        return ExternalCalendarEvent(
+        return ExternerTermin(
             uid = uid,
             title = summary,
             startZeit = eventStart,

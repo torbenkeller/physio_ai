@@ -8,6 +8,7 @@ import type {
   ConflictCheckRequest,
   ConflictResult,
   UpdateBemerkungDto,
+  KalenderEinstellungenDto,
 } from '../types/behandlung.types'
 
 export const behandlungenApi = api.injectEndpoints({
@@ -93,6 +94,21 @@ export const behandlungenApi = api.injectEndpoints({
       }),
       invalidatesTags: ['Behandlungen'],
     }),
+    getKalenderEinstellungen: builder.query<KalenderEinstellungenDto, void>({
+      query: () => '/behandlungen/kalender/einstellungen',
+      providesTags: ['KalenderEinstellungen'],
+    }),
+    updateKalenderEinstellungen: builder.mutation<
+      KalenderEinstellungenDto,
+      KalenderEinstellungenDto
+    >({
+      query: (body) => ({
+        url: '/behandlungen/kalender/einstellungen',
+        method: 'PUT',
+        body,
+      }),
+      invalidatesTags: ['KalenderEinstellungen', 'Behandlungen'],
+    }),
   }),
 })
 
@@ -110,4 +126,6 @@ export const {
   useCreateBehandlungenBatchMutation,
   useCheckConflictsMutation,
   useUpdateBemerkungMutation,
+  useGetKalenderEinstellungenQuery,
+  useUpdateKalenderEinstellungenMutation,
 } = behandlungenApi

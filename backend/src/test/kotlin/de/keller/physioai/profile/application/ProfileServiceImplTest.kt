@@ -79,7 +79,6 @@ class ProfileServiceImplTest {
                     inhaberName = "Updated Owner Name",
                     profilePictureUrl = null,
                     defaultBehandlungenProRezept = 8,
-                    externalCalendarUrl = null,
                 )
             }
 
@@ -112,7 +111,6 @@ class ProfileServiceImplTest {
                 inhaberName = "Carsten Huffmeyer",
                 profilePictureUrl = "http://example.com/new-photo.jpg",
                 defaultBehandlungenProRezept = 8,
-                externalCalendarUrl = null,
             )
 
             // Assert
@@ -151,7 +149,6 @@ class ProfileServiceImplTest {
                 inhaberName = "Carsten Huffmeyer Jr.",
                 profilePictureUrl = null,
                 defaultBehandlungenProRezept = 8,
-                externalCalendarUrl = null,
             )
 
             // Assert

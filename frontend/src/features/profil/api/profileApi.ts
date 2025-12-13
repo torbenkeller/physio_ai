@@ -1,5 +1,5 @@
 import { api } from '@/app/api'
-import type { ProfileDto, ProfileFormDto, ExternalCalendarEventDto } from '../types/profil.types'
+import type { ProfileDto, ProfileFormDto } from '../types/profil.types'
 
 export const profileApi = api.injectEndpoints({
   endpoints: (builder) => ({
@@ -23,19 +23,7 @@ export const profileApi = api.injectEndpoints({
       }),
       invalidatesTags: ['Profile'],
     }),
-    getExternalCalendarEvents: builder.query<
-      ExternalCalendarEventDto[],
-      { startDate: string; endDate: string }
-    >({
-      query: ({ startDate, endDate }) =>
-        `/profile/external-calendar/events?startDate=${startDate}&endDate=${endDate}`,
-    }),
   }),
 })
 
-export const {
-  useGetProfileQuery,
-  useCreateProfileMutation,
-  useUpdateProfileMutation,
-  useGetExternalCalendarEventsQuery,
-} = profileApi
+export const { useGetProfileQuery, useCreateProfileMutation, useUpdateProfileMutation } = profileApi

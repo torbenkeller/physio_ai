@@ -4,15 +4,13 @@ import com.ninjasquad.springmockk.MockkBean
 import de.keller.physioai.behandlungen.domain.BehandlungAggregate
 import de.keller.physioai.behandlungen.ports.BehandlungenRepository
 import de.keller.physioai.behandlungen.ports.BehandlungenService
-import de.keller.physioai.behandlungen.ports.GetWeeklyCalendarBehandlungResponse
+import de.keller.physioai.behandlungen.ports.KalenderAnsichtService
 import de.keller.physioai.patienten.PatientenRepository
 import de.keller.physioai.patienten.domain.PatientAggregate
 import de.keller.physioai.shared.AggregateNotFoundException
 import de.keller.physioai.shared.BehandlungId
-import de.keller.physioai.shared.ExternalCalendarService
 import de.keller.physioai.shared.PatientId
 import de.keller.physioai.shared.RezeptId
-import de.keller.physioai.shared.anyValue
 import de.keller.physioai.shared.config.SecurityConfig
 import io.mockk.every
 import io.mockk.verify
@@ -45,7 +43,7 @@ class BehandlungenControllerTest {
     private lateinit var patientenRepository: PatientenRepository
 
     @MockkBean
-    private lateinit var externalCalendarService: ExternalCalendarService
+    private lateinit var kalenderAnsichtService: KalenderAnsichtService
 
     @Nested
     inner class CreateBehandlung {
@@ -594,21 +592,20 @@ class BehandlungenControllerTest {
         @Test
         fun `should return treatments grouped by weekdays for given week`() {
             // Arrange
-            val queryDate = "2024-01-15" // Monday
-
-            // Mock service to return enriched treatments grouped by dates
-            val weeklyCalendar: Map<LocalDate, List<GetWeeklyCalendarBehandlungResponse>> = mapOf(
-                LocalDate.of(2024, 1, 15) to emptyList(), // Monday
-                LocalDate.of(2024, 1, 16) to emptyList(), // Tuesday
-                LocalDate.of(2024, 1, 17) to emptyList(), // Wednesday
-                LocalDate.of(2024, 1, 18) to emptyList(), // Thursday
-                LocalDate.of(2024, 1, 19) to emptyList(), // Friday
-                LocalDate.of(2024, 1, 20) to emptyList(), // Saturday
-                LocalDate.of(2024, 1, 21) to emptyList(), // Sunday
+            val wochenkalenderResponse = KalenderAnsichtService.WochenkalenderResponse(
+                behandlungen = mapOf(
+                    LocalDate.of(2024, 1, 15) to emptyList(), // Monday
+                    LocalDate.of(2024, 1, 16) to emptyList(), // Tuesday
+                    LocalDate.of(2024, 1, 17) to emptyList(), // Wednesday
+                    LocalDate.of(2024, 1, 18) to emptyList(), // Thursday
+                    LocalDate.of(2024, 1, 19) to emptyList(), // Friday
+                    LocalDate.of(2024, 1, 20) to emptyList(), // Saturday
+                    LocalDate.of(2024, 1, 21) to emptyList(), // Sunday
+                ),
+                externeTermine = emptyList(),
             )
 
-            every { behandlungenService.getWeeklyCalendar(LocalDate.of(2024, 1, 15)) } returns weeklyCalendar
-            every { externalCalendarService.getExternalEvents(anyValue(), any(), any()) } returns emptyList()
+            every { kalenderAnsichtService.getWochenkalender(LocalDate.of(2024, 1, 15)) } returns wochenkalenderResponse
 
             // Act & Assert
             mockMvc
@@ -624,7 +621,7 @@ class BehandlungenControllerTest {
                 .andExpect(MockMvcResultMatchers.jsonPath("$.behandlungen['2024-01-21'].length()").value(0)) // Sunday
                 .andExpect(MockMvcResultMatchers.jsonPath("$.externeTermine").isArray())
 
-            verify { behandlungenService.getWeeklyCalendar(LocalDate.of(2024, 1, 15)) }
+            verify { kalenderAnsichtService.getWochenkalender(LocalDate.of(2024, 1, 15)) }
         }
     }
 

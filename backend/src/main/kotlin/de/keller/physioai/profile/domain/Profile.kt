@@ -17,7 +17,6 @@ data class Profile(
     val profilePictureUrl: String?,
     val defaultBehandlungenProRezept: Int = 8,
     val accessToken: UUID = UUID.randomUUID(),
-    val externalCalendarUrl: String? = null,
     @Version
     val version: Int = 0,
 ) {

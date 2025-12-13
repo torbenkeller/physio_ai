@@ -19,6 +19,5 @@ interface ProfileService {
         inhaberName: String,
         profilePictureUrl: String?,
         defaultBehandlungenProRezept: Int,
-        externalCalendarUrl: String?,
     ): Profile
 }

@@ -13,7 +13,7 @@ import {
 } from '@/features/patienten/api/patientenApi'
 import { useGetBehandlungsartenQuery } from '@/features/rezepte/api/rezepteApi'
 import { useGetProfileQuery } from '@/features/profil/api/profileApi'
-import type { ExternalCalendarEventDto } from '@/features/profil/types/profil.types'
+import type { ExternalCalendarEventDto } from '../types/behandlung.types'
 import { useMultiTerminSelection } from '../hooks/useMultiTerminSelection'
 import { useKalenderSettings } from '../hooks/useKalenderSettings'
 import { useIsMobile } from '@/shared/hooks/useIsMobile'

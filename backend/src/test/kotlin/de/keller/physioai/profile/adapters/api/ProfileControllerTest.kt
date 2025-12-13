@@ -6,7 +6,6 @@ import de.keller.physioai.profile.ports.KalenderService
 import de.keller.physioai.profile.ports.ProfileRepository
 import de.keller.physioai.profile.ports.ProfileService
 import de.keller.physioai.shared.AggregateNotFoundException
-import de.keller.physioai.shared.ExternalCalendarService
 import de.keller.physioai.shared.ProfileId
 import de.keller.physioai.shared.anyValue
 import de.keller.physioai.shared.config.SecurityConfig
@@ -36,9 +35,6 @@ class ProfileControllerTest {
 
     @MockkBean
     private lateinit var kalenderService: KalenderService
-
-    @MockkBean
-    private lateinit var externalCalendarService: ExternalCalendarService
 
     @Test
     fun `getProfile should return null when no profile exists`() {
@@ -126,7 +122,7 @@ class ProfileControllerTest {
     fun `updateProfile should throw exception when no profile exists to update`() {
         // Arrange
         val profileId = ProfileId(UUID.fromString("d7e8f9a0-b1c2-3d4e-5f6a-7b8c9d0e1f2a"))
-        every { profileService.updateProfile(profileId, any(), any(), any(), any(), any()) } throws AggregateNotFoundException()
+        every { profileService.updateProfile(profileId, any(), any(), any(), any()) } throws AggregateNotFoundException()
 
         // Act & Assert
         mockMvc
@@ -145,7 +141,7 @@ class ProfileControllerTest {
                     ),
             ).andExpect(MockMvcResultMatchers.status().isNotFound)
 
-        verify { profileService.updateProfile(profileId, any(), any(), any(), any(), any()) }
+        verify { profileService.updateProfile(profileId, any(), any(), any(), any()) }
     }
 
     @Test
@@ -162,7 +158,7 @@ class ProfileControllerTest {
             version = 1,
         )
 
-        every { profileService.updateProfile(profileId, any(), any(), any(), any(), any()) } returns updatedProfile
+        every { profileService.updateProfile(profileId, any(), any(), any(), any()) } returns updatedProfile
 
         // Act & Assert
         mockMvc
@@ -186,7 +182,7 @@ class ProfileControllerTest {
             .andExpect(MockMvcResultMatchers.jsonPath("$.inhaberName").value("Updated Owner Name"))
             .andExpect(MockMvcResultMatchers.jsonPath("$.profilePictureUrl").value("http://example.com/new-photo.jpg"))
 
-        verify { profileService.updateProfile(profileId, any(), any(), any(), any(), any()) }
+        verify { profileService.updateProfile(profileId, any(), any(), any(), any()) }
     }
 
     @Test

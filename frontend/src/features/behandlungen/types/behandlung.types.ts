@@ -1,5 +1,16 @@
 import type { PatientSummaryDto } from '@/features/patienten/types/patient.types'
-import type { ExternalCalendarEventDto } from '@/features/profil/types/profil.types'
+
+export interface ExternalCalendarEventDto {
+  id: string
+  title: string
+  startZeit: string
+  endZeit: string
+  isAllDay: boolean
+}
+
+export interface KalenderEinstellungenDto {
+  externalCalendarUrl: string | null
+}
 
 export interface BehandlungDto {
   id: string

@@ -43,7 +43,6 @@ class ProfileServiceImpl(
         inhaberName: String,
         profilePictureUrl: String?,
         defaultBehandlungenProRezept: Int,
-        externalCalendarUrl: String?,
     ): Profile {
         val existingProfile = repository.findById(id) ?: throw AggregateNotFoundException()
 
@@ -57,7 +56,6 @@ class ProfileServiceImpl(
                     existingProfile.profilePictureUrl
                 },
                 defaultBehandlungenProRezept = defaultBehandlungenProRezept,
-                externalCalendarUrl = Strings.trimToNull(externalCalendarUrl),
             )
 
         return repository.save(updatedProfile)

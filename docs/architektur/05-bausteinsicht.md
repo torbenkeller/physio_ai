@@ -124,7 +124,7 @@ CLIENT --> PROF : REST API
 
 
 ' External Dependencies
-PROF <--> EXTCAL : CalDAV
+BEH <--> EXTCAL : iCal/HTTP
 REZ --> EXTAI : API Calls
 
 @enduml
@@ -136,8 +136,8 @@ REZ --> EXTAI : API Calls
 |------|-------------------|
 | **Patienten** | Patientenstammdaten und Patientenverwaltung |
 | **Rezepte** | KI-gestützte Rezeptverarbeitung und -verwaltung |
-| **Behandlungen** | Behandlungsplanung und -dokumentation |
-| **Profil** | Benutzerprofile und Kalenderintegration |
+| **Behandlungen** | Behandlungsplanung, -dokumentation und Kalenderintegration (inkl. externer iCal-Kalender) |
+| **Profil** | Praxisdaten und Benutzerprofileinstellungen |
 
 **Begründung der Struktur:**
 

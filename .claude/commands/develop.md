@@ -45,17 +45,24 @@ Plane gemeinsam mit dem Benutzer die konkrete Umsetzung.
 
 ### Vorgehen
 
-1. **Erstelle einen Implementierungsplan** mit:
+1. **Backend-Architektur analysieren** (bei Backend-Features):
+   - Nutze den **backend-architect Agent** (Task tool mit subagent_type=backend-architect) für:
+     - Bounded Context Zuordnung und Domain Model Design
+     - Aggregate, Entity und Value Object Entscheidungen
+     - API Contract Design für die Frontend-Integration
+   - Warte auf die architektonische Analyse, bevor du den Implementierungsplan erstellst
+
+2. **Erstelle einen Implementierungsplan** mit:
    - Konkrete Änderungen pro Datei/Komponente
    - Reihenfolge der Implementierung
    - Teststrategie (welche Tests werden geschrieben)
 
-2. **Kläre offene Fragen** mit dem Benutzer:
+3. **Kläre offene Fragen** mit dem Benutzer:
    - Unklare Anforderungen
    - Designentscheidungen (z.B. UI/UX)
    - Technische Alternativen
 
-3. **Warte auf Freigabe** vom Benutzer, bevor du mit der Implementierung beginnst.
+4. **Warte auf Freigabe** vom Benutzer, bevor du mit der Implementierung beginnst.
 
 ---
 

@@ -265,7 +265,7 @@ main() {
     trap cleanup ERR
 
     # Schritt 1: Ports berechnen
-    log_step "1/5" "Berechne Ports aus Branch-Name..."
+    log_step "1/6" "Berechne Ports aus Branch-Name..."
     calculate_ports "$BRANCH_NAME"
     echo "      Frontend: $FRONTEND_PORT"
     echo "      Backend:  $BACKEND_PORT"
@@ -280,7 +280,7 @@ main() {
     done
 
     # Schritt 2: Worktree erstellen
-    log_step "2/5" "Erstelle Worktree..."
+    log_step "2/6" "Erstelle Worktree..."
     echo "      Pfad: $WORKTREE_PATH"
     if [[ "$CREATE_NEW_BRANCH" == true ]]; then
         echo "      Neuer Branch: $BRANCH_NAME (basiert auf main)"
@@ -295,15 +295,25 @@ main() {
     echo ""
 
     # Schritt 3: .env generieren
-    log_step "3/5" "Generiere .env Datei..."
+    log_step "3/6" "Generiere .env Datei..."
     echo "      COMPOSE_PROJECT_NAME: physio_$sanitized"
     if [[ "$DRY_RUN" == false ]]; then
         generate_env_file "$WORKTREE_PATH" "$BRANCH_NAME"
     fi
     echo ""
 
-    # Schritt 4: Claude Code Settings kopieren
-    log_step "4/5" "Kopiere Claude Code Settings..."
+    # Schritt 4: Symlink für Backend erstellen
+    log_step "4/6" "Erstelle .env Symlink für Backend..."
+    if [[ "$DRY_RUN" == false ]]; then
+        ln -sf ../.env "$WORKTREE_PATH/backend/.env"
+        echo "      backend/.env -> ../.env"
+    else
+        echo "      backend/.env würde auf ../.env verlinkt"
+    fi
+    echo ""
+
+    # Schritt 5: Claude Code Settings kopieren
+    log_step "5/6" "Kopiere Claude Code Settings..."
     if [[ "$DRY_RUN" == false ]]; then
         if copy_claude_settings "$WORKTREE_PATH"; then
             echo "      .claude/settings.local.json kopiert"
@@ -319,8 +329,8 @@ main() {
     fi
     echo ""
 
-    # Schritt 5: Fertig!
-    log_step "5/5" "Fertig!"
+    # Schritt 6: Fertig!
+    log_step "6/6" "Fertig!"
     echo ""
 
     # Zusammenfassung

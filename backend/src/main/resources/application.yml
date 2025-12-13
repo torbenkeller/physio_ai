@@ -1,3 +1,7 @@
+env:
+  dotenv:
+    location: ../
+
 spring:
   application:
     name: physio_ai

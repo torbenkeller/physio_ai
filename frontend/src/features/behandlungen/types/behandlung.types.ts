@@ -1,5 +1,17 @@
 import type { PatientSummaryDto } from '@/features/patienten/types/patient.types'
 
+export interface ExternalCalendarEventDto {
+  id: string
+  title: string
+  startZeit: string
+  endZeit: string
+  isAllDay: boolean
+}
+
+export interface KalenderEinstellungenDto {
+  externalCalendarUrl: string | null
+}
+
 export interface BehandlungDto {
   id: string
   patientId: string
@@ -37,7 +49,10 @@ export interface VerschiebeBehandlungDto {
   nach: string
 }
 
-export type WeeklyCalendarResponse = Record<string, BehandlungKalenderDto[]>
+export interface WeeklyCalendarResponse {
+  behandlungen: Record<string, BehandlungKalenderDto[]>
+  externeTermine: ExternalCalendarEventDto[]
+}
 
 // Multi-Termin-Erstellung
 export interface SelectedTimeSlot {

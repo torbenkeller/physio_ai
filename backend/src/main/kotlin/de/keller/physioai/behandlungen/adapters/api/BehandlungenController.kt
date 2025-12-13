@@ -3,6 +3,7 @@ package de.keller.physioai.behandlungen.adapters.api
 import de.keller.physioai.behandlungen.ports.BehandlungenRepository
 import de.keller.physioai.behandlungen.ports.BehandlungenService
 import de.keller.physioai.behandlungen.ports.GetWeeklyCalendarBehandlungResponse
+import de.keller.physioai.behandlungen.ports.KalenderAnsichtService
 import de.keller.physioai.patienten.PatientenRepository
 import de.keller.physioai.shared.AggregateNotFoundException
 import de.keller.physioai.shared.BehandlungId
@@ -34,6 +35,7 @@ class BehandlungenController(
     private val behandlungenService: BehandlungenService,
     private val behandlungenRepository: BehandlungenRepository,
     private val patientenRepository: PatientenRepository,
+    private val kalenderAnsichtService: KalenderAnsichtService,
 ) {
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
@@ -181,13 +183,42 @@ class BehandlungenController(
     @GetMapping("/calender/week")
     fun getWeeklyCalendar(
         @RequestParam date: String,
-    ): Map<LocalDate, List<BehandlungKalenderDto>> {
+    ): WeeklyCalendarResponseDto {
         val parsedDate = LocalDate.parse(date)
-        val weeklyCalendar = behandlungenService.getWeeklyCalendar(parsedDate)
-        return weeklyCalendar
-            .mapValues { (_, behandlungen) ->
-                behandlungen.map { BehandlungKalenderDto.fromDomain(it) }
+        val wochenkalender = kalenderAnsichtService.getWochenkalender(parsedDate)
+
+        val behandlungen = wochenkalender.behandlungen.mapValues { (_, termine) ->
+            termine.map { termin ->
+                BehandlungKalenderDto(
+                    id = termin.id,
+                    startZeit = termin.startZeit,
+                    endZeit = termin.endZeit,
+                    rezeptId = termin.rezeptId,
+                    behandlungsartId = termin.behandlungsartId,
+                    bemerkung = termin.bemerkung,
+                    patient = PatientSummaryDto(
+                        id = termin.patientId,
+                        name = "${termin.patientVorname} ${termin.patientNachname}",
+                        birthday = termin.patientGeburtstag,
+                    ),
+                )
             }
+        }
+
+        val externeTermine = wochenkalender.externeTermine.map { termin ->
+            ExternalCalendarEventDto(
+                id = termin.uid,
+                title = termin.title,
+                startZeit = termin.startZeit,
+                endZeit = termin.endZeit,
+                isAllDay = termin.isAllDay,
+            )
+        }
+
+        return WeeklyCalendarResponseDto(
+            behandlungen = behandlungen,
+            externeTermine = externeTermine,
+        )
     }
 
     @PostMapping("/check-conflicts")

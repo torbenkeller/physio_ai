@@ -36,6 +36,7 @@ BRANCH_NAME=""
 WORKTREE_PATH=""
 FORCE=false
 DRY_RUN=false
+CREATE_NEW_BRANCH=false
 FRONTEND_PORT=0
 BACKEND_PORT=0
 DB_PORT=0
@@ -211,8 +212,8 @@ validate_environment() {
     # Prüfe ob Branch existiert (lokal oder remote)
     if ! git show-ref --verify --quiet "refs/heads/$BRANCH_NAME" && \
        ! git show-ref --verify --quiet "refs/remotes/origin/$BRANCH_NAME"; then
-        log_error "Branch '$BRANCH_NAME' nicht gefunden (lokal oder remote)"
-        exit 1
+        # Branch existiert nicht -> wird neu erstellt
+        CREATE_NEW_BRANCH=true
     fi
 }
 
@@ -281,8 +282,15 @@ main() {
     # Schritt 2: Worktree erstellen
     log_step "2/6" "Erstelle Worktree..."
     echo "      Pfad: $WORKTREE_PATH"
+    if [[ "$CREATE_NEW_BRANCH" == true ]]; then
+        echo "      Neuer Branch: $BRANCH_NAME (basiert auf main)"
+    fi
     if [[ "$DRY_RUN" == false ]]; then
-        git worktree add "$WORKTREE_PATH" "$BRANCH_NAME"
+        if [[ "$CREATE_NEW_BRANCH" == true ]]; then
+            git worktree add -b "$BRANCH_NAME" "$WORKTREE_PATH" main
+        else
+            git worktree add "$WORKTREE_PATH" "$BRANCH_NAME"
+        fi
     fi
     echo ""
 
